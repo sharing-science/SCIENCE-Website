@@ -25,7 +25,7 @@ import {
 import NavBar from "components/NavBar";
 import Footer from "components/Footer";
 
-export default function RegisterPage() {
+const RegisterPage = () => {
   const [squares1to6, setSquares1to6] = React.useState("");
   const [squares7and8, setSquares7and8] = React.useState("");
   const [fullNameFocus, setFullNameFocus] = React.useState(false);
@@ -39,7 +39,7 @@ export default function RegisterPage() {
       document.body.classList.toggle("register-page");
       document.documentElement.removeEventListener("mousemove", followCursor);
     };
-  },[]);
+  }, []);
   const followCursor = (event) => {
     let posX = event.clientX - window.innerWidth / 2;
     let posY = event.clientY - window.innerWidth / 6;
@@ -143,10 +143,7 @@ export default function RegisterPage() {
                           <Label check>
                             <Input type="checkbox" />
                             <span className="form-check-sign" />I agree to the{" "}
-                            <a
-                              href="#"
-                              onClick={(e) => e.preventDefault()}
-                            >
+                            <a href="#" onClick={(e) => e.preventDefault()}>
                               terms and conditions
                             </a>
                             .
@@ -200,4 +197,6 @@ export default function RegisterPage() {
       </div>
     </>
   );
-}
+};
+
+export default RegisterPage;
