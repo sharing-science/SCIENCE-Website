@@ -1,1 +1,1 @@
-# front-end
+# SCIENCE Front End
