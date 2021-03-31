@@ -9,6 +9,7 @@ import "assets/demo/demo.css";
 import Landing from "views/Landing";
 import RegisterPage from "views/RegisterPage";
 import ContactUs from "views/ContactUs";
+import UploadFile from "views/UploadFile";
 
 ReactDOM.render(
   <Router>
@@ -18,6 +19,7 @@ ReactDOM.render(
         render={(props) => <RegisterPage {...props} />}
       />
       <Route path="/contact-us" render={(props) => <ContactUs {...props} />} />
+      <Route path="/upload" render={(props) => <UploadFile {...props} />} />
       <Route path="/" render={(props) => <Landing {...props} />} />
     </Switch>
   </Router>,
