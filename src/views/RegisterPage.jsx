@@ -143,7 +143,7 @@ const RegisterPage = () => {
                           <Label check>
                             <Input type="checkbox" />
                             <span className="form-check-sign" />I agree to the{" "}
-                            <a href="#" onClick={(e) => e.preventDefault()}>
+                            <a href="https://www.google.com/">
                               terms and conditions
                             </a>
                             .

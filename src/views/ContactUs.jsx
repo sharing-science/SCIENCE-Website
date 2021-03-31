@@ -73,7 +73,7 @@ export default function ProfilePage() {
                         className="btn-round float-right"
                         color="primary"
                         data-placement="right"
-                        id="tooltip341148792"
+                        id="SendTextButton"
                         type="button"
                       >
                         Send text
@@ -81,7 +81,7 @@ export default function ProfilePage() {
                       <UncontrolledTooltip
                         delay={0}
                         placement="right"
-                        target="tooltip341148792"
+                        target="SendTextButton"
                       >
                         Can't wait for your message
                       </UncontrolledTooltip>
