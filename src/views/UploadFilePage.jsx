@@ -19,7 +19,7 @@ import {
 import NavBar from "components/NavBar";
 import Footer from "components/Footer";
 
-const UploadFile = () => {
+const UploadFilePage = () => {
   const [uploadInput, setUploadInput] = useState();
 
   const fileUploaded = (e) => {
@@ -105,4 +105,4 @@ const UploadFile = () => {
   );
 };
 
-export default UploadFile;
+export default UploadFilePage;

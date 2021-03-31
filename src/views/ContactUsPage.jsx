@@ -18,7 +18,7 @@ import {
 import NavBar from "components/NavBar";
 import Footer from "components/Footer";
 
-export default function ProfilePage() {
+const ContactUsPage = () => {
   return (
     <>
       <NavBar />
@@ -124,4 +124,6 @@ export default function ProfilePage() {
       </div>
     </>
   );
-}
+};
+
+export default ContactUsPage;

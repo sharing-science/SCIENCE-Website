@@ -5,7 +5,7 @@ import NavBar from "components/NavBar";
 import PageHeader from "components/PageHeader";
 import Footer from "components/Footer";
 
-const Landing = () => {
+const LandingPage = () => {
   React.useEffect(() => {
     document.body.classList.toggle("index-page");
     // Specify how to clean up after this effect:
@@ -25,4 +25,4 @@ const Landing = () => {
   );
 };
 
-export default Landing;
+export default LandingPage;
