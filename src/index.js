@@ -18,7 +18,10 @@ ReactDOM.render(
         path="/register-page"
         render={(props) => <RegisterPage {...props} />}
       />
-      <Route path="/contact-us" render={(props) => <ContactUsPage {...props} />} />
+      <Route
+        path="/contact-us"
+        render={(props) => <ContactUsPage {...props} />}
+      />
       <Route path="/upload" render={(props) => <UploadFilePage {...props} />} />
       <Route path="/" render={(props) => <LandingPage {...props} />} />
     </Switch>

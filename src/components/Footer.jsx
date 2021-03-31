@@ -47,7 +47,9 @@ const Footer = () => {
           <Col md="3">
             <Nav>
               <NavItem>
-                <NavLink to="/contact-us" tag={Link}>Contact Us</NavLink>
+                <NavLink to="/contact-us" tag={Link}>
+                  Contact Us
+                </NavLink>
               </NavItem>
               <NavItem>
                 <NavLink href="#">About Us</NavLink>
