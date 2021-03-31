@@ -49,11 +49,19 @@ const UploadFile = () => {
                               className="btn-round"
                               color="primary"
                               data-placement="right"
+                              id="UploadFileButton"
                               type="button"
                             >
                               Upload File
                               <Input type="file" />
                             </Button>
+                            <UncontrolledTooltip
+                              delay={0}
+                              placement="right"
+                              target="UploadFileButton"
+                            >
+                              Click to upload your file
+                            </UncontrolledTooltip>
                           </FormGroup>
                         </Col>
                       </Row>
