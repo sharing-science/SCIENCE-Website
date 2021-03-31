@@ -2,10 +2,12 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
+// Import CSS Frameworks
 import "assets/css/nucleo-icons.css";
 import "assets/scss/blk-design-system-react.scss?v=1.2.0";
 import "assets/demo/demo.css";
 
+// Import Pages
 import LandingPage from "views/LandingPage";
 import RegisterPage from "views/RegisterPage";
 import ContactUsPage from "views/ContactUsPage";

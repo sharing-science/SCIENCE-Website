@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 import {
@@ -26,7 +26,7 @@ const NavBar = () => {
   const [color, setColor] = React.useState("navbar-transparent");
 
   // Change Colors when scrolling down
-  React.useEffect(() => {
+  useEffect(() => {
     window.addEventListener("scroll", changeColor);
     return () => {
       window.removeEventListener("scroll", changeColor);
@@ -180,7 +180,7 @@ const NavBar = () => {
                 className="nav-link d-none d-lg-block"
                 color="default"
                 tag={Link}
-                to="/profile-page"
+                to="/profile"
               >
                 <i className="tim-icons icon-single-02" /> Profile
               </Button>
