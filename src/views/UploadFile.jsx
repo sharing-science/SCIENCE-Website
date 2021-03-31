@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 // reactstrap components
 import {
@@ -20,6 +20,14 @@ import NavBar from "components/NavBar";
 import Footer from "components/Footer";
 
 const UploadFile = () => {
+  const [uploadInput, setUploadInput] = useState();
+
+  const fileUploaded = (e) => {
+    e.target.files ? console.log(e.target.files) : console.log("problem");
+
+    setUploadInput(e.target.files);
+  };
+
   return (
     <>
       <NavBar />
@@ -52,15 +60,18 @@ const UploadFile = () => {
                               id="UploadFileButton"
                               type="button"
                             >
-                              Upload File
-                              <Input type="file" />
+                              {uploadInput ? "File Uploaded" : "Upload File"}
+                              <Input type="file" onChange={fileUploaded} />
                             </Button>
                             <UncontrolledTooltip
                               delay={0}
                               placement="right"
                               target="UploadFileButton"
                             >
-                              Click to upload your file
+                              {uploadInput
+                                ? uploadInput[0].name +
+                                  " was successfully uploaded"
+                                : "Click to upload your file"}
                             </UncontrolledTooltip>
                           </FormGroup>
                         </Col>
@@ -79,39 +90,11 @@ const UploadFile = () => {
                         placement="right"
                         target="SubmitFilesButton"
                       >
-                        Click to upload your file
+                        Click to submit your file
                       </UncontrolledTooltip>
                     </Form>
                   </CardBody>
                 </Card>
-              </Col>
-              <Col className="ml-auto" md="4">
-                <div className="info info-horizontal pt-4">
-                  <div className="icon icon-primary">
-                    <i className="tim-icons icon-square-pin" />
-                  </div>
-                  <div className="description">
-                    <h4 className="info-title">Find us at the office</h4>
-                    <p>
-                      RPI, <br />
-                      Troy, <br />
-                      USA
-                    </p>
-                  </div>
-                </div>
-                <div className="info info-horizontal">
-                  <div className="icon icon-primary">
-                    <i className="tim-icons icon-mobile" />
-                  </div>
-                  <div className="description">
-                    <h4 className="info-title">Give us a ring</h4>
-                    <p>
-                      Landline <br />
-                      123456789 <br />
-                      Mon - Fri, 8:00-22:00
-                    </p>
-                  </div>
-                </div>
               </Col>
             </Row>
           </Container>
