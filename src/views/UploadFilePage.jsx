@@ -32,6 +32,16 @@ const UploadFilePage = () => {
     <>
       <NavBar />
       <div className="wrapper">
+        <img
+          alt="..."
+          className="dots"
+          src={require("assets/img/dots.png").default}
+        />
+        <img
+          alt="..."
+          className="path"
+          src={require("assets/img/path4.png").default}
+        />
         <section className="section">
           <Container>
             <Row>

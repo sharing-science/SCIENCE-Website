@@ -12,6 +12,7 @@ import LandingPage from "views/LandingPage";
 import RegisterPage from "views/RegisterPage";
 import ContactUsPage from "views/ContactUsPage";
 import UploadFilePage from "views/UploadFilePage";
+import ProfilePage from "views/ProfilePage";
 
 ReactDOM.render(
   <Router>
@@ -25,6 +26,7 @@ ReactDOM.render(
         render={(props) => <ContactUsPage {...props} />}
       />
       <Route path="/upload" render={(props) => <UploadFilePage {...props} />} />
+      <Route path="/profile" render={(props) => <ProfilePage {...props} />} />
       <Route path="/" render={(props) => <LandingPage {...props} />} />
     </Switch>
   </Router>,

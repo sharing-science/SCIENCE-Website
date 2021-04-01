@@ -159,7 +159,7 @@ const NavBar = () => {
                   <i className="tim-icons icon-image-02" />
                   Landing Page
                 </DropdownItem>
-                <DropdownItem tag={Link} to="/profile-page">
+                <DropdownItem tag={Link} to="/profile">
                   <i className="tim-icons icon-single-02" />
                   Profile Page
                 </DropdownItem>
