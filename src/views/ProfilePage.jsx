@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import classnames from "classnames";
 
 // javascript plugin used to create scrollbars on windows
@@ -31,8 +31,8 @@ import Footer from "components/Footer";
 let ps = null;
 
 const ProfilePage = () => {
-  const [tabs, setTabs] = React.useState(1);
-  React.useEffect(() => {
+  const [tabs, setTabs] = useState(1);
+  useEffect(() => {
     if (navigator.platform.indexOf("Win") > -1) {
       document.documentElement.className += " perfect-scrollbar-on";
       document.documentElement.classList.remove("perfect-scrollbar-off");
@@ -98,7 +98,7 @@ const ProfilePage = () => {
                           }}
                           href="#"
                         >
-                          Wallet
+                          Recent
                         </NavLink>
                       </NavItem>
                       <NavItem>
@@ -112,7 +112,7 @@ const ProfilePage = () => {
                           }}
                           href="#"
                         >
-                          Send
+                          Edit
                         </NavLink>
                       </NavItem>
                       <NavItem>
