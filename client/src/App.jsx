@@ -6,10 +6,18 @@ import RegisterPage from "./views/RegisterPage";
 import ContactUsPage from "./views/ContactUsPage";
 import UploadFilePage from "./views/UploadFilePage";
 import ProfilePage from "./views/ProfilePage";
-import LoginPage from "./views/LoginPage";
+// import LoginPage from "./views/LoginPage";
 import SampleContract from "views/SampleContractPage";
+import Context from "./Context";
+import { useState } from "react/cjs/react.production.min";
 
 const App = () => {
+  const [context, setContext] = useState({});
+
+  /* <Context.Provider value={{ context, setContext }}>
+
+</Context.Provider> */
+
   return (
     <Router>
       <Switch>
@@ -17,10 +25,10 @@ const App = () => {
           path="/register-page"
           render={(props) => <RegisterPage {...props} />}
         />
-        <Route
+        {/* <Route
           path="/login-page"
           render={(props) => <LoginPage {...props} />}
-        />
+        /> */}
         <Route
           path="/contact-us"
           render={(props) => <ContactUsPage {...props} />}

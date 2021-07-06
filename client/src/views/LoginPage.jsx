@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import jwtDecode from "jwt-decode";
+import React, { useState } from "react";
+import getWeb3 from "../getWeb3";
 
 // reactstrap components
 import {
@@ -17,129 +17,42 @@ import {
 // core components
 import NavBar from "components/NavBar";
 import Footer from "components/Footer";
-import Web3 from "web3";
-
-let web3 = false;
+import Context from "../Context";
+import { useContext } from "react/cjs/react.production.min";
 
 const LoginPage = () => {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [publicKey, setPublicKey] = useState("");
-
-  const handleLoggedIn = (auth) => {
-    localStorage.setItem("public_key", auth);
-    let key = getPublicKey();
-    setLoggedIn(true);
-    setPublicKey(key);
-  };
-
-  const handleAuthenticate = ({ publicAddress, signature }) =>
-    fetch(`http://localhost:5000/api/auth`, {
-      body: JSON.stringify({ publicAddress, signature }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-    })
-      .then((response) => response.json())
-      .then((response) => {
-        console.log({ response, publicAddress, signature });
-        return response;
-      });
-
-  const handleSignMessage = async ({ publicAddress, nonce }) => {
-    console.log("handleSign");
-    try {
-      const signature = await web3.eth.personal.sign(
-        `I am signing my one-time nonce: ${nonce}`,
-        publicAddress,
-        "" // MetaMask will ignore the password argument here
-      );
-
-      return { publicAddress, signature };
-    } catch (err) {
-      throw new Error("You need to sign the message to be able to log in.");
-    }
-  };
-
-  const handleSignup = (publicAddress) =>
-    fetch(`http://localhost:8000/api/users`, {
-      body: JSON.stringify({ publicAddress }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-    })
-      .then((response) => response.json())
-      .then((response) => {
-        console.log({ response });
-        return response;
-      });
+  const { context, setContext } = useContext(Context);
 
   const handleClick = async () => {
-    // Check if MetaMask is installed
-    if (!window.ethereum) {
-      window.alert("Please install MetaMask first.");
-      return;
-    }
-
-    if (!web3) {
-      try {
-        // Request account access if needed
-        await window.ethereum.enable();
-
-        // We don't know window.web3 version, so we use our own instance of web3
-        // with the injected provider given by MetaMask
-        web3 = new Web3(window.ethereum);
-      } catch (error) {
-        window.alert("You need to allow MetaMask.");
-        return;
-      }
-    }
-    const coinbase = await web3.eth.getCoinbase();
-    if (!coinbase) {
-      window.alert("Please activate MetaMask first.");
-      return;
-    }
-
-    const publicAddress = coinbase.toLowerCase();
-    // setLoading(true);
-
-    // Look if user with current publicAddress is already present on backend
-    fetch(`http://localhost:5000/api/users?publicAddress=${publicAddress}`)
-      .then((response) => response.json())
-      // If yes, retrieve it. If no, create it.
-      .then((users) => {
-        console.log(users);
-        return users.length ? users[0] : handleSignup(publicAddress);
-      })
-      // Popup MetaMask confirmation modal to sign message
-      .then(handleSignMessage)
-      // Send signature to backend on the /auth route
-      .then(handleAuthenticate)
-      // Pass accessToken back to parent component (to save it in localStorage)
-      .then(handleLoggedIn)
-      .catch((err) => {
-        window.alert(err);
-        // setLoading(false);
-      });
+    const web3 = await getWeb3();
+    const accounts = await this.web3.eth.getAccounts();
+    const networkId = 5777;
+    setContext({
+      ...context,
+      web3: {
+        web3,
+        accounts,
+        networkId,
+      },
+    });
   };
 
-  useEffect(() => {
-    document.body.classList.toggle("register-page");
-    let key = getPublicKey();
-    if (key) {
-      setLoggedIn(true);
-      setPublicKey(key);
-    }
-    // Specify how to clean up after this effect:
-    return function cleanup() {
-      document.body.classList.toggle("register-page");
-    };
-  }, []);
+  // useEffect(() => {
+  //   document.body.classList.toggle("register-page");
+  //   let key = getPublicKey();
+  //   if (key) {
+  //     setLoggedIn(true);
+  //     setPublicKey(key);
+  //   }
+  //   // Specify how to clean up after this effect:
+  //   return function cleanup() {
+  //     document.body.classList.toggle("register-page");
+  //   };
+  // }, []);
 
-  const getPublicKey = () => {
-    let key = localStorage.getItem("public_key");
-    return key ? jwtDecode(key).sub.publicAddress : "";
+  const printContext = () => {
+    console.log(context);
   };
 
   return (
@@ -172,7 +85,7 @@ const LoginPage = () => {
                         </Button>
                       ) : (
                         <>
-                          <p>Your public Key is {publicKey}</p>
+                          <p>Your public Key is </p>
                           <Button
                             className="btn-round"
                             color="primary"
@@ -189,6 +102,9 @@ const LoginPage = () => {
                     </CardFooter>
                   </Card>
                 </Col>
+              </Row>
+              <Row>
+                <Button onClick={printContext}>See Context</Button>
               </Row>
               <div className="register-bg" />
             </Container>
