@@ -92,7 +92,7 @@ const Footer = () => {
               <Button
                 className="btn-icon btn-neutral btn-round btn-simple"
                 color="default"
-                href="https://github.com/"
+                href="https://github.com/sharing-science/SCIENCE-Website"
                 id="tooltip318450378"
                 target="_blank"
               >

@@ -130,7 +130,7 @@ const NavBar = () => {
             <NavItem className="p-0">
               <NavLink
                 data-placement="bottom"
-                href="https://www.github.com/"
+                href="https://github.com/sharing-science/SCIENCE-Website"
                 rel="noopener noreferrer"
                 target="_blank"
                 title="Star us on Github"
