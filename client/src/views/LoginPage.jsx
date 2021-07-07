@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import getWeb3 from "../getWeb3";
+import React, { useContext } from "react";
 
 // reactstrap components
 import {
@@ -17,42 +16,39 @@ import {
 // core components
 import NavBar from "components/NavBar";
 import Footer from "components/Footer";
-import Context from "../Context";
-import { useContext } from "react/cjs/react.production.min";
+import Context from "../Helpers/Context";
+import getWeb3 from "../Helpers/getWeb3";
 
 const LoginPage = () => {
-  const [loggedIn, setLoggedIn] = useState(false);
-  const { context, setContext } = useContext(Context);
+  const { contextValue, dispatchContextValue } = useContext(Context);
 
-  const handleClick = async () => {
-    const web3 = await getWeb3();
-    const accounts = await this.web3.eth.getAccounts();
-    const networkId = 5777;
-    setContext({
-      ...context,
-      web3: {
-        web3,
-        accounts,
-        networkId,
-      },
-    });
+  const handleLogin = async () => {
+    try {
+      // Get network provider (typically MetaMask) and web3 instance
+      const web3 = await getWeb3();
+
+      // Use web3 to get the user's accounts from the provider (MetaMask)
+      const accounts = await web3.eth.getAccounts();
+
+      const networkId = await web3.eth.net.getId();
+
+      dispatchContextValue({
+        type: "login",
+        payload: { accounts, networkId },
+      });
+    } catch (error) {
+      // Catch any errors for any of the above operations
+      alert(
+        `Failed to load web3, accounts, or contract. Did you migrate the contract or install MetaMask? Check console for details.`
+      );
+      console.error(error);
+    }
   };
 
-  // useEffect(() => {
-  //   document.body.classList.toggle("register-page");
-  //   let key = getPublicKey();
-  //   if (key) {
-  //     setLoggedIn(true);
-  //     setPublicKey(key);
-  //   }
-  //   // Specify how to clean up after this effect:
-  //   return function cleanup() {
-  //     document.body.classList.toggle("register-page");
-  //   };
-  // }, []);
-
-  const printContext = () => {
-    console.log(context);
+  const handleLogout = () => {
+    dispatchContextValue({
+      type: "logout",
+    });
   };
 
   return (
@@ -71,29 +67,31 @@ const LoginPage = () => {
                         alt="..."
                         src={require("assets/img/square-purple-1.png").default}
                       />
-                      <CardTitle tag="h4">Login</CardTitle>
+                      <CardTitle tag="h4">
+                        {" "}
+                        <span className="ml-3">Login</span>
+                      </CardTitle>
                     </CardHeader>
                     <CardFooter>
-                      {!loggedIn ? (
+                      {!contextValue.loggedIn ? (
                         <Button
                           className="btn-round"
                           color="primary"
                           size="lg"
-                          onClick={handleClick}
+                          onClick={handleLogin}
                         >
                           Login With MetaMask
                         </Button>
                       ) : (
                         <>
-                          <p>Your public Key is </p>
+                          <p>
+                            Your public Key is {contextValue.web3.accounts[0]}
+                          </p>
                           <Button
                             className="btn-round"
                             color="primary"
                             size="lg"
-                            onClick={() => {
-                              localStorage.removeItem("public_key");
-                              setLoggedIn(false);
-                            }}
+                            onClick={handleLogout}
                           >
                             Logout
                           </Button>
@@ -104,7 +102,13 @@ const LoginPage = () => {
                 </Col>
               </Row>
               <Row>
-                <Button onClick={printContext}>See Context</Button>
+                <Button
+                  onClick={() => {
+                    console.log(contextValue);
+                  }}
+                >
+                  Print Context
+                </Button>
               </Row>
               <div className="register-bg" />
             </Container>
