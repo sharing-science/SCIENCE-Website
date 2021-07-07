@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom";
-import reportWebVitals from "./reportWebVitals";
+import reportWebVitals from "./Helpers/reportWebVitals";
 
 // Import CSS Frameworks
 import "./assets/css/nucleo-icons.css";
