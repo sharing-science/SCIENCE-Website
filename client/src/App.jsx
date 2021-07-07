@@ -2,7 +2,6 @@ import React, { useReducer } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import LandingPage from "./views/LandingPage";
-import RegisterPage from "./views/RegisterPage";
 import ContactUsPage from "./views/ContactUsPage";
 import UploadFilePage from "./views/UploadFilePage";
 import ProfilePage from "./views/ProfilePage";
@@ -22,10 +21,6 @@ const App = () => {
     <Context.Provider value={{ contextValue, dispatchContextValue }}>
       <Router>
         <Switch>
-          <Route
-            path="/register-page"
-            render={(props) => <RegisterPage {...props} />}
-          />
           <Route
             path="/login-page"
             render={(props) => <LoginPage {...props} />}

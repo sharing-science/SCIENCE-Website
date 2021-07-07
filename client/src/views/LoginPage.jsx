@@ -101,15 +101,6 @@ const LoginPage = () => {
                   </Card>
                 </Col>
               </Row>
-              <Row>
-                <Button
-                  onClick={() => {
-                    console.log(contextValue);
-                  }}
-                >
-                  Print Context
-                </Button>
-              </Row>
               <div className="register-bg" />
             </Container>
           </div>
