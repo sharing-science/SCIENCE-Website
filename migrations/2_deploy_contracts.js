@@ -1,5 +1,5 @@
-var SimpleStorage = artifacts.require("./SimpleStorage.sol");
+const Covid19usecase = artifacts.require("./Covid19usecase.sol");
 
-module.exports = (deployer) => {
-  deployer.deploy(SimpleStorage);
+module.exports = function (deployer) {
+  deployer.deploy(Covid19usecase);
 };
