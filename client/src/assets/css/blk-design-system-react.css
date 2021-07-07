@@ -18893,7 +18893,7 @@ textarea.form-control:active {
   text-decoration: none;
 }
 .register-page .register-bg {
-  height: 700px;
+  height: auto;
   background: linear-gradient(to bottom, transparent 0%, #1f2251 100%);
   width: 700px;
   position: relative;

@@ -54,7 +54,7 @@ const LoginPage = () => {
   return (
     <>
       <NavBar />
-      <div className="wrapper">
+      <div className="wrapper register-page">
         <div className="page-header">
           <div className="page-header-image" />
           <div className="content">
