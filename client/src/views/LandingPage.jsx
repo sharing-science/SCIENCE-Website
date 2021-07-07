@@ -12,6 +12,11 @@ const LandingPage = () => {
       <div className="wrapper index-page">
         <div className="page-header header-filter">
           <Container>
+            <img
+              alt="..."
+              className="path"
+              src={require("assets/img/path1.png").default}
+            />
             <div className="content-center brand">
               <h1 className="h1-seo">SCIENCE Website</h1>
               <h3 className="d-none d-sm-block">
