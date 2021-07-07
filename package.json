@@ -1,0 +1,22 @@
+{
+  "name": "science-research",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sharing-science/SCIENCE-Website.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sharing-science/SCIENCE-Website/issues"
+  },
+  "homepage": "https://github.com/sharing-science/SCIENCE-Website#readme"
+}
