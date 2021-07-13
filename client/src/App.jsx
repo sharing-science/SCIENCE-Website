@@ -10,6 +10,7 @@ import SampleContract from "./views/SampleContractPage";
 import Context from "./Helpers/Context";
 import { contextReducer } from "Helpers/reducers";
 import { getLocalStorageObject } from "Helpers/helperFunctions";
+import { PrivateRoute, PublicRoute } from "./Helpers/Routes";
 
 const App = () => {
   const [contextValue, dispatchContextValue] = useReducer(contextReducer, {
@@ -21,27 +22,15 @@ const App = () => {
     <Context.Provider value={{ contextValue, dispatchContextValue }}>
       <Router>
         <Switch>
-          <Route
-            path="/login-page"
-            render={(props) => <LoginPage {...props} />}
-          />
-          <Route
-            path="/contact-us"
-            render={(props) => <ContactUsPage {...props} />}
-          />
-          <Route
-            path="/upload"
-            render={(props) => <UploadFilePage {...props} />}
-          />
-          <Route
-            path="/contract"
-            render={(props) => <SampleContract {...props} />}
-          />
-          <Route
-            path="/profile"
-            render={(props) => <ProfilePage {...props} />}
-          />
-          <Route path="/" render={(props) => <LandingPage {...props} />} />
+          {/* Private Routes */}
+          <PrivateRoute exact path="/upload" component={UploadFilePage} />
+          <PrivateRoute exact path="/contract" component={SampleContract} />
+          <PrivateRoute exact path="/profile" component={ProfilePage} />
+
+          {/* Public Routes */}
+          <PublicRoute exact path="/login" component={LoginPage} />
+          <PublicRoute exact path="/contact-us" component={ContactUsPage} />
+          <PublicRoute path="/" component={LandingPage} />
         </Switch>
       </Router>
     </Context.Provider>
