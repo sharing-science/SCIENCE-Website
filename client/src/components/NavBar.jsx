@@ -151,7 +151,7 @@ const NavBar = () => {
                 Getting started
               </DropdownToggle>
               <DropdownMenu className="dropdown-with-icons">
-                <DropdownItem tag={Link} to="/login-page">
+                <DropdownItem tag={Link} to="/login">
                   <i className="tim-icons icon-bullet-list-67" />
                   Login Page
                 </DropdownItem>
