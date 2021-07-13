@@ -2,6 +2,7 @@ const contextReducer = (state, action) => {
   switch (action.type) {
     case "login":
       localStorage.setItem("web3", JSON.stringify(action.payload));
+      localStorage.setItem("loggedIn", true);
       return {
         ...state,
         loggedIn: true,
