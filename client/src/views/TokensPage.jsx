@@ -21,9 +21,9 @@ const SampleContract = () => {
     kycAddress: "0x123",
     sendTo: "0x123",
   });
-  const [myToken, setMyToken] = useState();
-  const [myTokenSale, setMyTokenSale] = useState();
-  const [kycContract, setKycContract] = useState();
+  const [myToken, setMyToken] = useState({});
+  const [myTokenSale, setMyTokenSale] = useState({});
+  const [kycContract, setKycContract] = useState({});
   const [userTokens, setUserTokens] = useState(0);
 
   const handleInputChange = (e) => {
@@ -51,7 +51,7 @@ const SampleContract = () => {
         .call();
       setUserTokens(amount);
     },
-    [contextValue.web3.accounts]
+    [contextValue.web3.accounts, myToken._address]
   );
 
   const handleBuyToken = async () => {
