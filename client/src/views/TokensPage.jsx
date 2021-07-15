@@ -1,7 +1,16 @@
 import React, { useContext, useEffect, useState, useCallback } from "react";
 
 // reactstrap components
-import { Button, Container, Row, FormGroup, Input, Col } from "reactstrap";
+import {
+  Button,
+  Container,
+  Row,
+  FormGroup,
+  Input,
+  Col,
+  Card,
+  CardBody,
+} from "reactstrap";
 
 // core components
 import NavBar from "components/NavBar";
@@ -109,19 +118,21 @@ const SampleContract = () => {
       <NavBar />
       <div className="wrapper register-page">
         <div className="page-header">
-          <div className="page-header-image" />
           <div className="content">
+            <img
+              alt="..."
+              className="path"
+              src={require("assets/img/cercuri.png").default}
+            />
             <Container>
               <Row className="mb-4">
                 <h1>Kudos Tokens</h1>
               </Row>
               <Row>
                 <Col xs="3">
-                  <Row>
-                    <h2>Enable your account</h2>
-                  </Row>
-                  <Row>
-                    <Col>
+                  <Card className="p-4">
+                    <h3>Enable your account</h3>
+                    <CardBody>
                       <FormGroup>
                         <label>Address to allow:</label>
                         <Input
@@ -131,10 +142,6 @@ const SampleContract = () => {
                           type="text"
                         />
                       </FormGroup>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col>
                       <Button
                         type="button"
                         className="btn-round"
@@ -143,44 +150,40 @@ const SampleContract = () => {
                       >
                         Add Address to Whitelist
                       </Button>
-                    </Col>
-                  </Row>
+                    </CardBody>
+                  </Card>
                 </Col>
                 <Col xs="1"></Col>
                 <Col xs="3">
-                  <Row>
+                  <Card className="p-4">
                     <h2>You have {userTokens}KUD</h2>
-                  </Row>
-                  <Row>
-                    <Button
-                      type="button"
-                      className="btn-round"
-                      color="primary"
-                      size="lg"
-                      onClick={() => updateUserTokens(myToken)}
-                    >
-                      Update
-                    </Button>
-                  </Row>
-                  <Row className="mt-4">
-                    <Button
-                      type="button"
-                      className="btn-round"
-                      color="primary"
-                      size="lg"
-                      onClick={handleBuyToken}
-                    >
-                      Buy Token!
-                    </Button>
-                  </Row>
+                    <CardBody>
+                      <Button
+                        type="button"
+                        className="btn-round"
+                        color="primary"
+                        size="lg"
+                        onClick={() => updateUserTokens(myToken)}
+                      >
+                        Update
+                      </Button>
+                      <Button
+                        type="button"
+                        className="btn-round"
+                        color="primary"
+                        size="lg"
+                        onClick={handleBuyToken}
+                      >
+                        Buy Token!
+                      </Button>
+                    </CardBody>
+                  </Card>
                 </Col>
                 <Col xs="1"></Col>
                 <Col xs="3">
-                  <Row>
+                  <Card className="p-4">
                     <h2>Send KUD</h2>
-                  </Row>
-                  <Row>
-                    <Col>
+                    <CardBody>
                       <FormGroup>
                         <label>Send To:</label>
                         <Input
@@ -190,21 +193,17 @@ const SampleContract = () => {
                           type="text"
                         />
                       </FormGroup>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col>
-                      <Button
-                        type="button"
-                        className="btn-round"
-                        color="primary"
-                        size="lg"
-                        onClick={handleSendToken}
-                      >
-                        Send
-                      </Button>
-                    </Col>
-                  </Row>
+                    </CardBody>
+                    <Button
+                      type="button"
+                      className="btn-round"
+                      color="primary"
+                      size="lg"
+                      onClick={handleSendToken}
+                    >
+                      Send
+                    </Button>
+                  </Card>
                 </Col>
               </Row>
             </Container>

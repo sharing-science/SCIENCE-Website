@@ -16,10 +16,6 @@ contract("Token Test", async (accounts) => {
   it("All tokens should be in my account", async () => {
     let instance = this.myToken;
     let totalSupply = await instance.totalSupply();
-    //old style:
-    //let balance = await instance.balanceOf.call(initialHolder);
-    //assert.equal(balance.valueOf(), 0, "Account 1 has a balance");
-    //condensed, easier readable style:
     return expect(
       instance.balanceOf(initialHolder)
     ).to.eventually.be.a.bignumber.equal(totalSupply);

@@ -1,7 +1,15 @@
 import React, { useContext, useEffect, useState } from "react";
 
 // reactstrap components
-import { Button, Container, Row } from "reactstrap";
+import {
+  Button,
+  Container,
+  Card,
+  CardBody,
+  CardHeader,
+  CardFooter,
+  Col
+} from "reactstrap";
 
 // core components
 import NavBar from "components/NavBar";
@@ -66,39 +74,47 @@ const SampleContract = () => {
         <div className="page-header">
           <div className="page-header-image" />
           <div className="content">
+            <img
+              alt="..."
+              className="path"
+              src={require("assets/img/waves.png").default}
+            />
             <Container>
-              <Row className="mb-4">
-                <Button onClick={getClauses}>Get Clauses</Button>
-              </Row>
-              <Row>
-                {clauseList.map((item, key) => (
-                  <span key={key + "-clause"}>
-                    <p className="text-left" key={key + "-num-Clause"}>
-                      <b>{key + 1}. </b>
-                      {item}
-                    </p>
+              <Col xs="10">
+                <Card className="p-4 card-stats">
+                  <CardHeader>
+                    <Button onClick={getClauses}>Get Clauses</Button>
+                  </CardHeader>
+                  <CardBody>
+                    {clauseList.map((item, key) => (
+                      <span key={key + "-clause"}>
+                        <p className="text-left" key={key + "-num-Clause"}>
+                          <b>{key + 1}. </b>
+                          {item}
+                        </p>
+                        <Button
+                          className="btn-round"
+                          color="primary"
+                          size="lg"
+                          name={key}
+                          onClick={acceptClause}
+                        >
+                          Accept
+                        </Button>
+                      </span>
+                    ))}
+                  </CardBody>
+                  <CardFooter>
                     <Button
                       className="btn-round"
-                      color="primary"
-                      size="lg"
-                      name={key}
-                      onClick={acceptClause}
+                      color="info"
+                      onClick={checkAccepted}
                     >
-                      Accept
+                      Check
                     </Button>
-                  </span>
-                ))}
-              </Row>
-              <Row>
-                <Button
-                  className="btn-round"
-                  color="primary"
-                  size="lg"
-                  onClick={checkAccepted}
-                >
-                  Check
-                </Button>
-              </Row>
+                  </CardFooter>
+                </Card>
+              </Col>
             </Container>
           </div>
         </div>
