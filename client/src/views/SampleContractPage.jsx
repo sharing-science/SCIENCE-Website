@@ -80,7 +80,7 @@ const SampleContract = () => {
               src={require("assets/img/waves.png").default}
             />
             <Container>
-              <Col xs="10">
+              <Col xs="6">
                 <Card className="p-4 card-stats">
                   <CardHeader>
                     <Button onClick={getClauses}>Get Clauses</Button>
