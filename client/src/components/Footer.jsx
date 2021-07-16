@@ -52,10 +52,10 @@ const Footer = () => {
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink href="#">About Us</NavLink>
+                <NavLink href="https://idea.rpi.edu/research/projects/science-blockchain">About Us</NavLink>
               </NavItem>
               <NavItem>
-                <NavLink href="#">Blog</NavLink>
+                <NavLink href="https://idea.rpi.edu/research/projects/science-blockchain">Blog</NavLink>
               </NavItem>
               <NavItem>
                 <NavLink href="#">License</NavLink>
