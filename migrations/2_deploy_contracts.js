@@ -1,12 +1,17 @@
 const Covid19usecase = artifacts.require("./Covid19usecase.sol");
-var MyToken = artifacts.require("./MyToken.sol");
-var MyTokenSales = artifacts.require("./MyTokenSale.sol");
-var KycContract = artifacts.require("./KycContract.sol");
+const ResearcherRoles = artifacts.require("./ResearcherRoles.sol");
+const MyToken = artifacts.require("./MyToken.sol");
+const MyTokenSales = artifacts.require("./MyTokenSale.sol");
+const KycContract = artifacts.require("./KycContract.sol");
+
 require("dotenv").config({ path: "../.env" });
 
 module.exports = async (deployer) => {
   // Agreement Contract
   deployer.deploy(Covid19usecase);
+
+  // Roles Contract
+  deployer.deploy(ResearcherRoles);
 
   // Tokens
   let addr = await web3.eth.getAccounts();
