@@ -10,6 +10,7 @@ const contextReducer = (state, action) => {
       };
     case "logout":
       localStorage.removeItem("web3");
+      localStorage.removeItem("loggedIn");
       return {
         ...state,
         loggedIn: false,
