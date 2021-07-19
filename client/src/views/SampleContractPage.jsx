@@ -8,7 +8,7 @@ import {
   CardBody,
   CardHeader,
   CardFooter,
-  Col
+  Col,
 } from "reactstrap";
 
 // core components

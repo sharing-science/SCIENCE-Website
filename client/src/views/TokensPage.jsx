@@ -129,7 +129,7 @@ const SampleContract = () => {
                 <h1>Kudos Tokens</h1>
               </Row>
               <Row>
-                <Col xs="3">
+                <Col xs="12" lg="3">
                   <Card className="p-4">
                     <h3>Enable your account</h3>
                     <CardBody>
@@ -153,8 +153,8 @@ const SampleContract = () => {
                     </CardBody>
                   </Card>
                 </Col>
-                <Col xs="1"></Col>
-                <Col xs="3">
+                <Col xs="0" lg="1"></Col>
+                <Col xs="12" lg="3">
                   <Card className="p-4">
                     <h2>You have {userTokens}KUD</h2>
                     <CardBody>
@@ -179,8 +179,8 @@ const SampleContract = () => {
                     </CardBody>
                   </Card>
                 </Col>
-                <Col xs="1"></Col>
-                <Col xs="3">
+                <Col xs="0" lg="1"></Col>
+                <Col xs="12" lg="3">
                   <Card className="p-4">
                     <h2>Send KUD</h2>
                     <CardBody>
