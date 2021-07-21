@@ -21,22 +21,25 @@ import Covid19usecase from "../contracts/Covid19usecase.json";
 const SampleContract = () => {
   const { contextValue } = useContext(Context);
 
-  const [web3, setWeb3] = useState();
-  const [contract, setContract] = useState(undefined);
+  const [contracts, setContracts] = useState({
+    contract: {},
+  });
   const [clauseList, setClauseList] = useState([]);
 
   useEffect(() => {
     const init = async () => {
       try {
-        const _web3 = await getWeb3();
-        const instance = new _web3.eth.Contract(
+        const web3 = await getWeb3();
+        const Contract_instance = new web3.eth.Contract(
           Covid19usecase.abi,
           Covid19usecase.networks[contextValue.web3.networkId] &&
             Covid19usecase.networks[contextValue.web3.networkId].address
         );
 
-        setWeb3(_web3);
-        setContract(instance);
+        setContracts((c) => ({
+          ...c,
+          contract: Contract_instance,
+        }));
       } catch (error) {
         console.log("Error");
       }
@@ -45,24 +48,24 @@ const SampleContract = () => {
   }, [contextValue.web3.networkId]);
 
   const getClauses = async () => {
-    const clauseCount = await contract.methods.getClauseCount().call();
+    const clauseCount = await contracts.contract.methods.getClauseCount().call();
     const _clauseList = [];
     for (let i = 0; i < clauseCount; ++i) {
-      const clause = await contract.methods.getClause(i + 1).call();
+      const clause = await contracts.contract.methods.getClause(i + 1).call();
       _clauseList.push(clause);
     }
     setClauseList(_clauseList);
   };
 
   const acceptClause = async (e) => {
-    await contract.methods
+    await contracts.contract.methods
       .acceptClause(e.target.name)
       .send({ from: contextValue.web3.accounts[0] });
   };
 
   const checkAccepted = async () => {
     for (let i = 0; i < clauseList.length; ++i) {
-      const status = await contract.methods.getClauseStatus(i).call();
+      const status = await contracts.contract.methods.getClauseStatus(i).call();
       console.log(`The Status of Clause number ${i} is ` + status);
     }
   };

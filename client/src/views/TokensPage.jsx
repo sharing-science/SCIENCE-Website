@@ -25,15 +25,16 @@ import KycContract from "../contracts/KycContract.json";
 const SampleContract = () => {
   const { contextValue } = useContext(Context);
 
-  const [web3, setWeb3] = useState();
   const [inputs, setInputs] = useState({
     kycAddress: "0x123",
     sendTo: "0x123",
   });
-  const [myToken, setMyToken] = useState({});
-  const [myTokenSale, setMyTokenSale] = useState({});
-  const [kycContract, setKycContract] = useState({});
   const [userTokens, setUserTokens] = useState(0);
+  const [contracts, setContracts] = useState({
+    myToken: {},
+    myTokenSale: {},
+    kycContract: {},
+  });
 
   const handleInputChange = (e) => {
     const value =
@@ -46,7 +47,7 @@ const SampleContract = () => {
 
   const handleKycSubmit = async () => {
     const { kycAddress } = inputs;
-    await kycContract.methods
+    await contracts.kycContract.methods
       .setKycCompleted(kycAddress)
       .send({ from: contextValue.web3.accounts[0] });
     alert("Account " + kycAddress + " is now whitelisted");
@@ -54,29 +55,26 @@ const SampleContract = () => {
 
   const updateUserTokens = useCallback(
     async (_myToken) => {
-      console.log(myToken._address);
       const amount = await _myToken.methods
         .balanceOf(contextValue.web3.accounts[0])
         .call();
       setUserTokens(amount);
     },
-    [contextValue.web3.accounts, myToken._address]
+    [contextValue.web3.accounts]
   );
 
   const handleBuyToken = async () => {
-    await myTokenSale.methods
+    await contracts.myTokenSale.methods
       .buyTokens(contextValue.web3.accounts[0])
       .send({ from: contextValue.web3.accounts[0], value: 1 });
+    updateUserTokens(contracts.myToken);
   };
 
   const handleSendToken = async () => {
-    console.log(myToken);
-    console.log(inputs.sendTo);
-
-    const answer = await myToken.methods
+    await contracts.myToken.methods
       .transfer(inputs.sendTo, 1)
       .send({ from: contextValue.web3.accounts[0] });
-    console.log(answer);
+    updateUserTokens(contracts.myToken);
   };
 
   useEffect(() => {
@@ -100,11 +98,12 @@ const SampleContract = () => {
           KycContract.networks[contextValue.web3.networkId] &&
             KycContract.networks[contextValue.web3.networkId].address
         );
-
-        setWeb3(_web3);
-        setMyToken(MyToken_instance);
-        setMyTokenSale(MyTokenSale_instance);
-        setKycContract(kycContract_instance);
+        setContracts((c) => ({
+          ...c,
+          myToken: MyToken_instance,
+          myTokenSale: MyTokenSale_instance,
+          kycContract: kycContract_instance,
+        }));
         updateUserTokens(MyToken_instance);
       } catch (error) {
         console.log(error);
