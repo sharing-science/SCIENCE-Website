@@ -162,15 +162,6 @@ const SampleContract = () => {
                         className="btn-round"
                         color="primary"
                         size="lg"
-                        onClick={() => updateUserTokens(myToken)}
-                      >
-                        Update
-                      </Button>
-                      <Button
-                        type="button"
-                        className="btn-round"
-                        color="primary"
-                        size="lg"
                         onClick={handleBuyToken}
                       >
                         Buy Token!
