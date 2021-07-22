@@ -63,8 +63,8 @@ const LoginPage = () => {
         console.log("Error");
       }
     };
-    init();
-  }, [contextValue.web3.networkId, updateRole]);
+    if (contextValue.loggedIn) init();
+  }, [contextValue.loggedIn, contextValue.web3.networkId, updateRole]);
 
   const handleLogin = async () => {
     try {

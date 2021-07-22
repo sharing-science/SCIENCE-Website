@@ -1,6 +1,6 @@
 const getLocalStorageObject = (name) => {
   const retrievedObject = localStorage.getItem(name);
-  if (!retrievedObject) return null;
+  if (!retrievedObject) return {};
   return JSON.parse(retrievedObject);
 };
 

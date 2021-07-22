@@ -15,7 +15,7 @@ import { PrivateRoute, PublicRoute } from "./Helpers/Routes";
 
 const App = () => {
   const [contextValue, dispatchContextValue] = useReducer(contextReducer, {
-    loggedIn: getLocalStorageObject("loggedIn"),
+    loggedIn: localStorage.getItem("loggedIn"),
     web3: getLocalStorageObject("web3"),
   });
 

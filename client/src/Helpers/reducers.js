@@ -14,7 +14,7 @@ const contextReducer = (state, action) => {
       return {
         ...state,
         loggedIn: false,
-        web3: null,
+        web3: {},
       };
     default:
       throw new Error();
