@@ -8,6 +8,7 @@ import ProfilePage from "./views/ProfilePage";
 import LoginPage from "./views/LoginPage";
 import SampleContract from "./views/SampleContractPage";
 import TokensPage from "./views/TokensPage";
+import TestPage from "./views/TestPage";
 import Context from "./Helpers/Context";
 import { contextReducer } from "Helpers/reducers";
 import { getLocalStorageObject } from "Helpers/helperFunctions";
@@ -28,6 +29,7 @@ const App = () => {
           <PrivateRoute exact path="/contract" component={SampleContract} />
           <PrivateRoute exact path="/profile" component={ProfilePage} />
           <PrivateRoute exact path="/tokens" component={TokensPage} />
+          <PrivateRoute exact path="/test" component={TestPage} />
 
           {/* Public Routes */}
           <PublicRoute exact path="/login" component={LoginPage} />
