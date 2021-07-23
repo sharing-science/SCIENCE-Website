@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.6.0;
 
-import "./Crowdsale.sol";
+import "./Libraries/Crowdsale.sol";
 import "./KycContract.sol";
 
 contract MyTokenSale is Crowdsale {
