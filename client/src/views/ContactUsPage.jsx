@@ -71,7 +71,7 @@ const ContactUsPage = () => {
                       </Row>
                       <Button
                         className="btn-round float-right"
-                        color="primary"
+                        color="info"
                         data-placement="right"
                         id="SendTextButton"
                         type="button"

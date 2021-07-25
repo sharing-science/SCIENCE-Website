@@ -15805,7 +15805,7 @@ img {
   background-color: #ff8d72 !important;
 }
 .navbar.bg-info {
-  background-color: #1d8cf8 !important;
+  background-color: #4e4e50 !important;
 }
 .navbar.bg-success {
   background-color: #00bf9a !important;
@@ -18971,14 +18971,6 @@ textarea.form-control:active {
   left: 300px;
   top: 400px;
   opacity: 0.4;
-}
-
-.index-page,
-.landing-page,
-.profile-page,
-.register-page {
-  background-image: url("../../../../assets/img/dots.png");
-  background-size: contain;
 }
 
 @media (max-width: 991.98px) {

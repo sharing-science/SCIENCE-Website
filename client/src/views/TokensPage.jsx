@@ -144,7 +144,7 @@ const SampleContract = () => {
                       <Button
                         type="button"
                         className="btn-round"
-                        color="primary"
+                        color="info"
                         onClick={handleKycSubmit}
                       >
                         Add Address to Whitelist
@@ -160,7 +160,7 @@ const SampleContract = () => {
                       <Button
                         type="button"
                         className="btn-round"
-                        color="primary"
+                        color="info"
                         size="lg"
                         onClick={handleBuyToken}
                       >
@@ -187,7 +187,7 @@ const SampleContract = () => {
                     <Button
                       type="button"
                       className="btn-round"
-                      color="primary"
+                      color="info"
                       size="lg"
                       onClick={handleSendToken}
                     >

@@ -59,11 +59,6 @@ const ProfilePage = () => {
         <div className="page-header">
           <img
             alt="..."
-            className="dots"
-            src={require("assets/img/dots.png").default}
-          />
-          <img
-            alt="..."
             className="path"
             src={require("assets/img/path1.png").default}
           />
@@ -187,7 +182,7 @@ const ProfilePage = () => {
                         </Row>
                         <Button
                           className="btn-simple btn-icon btn-round float-right"
-                          color="primary"
+                          color="info"
                           type="submit"
                         >
                           <i className="tim-icons icon-send" />

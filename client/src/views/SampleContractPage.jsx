@@ -97,7 +97,7 @@ const SampleContract = () => {
                         </p>
                         <Button
                           className="btn-round"
-                          color="primary"
+                          color="info"
                           size="lg"
                           name={key}
                           onClick={acceptClause}

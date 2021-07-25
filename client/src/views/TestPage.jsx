@@ -112,7 +112,7 @@ const TestPage = () => {
                     </p>
                     <Button
                       className="btn-round"
-                      color="primary"
+                      color="info"
                       size="lg"
                       onClick={acceptClause}
                     >

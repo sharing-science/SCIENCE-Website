@@ -450,8 +450,6 @@
 
 .register-page{
 
-    background-color: $background-black;
-
     .link{
         font-size: 10px;
         color: $white;
@@ -549,14 +547,6 @@
       top: 400px;
       opacity: .4;
     }
-}
-
-.index-page,
-.landing-page,
-.profile-page,
-.register-page{
-  background-image: url($asset-base-path + "/img/dots.png");
-  background-size: contain;
 }
 
 @include media-breakpoint-down(md){
