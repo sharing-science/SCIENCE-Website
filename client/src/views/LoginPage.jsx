@@ -105,15 +105,15 @@ const LoginPage = () => {
   return (
     <>
       <NavBar />
-      <div className="wrapper register-page">
-        <div className="page-header">
+      <div className="wrapper index-page">
+        <div className="page-header header-filter">
           <div className="content">
-            <img
-              alt="..."
-              className="path"
-              src={require("assets/img/blob.png").default}
-            />
             <Container>
+              <img
+                alt="background"
+                className="path"
+                src={require("assets/img/path3.png").default}
+              />
               <Row>
                 <Col className="offset-lg-0 offset-md-3" lg="5" md="6">
                   <Card className="card-register">

@@ -13,9 +13,9 @@ const LandingPage = () => {
         <div className="page-header header-filter">
           <Container>
             <img
-              alt="..."
+              alt="background"
               className="path"
-              src={require("assets/img/path1.png").default}
+              src={require("assets/img/path5.png").default}
             />
             <div className="content-center brand">
               <h1 className="h1-seo">SCIENCE Website</h1>
