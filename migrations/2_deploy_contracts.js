@@ -1,5 +1,4 @@
 const Covid19usecase = artifacts.require("Covid19usecase");
-const ResearcherRoles = artifacts.require("ResearcherRoles");
 const MyToken = artifacts.require("MyToken");
 const MyTokenSales = artifacts.require("MyTokenSale");
 const KycContract = artifacts.require("KycContract");
@@ -14,7 +13,6 @@ module.exports = async (deployer) => {
   deployer.deploy(Covid19usecase);
 
   // Roles Contract
-  deployer.deploy(ResearcherRoles);
   deployer.deploy(Roles, addr[0], addr[1]);
 
   // Tokens
