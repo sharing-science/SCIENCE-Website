@@ -15,7 +15,7 @@ module.exports = async (deployer) => {
 
   // Roles Contract
   deployer.deploy(ResearcherRoles);
-  deployer.deploy(Roles, addr[0], "Test Role");
+  deployer.deploy(Roles, addr[0], addr[1]);
 
   // Tokens
   await deployer.deploy(MyToken, process.env.INITIAL_TOKENS);
