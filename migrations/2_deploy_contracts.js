@@ -1,9 +1,9 @@
-const Covid19usecase = artifacts.require("./Covid19usecase.sol");
-const ResearcherRoles = artifacts.require("./ResearcherRoles.sol");
-const MyToken = artifacts.require("./MyToken.sol");
-const MyTokenSales = artifacts.require("./MyTokenSale.sol");
-const KycContract = artifacts.require("./KycContract.sol");
-const Roles = artifacts.require("./Roles.sol");
+const Covid19usecase = artifacts.require("Covid19usecase");
+const ResearcherRoles = artifacts.require("ResearcherRoles");
+const MyToken = artifacts.require("MyToken");
+const MyTokenSales = artifacts.require("MyTokenSale");
+const KycContract = artifacts.require("KycContract");
+const Roles = artifacts.require("Roles");
 
 require("dotenv").config({ path: "../.env" });
 
