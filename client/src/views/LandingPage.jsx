@@ -1,24 +1,30 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 // core components
 import NavBar from "components/NavBar";
-import PageHeader from "components/PageHeader";
 import Footer from "components/Footer";
+import { Container } from "reactstrap";
 
 const LandingPage = () => {
-  useEffect(() => {
-    document.body.classList.toggle("index-page");
-    // Specify how to clean up after this effect:
-    return () => {
-      document.body.classList.toggle("index-page");
-    };
-  }, []);
   return (
     <>
       <NavBar />
-      <div className="wrapper">
-        <PageHeader />
-        <div className="main"></div>
+      <div className="wrapper index-page">
+        <div className="page-header header-filter">
+          <Container>
+            <img
+              alt="background"
+              className="path"
+              src={require("assets/img/path5.png").default}
+            />
+            <div className="content-center brand">
+              <h1 className="h1-seo">SCIENCE Website</h1>
+              <h3 className="d-none d-sm-block">
+                Rensselaer Polytechnic Institute
+              </h3>
+            </div>
+          </Container>
+        </div>
         <Footer />
       </div>
     </>

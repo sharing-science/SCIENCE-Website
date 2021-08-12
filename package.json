@@ -1,0 +1,29 @@
+{
+  "name": "science-research",
+  "version": "1.0.0",
+  "description": "",
+  "dependencies": {
+    "@openzeppelin/contracts": "^3.0.0",
+    "chai": "^4.3.4",
+    "chai-as-promised": "^7.1.1",
+    "chai-bn": "^0.2.2",
+    "dotenv": "^10.0.0"
+  },
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sharing-science/SCIENCE-Website.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sharing-science/SCIENCE-Website/issues"
+  },
+  "homepage": "https://github.com/sharing-science/SCIENCE-Website#readme"
+}

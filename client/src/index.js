@@ -1,10 +1,11 @@
 import ReactDOM from "react-dom";
-import reportWebVitals from "./reportWebVitals";
+import reportWebVitals from "./Helpers/reportWebVitals";
 
 // Import CSS Frameworks
 import "./assets/css/nucleo-icons.css";
 import "./assets/scss/blk-design-system-react.scss?v=1.2.0";
 import "./assets/demo/demo.css";
+import "./assets/css/custom.css"
 
 // Import Pages
 

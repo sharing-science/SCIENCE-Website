@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import jwtDecode from "jwt-decode";
+import React, { useContext, useState, useEffect, useCallback } from "react";
+import classnames from "classnames";
 
 // reactstrap components
 import {
@@ -12,175 +12,141 @@ import {
   Container,
   Row,
   Col,
+  CardBody,
+  Nav,
+  NavItem,
+  NavLink,
+  TabContent,
+  TabPane,
 } from "reactstrap";
 
 // core components
 import NavBar from "components/NavBar";
 import Footer from "components/Footer";
-import Web3 from "web3";
-
-let web3 = false;
+import Context from "../Helpers/Context";
+import getWeb3 from "../Helpers/getWeb3";
+import ResearcherRoles from "../contracts/ResearcherRoles.json";
 
 const LoginPage = () => {
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [publicKey, setPublicKey] = useState("");
+  const { contextValue, dispatchContextValue } = useContext(Context);
+  const [roleTab, setRoleTab] = useState(1);
+  const [contracts, setContracts] = useState({
+    researcherRoles: {},
+  });
+  const [role, setRole] = useState("");
 
-  const handleLoggedIn = (auth) => {
-    localStorage.setItem("public_key", auth);
-    let key = getPublicKey();
-    setLoggedIn(true);
-    setPublicKey(key);
-  };
-
-  const handleAuthenticate = ({ publicAddress, signature }) =>
-    fetch(`http://localhost:5000/api/auth`, {
-      body: JSON.stringify({ publicAddress, signature }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-    })
-      .then((response) => response.json())
-      .then((response) => {
-        console.log({ response, publicAddress, signature });
-        return response;
-      });
-
-  const handleSignMessage = async ({ publicAddress, nonce }) => {
-    console.log("handleSign");
-    try {
-      const signature = await web3.eth.personal.sign(
-        `I am signing my one-time nonce: ${nonce}`,
-        publicAddress,
-        "" // MetaMask will ignore the password argument here
-      );
-
-      return { publicAddress, signature };
-    } catch (err) {
-      throw new Error("You need to sign the message to be able to log in.");
-    }
-  };
-
-  const handleSignup = (publicAddress) =>
-    fetch(`http://localhost:8000/api/users`, {
-      body: JSON.stringify({ publicAddress }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-    })
-      .then((response) => response.json())
-      .then((response) => {
-        console.log({ response });
-        return response;
-      });
-
-  const handleClick = async () => {
-    // Check if MetaMask is installed
-    if (!window.ethereum) {
-      window.alert("Please install MetaMask first.");
-      return;
-    }
-
-    if (!web3) {
-      try {
-        // Request account access if needed
-        await window.ethereum.enable();
-
-        // We don't know window.web3 version, so we use our own instance of web3
-        // with the injected provider given by MetaMask
-        web3 = new Web3(window.ethereum);
-      } catch (error) {
-        window.alert("You need to allow MetaMask.");
-        return;
-      }
-    }
-    const coinbase = await web3.eth.getCoinbase();
-    if (!coinbase) {
-      window.alert("Please activate MetaMask first.");
-      return;
-    }
-
-    const publicAddress = coinbase.toLowerCase();
-    // setLoading(true);
-
-    // Look if user with current publicAddress is already present on backend
-    fetch(`http://localhost:5000/api/users?publicAddress=${publicAddress}`)
-      .then((response) => response.json())
-      // If yes, retrieve it. If no, create it.
-      .then((users) => {
-        console.log(users);
-        return users.length ? users[0] : handleSignup(publicAddress);
-      })
-      // Popup MetaMask confirmation modal to sign message
-      .then(handleSignMessage)
-      // Send signature to backend on the /auth route
-      .then(handleAuthenticate)
-      // Pass accessToken back to parent component (to save it in localStorage)
-      .then(handleLoggedIn)
-      .catch((err) => {
-        window.alert(err);
-        // setLoading(false);
-      });
-  };
-
+  const updateRole = useCallback(
+    async (instance) => {
+      const _role = await instance.methods
+        .getAccountRole(contextValue.web3.accounts[0])
+        .call();
+      setRole(_role);
+    },
+    [contextValue.web3.accounts]
+  );
   useEffect(() => {
-    document.body.classList.toggle("register-page");
-    let key = getPublicKey();
-    if (key) {
-      setLoggedIn(true);
-      setPublicKey(key);
-    }
-    // Specify how to clean up after this effect:
-    return function cleanup() {
-      document.body.classList.toggle("register-page");
-    };
-  }, []);
+    const init = async () => {
+      try {
+        const web3 = await getWeb3();
+        const instance = new web3.eth.Contract(
+          ResearcherRoles.abi,
+          ResearcherRoles.networks[contextValue.web3.networkId] &&
+            ResearcherRoles.networks[contextValue.web3.networkId].address
+        );
 
-  const getPublicKey = () => {
-    let key = localStorage.getItem("public_key");
-    return key ? jwtDecode(key).sub.publicAddress : "";
+        updateRole(instance);
+        setContracts((c) => ({
+          ...c,
+          researcherRoles: instance,
+        }));
+      } catch (error) {
+        console.log("Error");
+      }
+    };
+    if (contextValue.loggedIn) init();
+  }, [contextValue.loggedIn, contextValue.web3.networkId, updateRole]);
+
+  const handleLogin = async () => {
+    try {
+      // Get network provider (typically MetaMask) and web3 instance
+      const web3 = await getWeb3();
+
+      // Use web3 to get the user's accounts from the provider (MetaMask)
+      const accounts = await web3.eth.getAccounts();
+
+      const networkId = await web3.eth.net.getId();
+
+      dispatchContextValue({
+        type: "login",
+        payload: { accounts, networkId },
+      });
+    } catch (error) {
+      // Catch any errors for any of the above operations
+      alert(
+        `Failed to load web3, accounts, or contract. Did you migrate the contract or install MetaMask? Check console for details.`
+      );
+      console.error(error);
+    }
+  };
+
+  const handleLogout = () => {
+    dispatchContextValue({
+      type: "logout",
+    });
+  };
+
+  const handleRoleChange = async () => {
+    await contracts.researcherRoles.methods
+      .changeAccountRole(roleTab)
+      .send({ from: contextValue.web3.accounts[0] });
+    await updateRole(contracts.researcherRoles);
   };
 
   return (
     <>
       <NavBar />
-      <div className="wrapper">
-        <div className="page-header">
-          <div className="page-header-image" />
+      <div className="wrapper index-page">
+        <div className="page-header header-filter">
           <div className="content">
             <Container>
+              <img
+                alt="background"
+                className="path"
+                src={require("assets/img/path3.png").default}
+              />
               <Row>
                 <Col className="offset-lg-0 offset-md-3" lg="5" md="6">
                   <Card className="card-register">
                     <CardHeader>
                       <CardImg
                         alt="..."
-                        src={require("assets/img/square-purple-1.png").default}
+                        src={require("assets/img/square6.png").default}
                       />
-                      <CardTitle tag="h4">Login</CardTitle>
+                      <CardTitle tag="h4">
+                        {" "}
+                        <span className="ml-3">Login</span>
+                      </CardTitle>
                     </CardHeader>
                     <CardFooter>
-                      {!loggedIn ? (
+                      {!contextValue.loggedIn ? (
                         <Button
                           className="btn-round"
-                          color="primary"
+                          color="info"
                           size="lg"
-                          onClick={handleClick}
+                          onClick={handleLogin}
                         >
                           Login With MetaMask
                         </Button>
                       ) : (
                         <>
-                          <p>Your public Key is {publicKey}</p>
+                          <p>
+                            Your public Key is {contextValue.web3.accounts[0]}
+                          </p>
                           <Button
                             className="btn-round"
-                            color="primary"
+                            color="info"
                             size="lg"
-                            onClick={() => {
-                              localStorage.removeItem("public_key");
-                              setLoggedIn(false);
-                            }}
+                            onClick={handleLogout}
                           >
                             Logout
                           </Button>
@@ -189,8 +155,80 @@ const LoginPage = () => {
                     </CardFooter>
                   </Card>
                 </Col>
+                {contextValue.loggedIn ? (
+                  <Col className="offset-lg-0 offset-md-3" xs="12" md="6">
+                    <Card className="card-register p-4">
+                      <CardHeader>
+                        <Nav className="nav-tabs-info" role="tablist" tabs>
+                          <NavItem>
+                            <NavLink
+                              className={classnames({
+                                active: roleTab === 1,
+                              })}
+                              onClick={(e) => setRoleTab(1)}
+                              href="#"
+                            >
+                              <i className="tim-icons icon-spaceship" />
+                              First Role
+                            </NavLink>
+                          </NavItem>
+                          <NavItem>
+                            <NavLink
+                              className={classnames({
+                                active: roleTab === 2,
+                              })}
+                              onClick={(e) => setRoleTab(2)}
+                              href="#"
+                            >
+                              <i className="tim-icons icon-settings-gear-63" />
+                              Second Role
+                            </NavLink>
+                          </NavItem>
+                          <NavItem>
+                            <NavLink
+                              className={classnames({
+                                active: roleTab === 3,
+                              })}
+                              onClick={(e) => setRoleTab(3)}
+                              href="#"
+                            >
+                              <i className="tim-icons icon-bag-16" />
+                              Third Role
+                            </NavLink>
+                          </NavItem>
+                        </Nav>
+                      </CardHeader>
+                      <CardBody>
+                        <TabContent
+                          className="tab-space"
+                          activeTab={"link" + roleTab}
+                        >
+                          <TabPane tabId="link1">
+                            <p>This is what the first role does.</p>
+                          </TabPane>
+                          <TabPane tabId="link2">
+                            <p>This is what the second role does</p>
+                          </TabPane>
+                          <TabPane tabId="link3">
+                            <p>This is what the third role does</p>
+                          </TabPane>
+                        </TabContent>
+                        <Button
+                          className="btn-round"
+                          color="info"
+                          size="lg"
+                          onClick={handleRoleChange}
+                        >
+                          Change Role
+                        </Button>
+                      </CardBody>
+                      <CardFooter>Your role is {role}</CardFooter>
+                    </Card>
+                  </Col>
+                ) : (
+                  <></>
+                )}
               </Row>
-              <div className="register-bg" />
             </Container>
           </div>
         </div>

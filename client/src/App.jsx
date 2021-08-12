@@ -1,42 +1,43 @@
-import React from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import React, { useReducer } from "react";
+import { BrowserRouter as Router, Switch } from "react-router-dom";
 
 import LandingPage from "./views/LandingPage";
-import RegisterPage from "./views/RegisterPage";
 import ContactUsPage from "./views/ContactUsPage";
 import UploadFilePage from "./views/UploadFilePage";
 import ProfilePage from "./views/ProfilePage";
 import LoginPage from "./views/LoginPage";
-import SampleContract from "views/SampleContractPage";
+import SampleContract from "./views/SampleContractPage";
+import TokensPage from "./views/TokensPage";
+import TestPage from "./views/TestPage";
+import Context from "./Helpers/Context";
+import { contextReducer } from "Helpers/reducers";
+import { getLocalStorageObject } from "Helpers/helperFunctions";
+import { PrivateRoute, PublicRoute } from "./Helpers/Routes";
 
 const App = () => {
+  const [contextValue, dispatchContextValue] = useReducer(contextReducer, {
+    loggedIn: localStorage.getItem("loggedIn"),
+    web3: getLocalStorageObject("web3"),
+  });
+
   return (
-    <Router>
-      <Switch>
-        <Route
-          path="/register-page"
-          render={(props) => <RegisterPage {...props} />}
-        />
-        <Route
-          path="/login-page"
-          render={(props) => <LoginPage {...props} />}
-        />
-        <Route
-          path="/contact-us"
-          render={(props) => <ContactUsPage {...props} />}
-        />
-        <Route
-          path="/upload"
-          render={(props) => <UploadFilePage {...props} />}
-        />
-        <Route
-          path="/contract"
-          render={(props) => <SampleContract {...props} />}
-        />
-        <Route path="/profile" render={(props) => <ProfilePage {...props} />} />
-        <Route path="/" render={(props) => <LandingPage {...props} />} />
-      </Switch>
-    </Router>
+    <Context.Provider value={{ contextValue, dispatchContextValue }}>
+      <Router>
+        <Switch>
+          {/* Private Routes */}
+          <PrivateRoute exact path="/upload" component={UploadFilePage} />
+          <PrivateRoute exact path="/contract" component={SampleContract} />
+          <PrivateRoute exact path="/profile" component={ProfilePage} />
+          <PrivateRoute exact path="/tokens" component={TokensPage} />
+          <PrivateRoute exact path="/test" component={TestPage} />
+
+          {/* Public Routes */}
+          <PublicRoute exact path="/login" component={LoginPage} />
+          <PublicRoute exact path="/contact-us" component={ContactUsPage} />
+          <PublicRoute path="/" component={LandingPage} />
+        </Switch>
+      </Router>
+    </Context.Provider>
   );
 };
 

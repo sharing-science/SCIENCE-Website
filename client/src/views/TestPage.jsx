@@ -9,6 +9,8 @@ import {
   CardHeader,
   CardFooter,
   Col,
+  FormGroup,
+  Input
 } from "reactstrap";
 
 // core components
@@ -18,18 +20,56 @@ import Context from "Helpers/Context";
 import getWeb3 from "Helpers/getWeb3";
 import Covid19usecase from "../contracts/Covid19usecase.json";
 
-const SampleContract = () => {
+const TestPage = () => {
+  // This is the context which is information distributed over the whole application
+  // contextValue.loggedIn true or false
+  // contextValue.web3.accounts[0], this is the address of the logged in account
   const { contextValue } = useContext(Context);
 
+  // This is a hook of all of the contract instances
   const [contracts, setContracts] = useState({
     contract: {},
   });
+
+  // another hook
   const [clauseList, setClauseList] = useState([]);
 
+  const getClauses = async () => {
+    const clauseCount = await contracts.contract.methods
+      .getClauseCount()
+      .call();
+    const _clauseList = [];
+    for (let i = 0; i < clauseCount; ++i) {
+      const clause = await contracts.contract.methods.getClause(i + 1).call();
+      _clauseList.push(clause);
+    }
+    setClauseList(_clauseList);
+    // Old version of above:
+    // this.state = {
+    //   ...this.state,
+    //   info: "hello",
+    // }
+  };
+
+  const acceptClause = async (e) => {
+    await contracts.contract.methods
+      .acceptClause(e.target.name)
+      .send({ from: contextValue.web3.accounts[0] });
+  };
+
+  const checkAccepted = async () => {
+    for (let i = 0; i < clauseList.length; ++i) {
+      const status = await contracts.contract.methods.getClauseStatus(i).call();
+      console.log(`The Status of Clause number ${i} is ` + status);
+    }
+  };
+
+  // This runs when the webpage opens, this will connect to web3 and get instances of the contracts
   useEffect(() => {
     const init = async () => {
       try {
         const web3 = await getWeb3();
+
         const Contract_instance = new web3.eth.Contract(
           Covid19usecase.abi,
           Covid19usecase.networks[contextValue.web3.networkId] &&
@@ -46,29 +86,6 @@ const SampleContract = () => {
     };
     init();
   }, [contextValue.web3.networkId]);
-
-  const getClauses = async () => {
-    const clauseCount = await contracts.contract.methods.getClauseCount().call();
-    const _clauseList = [];
-    for (let i = 0; i < clauseCount; ++i) {
-      const clause = await contracts.contract.methods.getClause(i + 1).call();
-      _clauseList.push(clause);
-    }
-    setClauseList(_clauseList);
-  };
-
-  const acceptClause = async (e) => {
-    await contracts.contract.methods
-      .acceptClause(e.target.name)
-      .send({ from: contextValue.web3.accounts[0] });
-  };
-
-  const checkAccepted = async () => {
-    for (let i = 0; i < clauseList.length; ++i) {
-      const status = await contracts.contract.methods.getClauseStatus(i).call();
-      console.log(`The Status of Clause number ${i} is ` + status);
-    }
-  };
 
   return (
     <>
@@ -89,25 +106,19 @@ const SampleContract = () => {
                     <Button onClick={getClauses}>Get Clauses</Button>
                   </CardHeader>
                   <CardBody>
-                    {clauseList.map((item, key) => (
-                      <span key={key + "-clause"}>
-                        <p className="text-left" key={key + "-num-Clause"}>
-                          <b>{key + 1}. </b>
-                          {item}
-                        </p>
-                        <Button
-                          className="btn-round"
-                          color="info"
-                          size="lg"
-                          name={key}
-                          onClick={acceptClause}
-                        >
-                          Accept
-                        </Button>
-                      </span>
-                    ))}
-                  </CardBody>
-                  <CardFooter>
+                    <p className="text-left">
+                      <b>1. </b>
+                      this is the contract name
+                    </p>
+                    <Button
+                      className="btn-round"
+                      color="info"
+                      size="lg"
+                      onClick={acceptClause}
+                    >
+                      Accept
+                    </Button>
+                    <br />
                     <Button
                       className="btn-round"
                       color="info"
@@ -115,6 +126,12 @@ const SampleContract = () => {
                     >
                       Check
                     </Button>
+                  </CardBody>
+                  <CardFooter>
+                    <FormGroup>
+                      <label>File Name</label>
+                      <Input type="text" />
+                    </FormGroup>
                   </CardFooter>
                 </Card>
               </Col>
@@ -127,4 +144,4 @@ const SampleContract = () => {
   );
 };
 
-export default SampleContract;
+export default TestPage;

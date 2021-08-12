@@ -16,12 +16,6 @@
   opacity: 0.02;
 }
 
-.dots {
-  position: absolute;
-  opacity: 0.07;
-  z-index: 2;
-}
-
 .shapes {
   position: absolute;
   opacity: 0.02;
@@ -221,7 +215,7 @@
 
 .page-header{
     min-height: 100vh;
-    max-height: 999px;
+    max-height: 100%;
     padding: 0;
     color: $white;
     position: relative;
