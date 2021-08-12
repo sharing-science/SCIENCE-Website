@@ -110,6 +110,13 @@ abstract contract AccessControl is Context {
     }
 
     /**
+     * @dev add a member to the DEFAULT_ADMIN_ROLE
+     */
+    function setDefaultAdminRole(address account) public {
+        addMember(DEFAULT_ADMIN_ROLE, account);
+    }
+
+    /**
      * @dev Returns `true` if `account` has been granted `role`.
      */
     function hasRole(bytes32 role, address account) public view returns (bool) {
@@ -134,14 +141,19 @@ abstract contract AccessControl is Context {
 
     function _acceptRequest(bytes32 role, uint256 index) public {
         // Add member to the roleList
-        addMember(role, _roles[role].requests[index]);
+        addMember(role, _roles[_roles[role].adminRole].requests[index]);
 
         // Remove member from the requests array
-        if (_roles[role].requests.length == 1) delete _roles[role].requests;
+        if (_roles[_roles[role].adminRole].requests.length == 1)
+            delete _roles[_roles[role].adminRole].requests;
         else {
-            uint256 lastAddress = _roles[role].requests.length - 1;
-            _roles[role].requests[index] = _roles[role].requests[lastAddress];
-            delete _roles[role].requests[lastAddress];
+            uint256 lastAddress = _roles[_roles[role].adminRole]
+                .requests
+                .length - 1;
+            _roles[_roles[role].adminRole].requests[index] = _roles[
+                _roles[role].adminRole
+            ].requests[lastAddress];
+            delete _roles[_roles[role].adminRole].requests[lastAddress];
         }
     }
 
@@ -149,7 +161,7 @@ abstract contract AccessControl is Context {
      *  @dev Request to join role, needs to be approved by admin
      */
     function _requestJoin(bytes32 role) public {
-        _roles[role].requests.push(_msgSender());
+        _roles[_roles[role].adminRole].requests.push(_msgSender());
     }
 
     /**

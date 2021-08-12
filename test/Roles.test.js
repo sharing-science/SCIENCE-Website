@@ -30,14 +30,14 @@ contract("Roles", async function (accounts) {
 
   it("Requesting and joining role works", async () => {
     let instance = this.Roles;
-    let RolesList = await instance.getRolesList();
+    let RolesList = await instance.getRolesEncodings();
     await expect(
       instance.requestJoin.sendTransaction(RolesList[1], {
         from: anotherAccount,
       })
     ).to.eventually.be.fulfilled;
 
-    await expect(instance.getRequests.call(RolesList[1]))
+    await expect(instance.getRequests.call(RolesList[0]))
       .to.eventually.be.an("array")
       .that.include(anotherAccount);
 
