@@ -10,7 +10,7 @@ import {
   CardFooter,
   Col,
   FormGroup,
-  Input
+  Input, Row
 } from "reactstrap";
 
 // core components
@@ -34,6 +34,12 @@ const TestPage = () => {
   // another hook
   const [clauseList, setClauseList] = useState([]);
 
+  const [state, setState] = useState("");
+
+  const [dataLink, setDataLink] = useState();
+
+  const [linkText, setLinkTest] = useState();
+
   const getClauses = async () => {
     const clauseCount = await contracts.contract.methods
       .getClauseCount()
@@ -51,10 +57,17 @@ const TestPage = () => {
     // }
   };
 
+
   const acceptClause = async (e) => {
     await contracts.contract.methods
       .acceptClause(e.target.name)
       .send({ from: contextValue.web3.accounts[0] });
+    if(e.target.name==0){
+      window.location.replace("http://localhost:3000/upload");
+    }
+    if(e.target.name==1){
+      window.location.replace("http://localhost:3000/report");
+    }
   };
 
   const checkAccepted = async () => {
@@ -63,6 +76,19 @@ const TestPage = () => {
       console.log(`The Status of Clause number ${i} is ` + status);
     }
   };
+
+  const checkStatus = async () => {
+    const name=await contracts.contract.methods.getStateName().call();
+    setState(name);
+  }
+
+  const getDataLink = async () => {
+    const name=await contracts.contract.methods.getStateName().call();
+    if(name=="Active"){
+      setDataLink("http://localhost:3000/Data");
+      setLinkTest("Click Here!")
+    }
+  }
 
   // This runs when the webpage opens, this will connect to web3 and get instances of the contracts
   useEffect(() => {
@@ -100,25 +126,33 @@ const TestPage = () => {
               src={require("assets/img/waves.png").default}
             />
             <Container>
+              <Row>
               <Col xs="6">
-                <Card className="p-4 card-stats">
+              <Card className="p-4 card-stats">
                   <CardHeader>
                     <Button onClick={getClauses}>Get Clauses</Button>
                   </CardHeader>
                   <CardBody>
-                    <p className="text-left">
-                      <b>1. </b>
-                      this is the contract name
-                    </p>
-                    <Button
-                      className="btn-round"
-                      color="info"
-                      size="lg"
-                      onClick={acceptClause}
-                    >
-                      Accept
-                    </Button>
-                    <br />
+                    {clauseList.map((item, key) => (
+                      <span key={key + "-clause"}>
+                        <p className="text-left" key={key + "-num-Clause"}>
+                          <b>{key + 1}. </b>
+                          {item}
+                        </p>
+                        <Button
+                          className="btn-round"
+                          color="primary"
+                          size="lg"
+                          name={key}
+                          onClick={acceptClause}
+                        >
+                          Accept
+                        </Button>
+                        
+                      </span>
+                    ))}
+                  </CardBody>
+                  <CardFooter>
                     <Button
                       className="btn-round"
                       color="info"
@@ -126,15 +160,37 @@ const TestPage = () => {
                     >
                       Check
                     </Button>
-                  </CardBody>
-                  <CardFooter>
-                    <FormGroup>
-                      <label>File Name</label>
-                      <Input type="text" />
-                    </FormGroup>
                   </CardFooter>
                 </Card>
               </Col>
+              <Col xs="6">
+                <Col xs="6">
+                  <Card className="p-4 card-stats">
+                    <CardHeader>
+                      <Button onClick={checkStatus}>Get Contract Status</Button>
+                    </CardHeader>
+                    <CardBody>
+                      <p className="text-left">
+                        {state}
+                      </p>
+                    </CardBody>
+                  </Card>
+                </Col>
+                <Col xs="6">
+                  <Card className="p-4 card-stats">
+                    <CardHeader>
+                      <Button onClick={getDataLink}>Get DataSet</Button>
+                    </CardHeader>
+                    <CardBody>
+                      <p className="text-left">
+                        <a href={dataLink}>{linkText}</a>
+                      </p>
+                    </CardBody>
+                  </Card>
+                </Col>
+              </Col>
+              
+              </Row>
             </Container>
           </div>
         </div>

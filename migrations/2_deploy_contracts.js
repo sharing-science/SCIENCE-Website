@@ -3,12 +3,15 @@ const ResearcherRoles = artifacts.require("./ResearcherRoles.sol");
 const MyToken = artifacts.require("./MyToken.sol");
 const MyTokenSales = artifacts.require("./MyTokenSale.sol");
 const KycContract = artifacts.require("./KycContract.sol");
+const DataUseTeam = artifacts.require("./DataUseTeam.sol");
 
 require("dotenv").config({ path: "../.env" });
 
 module.exports = async (deployer) => {
   // Agreement Contract
   deployer.deploy(Covid19usecase);
+
+  deployer.deploy(DataUseTeam);
 
   // Roles Contract
   deployer.deploy(ResearcherRoles);

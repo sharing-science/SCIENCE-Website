@@ -105,22 +105,18 @@ const LoginPage = () => {
   return (
     <>
       <NavBar />
-      <div className="wrapper index-page">
-        <div className="page-header header-filter">
+      <div className="wrapper register-page">
+        <div className="page-header">
+          <div className="page-header-image" />
           <div className="content">
             <Container>
-              <img
-                alt="background"
-                className="path"
-                src={require("assets/img/path3.png").default}
-              />
               <Row>
                 <Col className="offset-lg-0 offset-md-3" lg="5" md="6">
                   <Card className="card-register">
                     <CardHeader>
                       <CardImg
                         alt="..."
-                        src={require("assets/img/square6.png").default}
+                        src={require("assets/img/square-purple-1.png").default}
                       />
                       <CardTitle tag="h4">
                         {" "}
@@ -131,7 +127,7 @@ const LoginPage = () => {
                       {!contextValue.loggedIn ? (
                         <Button
                           className="btn-round"
-                          color="info"
+                          color="primary"
                           size="lg"
                           onClick={handleLogin}
                         >
@@ -144,7 +140,7 @@ const LoginPage = () => {
                           </p>
                           <Button
                             className="btn-round"
-                            color="info"
+                            color="primary"
                             size="lg"
                             onClick={handleLogout}
                           >
@@ -215,7 +211,7 @@ const LoginPage = () => {
                         </TabContent>
                         <Button
                           className="btn-round"
-                          color="info"
+                          color="primary"
                           size="lg"
                           onClick={handleRoleChange}
                         >
@@ -229,6 +225,7 @@ const LoginPage = () => {
                   <></>
                 )}
               </Row>
+              <div className="register-bg" />
             </Container>
           </div>
         </div>
