@@ -1,23 +1,49 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.6.0;
+pragma experimental ABIEncoderV2;
 import "./Libraries/AccessControl.sol";
 
 /// @dev Implements a single role access control contract.
 contract Roles is AccessControl {
-    string[2] RoleNames = ["TEST_ADMIN_ROLE", "TEST_ROLE"];
-    bytes32[2] RolesList = [
+    uint8 constant numRoles = 2;
+    string[numRoles] RoleNames = ["TEST_ADMIN_ROLE", "TEST_ROLE"];
+    bytes32[numRoles] RolesEncodings = [
         keccak256("TEST_ADMIN_ROLE"),
         keccak256("TEST_ROLE")
     ];
 
     /// @dev Create the community role, with `root` as a member.
     constructor(address test_admin_role_root, address test_role_root) public {
-        _setupRole(RolesList[0], test_admin_role_root, DEFAULT_ADMIN_ROLE);
-        _setupRole(RolesList[1], test_role_root, RolesList[0]);
+        _setupRole(RolesEncodings[0], test_admin_role_root, DEFAULT_ADMIN_ROLE);
+        _setupRole(RolesEncodings[1], test_role_root, RolesEncodings[0]);
     }
 
-    function getRolesList() public view returns (bytes32[2] memory) {
-        return (RolesList);
+    function getUsersRoles(address user)
+        public
+        view
+        returns (bytes32[numRoles] memory)
+    {
+        bytes32[numRoles] memory answer;
+        uint8 position = 0;
+        for (uint256 i = 0; i < RolesEncodings.length; ++i) {
+            if (hasRole(RolesEncodings[i], user)) {
+                answer[position] = RolesEncodings[i];
+                ++position;
+            }
+        }
+        return answer;
+    }
+
+    function getRolesEncodings()
+        public
+        view
+        returns (bytes32[numRoles] memory)
+    {
+        return (RolesEncodings);
+    }
+
+    function getRolesNames() public view returns (string[numRoles] memory) {
+        return (RoleNames);
     }
 
     function requestJoin(bytes32 role) public {
@@ -35,7 +61,7 @@ contract Roles is AccessControl {
     function testFunction()
         public
         view
-        onlyMember(RolesList[1])
+        onlyMember(RolesEncodings[1])
         returns (bool)
     {
         return true;
@@ -44,7 +70,7 @@ contract Roles is AccessControl {
     function testAdminFunction()
         public
         view
-        onlyAdmin(RolesList[1])
+        onlyAdmin(RolesEncodings[1])
         returns (bool)
     {
         return true;
