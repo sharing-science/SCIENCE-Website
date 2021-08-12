@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useCallback } from "react";
+import React, { useContext } from "react";
 
 // reactstrap components
 import {
@@ -18,8 +18,9 @@ import NavBar from "components/NavBar";
 import Footer from "components/Footer";
 import Context from "../Helpers/Context";
 import getWeb3 from "../Helpers/getWeb3";
+import { Redirect } from "react-router-dom/cjs/react-router-dom.min";
 
-const LoginPage = () => {
+const LoginPage = ({}) => {
   const { contextValue, dispatchContextValue } = useContext(Context);
 
   const handleLogin = async () => {
@@ -45,13 +46,9 @@ const LoginPage = () => {
     }
   };
 
-  const handleLogout = () => {
-    dispatchContextValue({
-      type: "logout",
-    });
-  };
-
-  return (
+  return contextValue.loggedIn ? (
+    <Redirect to="/profile" />
+  ) : (
     <>
       <NavBar />
       <div className="wrapper register-page">
@@ -73,30 +70,14 @@ const LoginPage = () => {
                       </CardTitle>
                     </CardHeader>
                     <CardFooter>
-                      {!contextValue.loggedIn ? (
-                        <Button
-                          className="btn-round"
-                          color="primary"
-                          size="lg"
-                          onClick={handleLogin}
-                        >
-                          Login With MetaMask
-                        </Button>
-                      ) : (
-                        <>
-                          <p>
-                            Your public Key is {contextValue.web3.accounts[0]}
-                          </p>
-                          <Button
-                            className="btn-round"
-                            color="primary"
-                            size="lg"
-                            onClick={handleLogout}
-                          >
-                            Logout
-                          </Button>
-                        </>
-                      )}
+                      <Button
+                        className="btn-round"
+                        color="info"
+                        size="lg"
+                        onClick={handleLogin}
+                      >
+                        Login With MetaMask
+                      </Button>
                     </CardFooter>
                   </Card>
                 </Col>
