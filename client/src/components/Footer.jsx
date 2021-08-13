@@ -28,8 +28,18 @@ const Footer = () => {
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink href="https://idea.rpi.edu/research/projects/science-blockchain">
-                  About Us
+                <NavLink to="/landing-page" tag={Link}>
+                  Landing
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink to="/register-page" tag={Link}>
+                  Register
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink to="/profile" tag={Link}>
+                  Profile
                 </NavLink>
               </NavItem>
             </Nav>
@@ -37,9 +47,15 @@ const Footer = () => {
           <Col md="3">
             <Nav>
               <NavItem>
-                <NavLink href="https://idea.rpi.edu/research/projects/science-blockchain">
-                  Blog
+                <NavLink to="/contact-us" tag={Link}>
+                  Contact Us
                 </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink href="https://idea.rpi.edu/research/projects/science-blockchain">About Us</NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink href="https://idea.rpi.edu/research/projects/science-blockchain">Blog</NavLink>
               </NavItem>
               <NavItem>
                 <NavLink href="#">License</NavLink>

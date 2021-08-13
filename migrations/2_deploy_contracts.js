@@ -1,3 +1,4 @@
+const DataUseTeam = artifacts.require("DataUseTeam");
 const Covid19usecase = artifacts.require("Covid19usecase");
 const MyToken = artifacts.require("MyToken");
 const MyTokenSales = artifacts.require("MyTokenSale");

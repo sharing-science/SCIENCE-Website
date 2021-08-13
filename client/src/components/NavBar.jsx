@@ -176,7 +176,7 @@ const NavBar = () => {
             <NavItem>
               <Button
                 className="nav-link d-none d-lg-block"
-                color="info"
+                color="primary"
                 tag={Link}
                 to="/upload"
               >
