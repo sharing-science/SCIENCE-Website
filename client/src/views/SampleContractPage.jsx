@@ -48,9 +48,7 @@ const SampleContract = () => {
   }, [contextValue.web3.networkId]);
 
   const getClauses = async () => {
-    const clauseCount = await contracts.contract.methods
-      .getClauseCount()
-      .call();
+    const clauseCount = await contracts.contract.methods.getClauseCount().call();
     const _clauseList = [];
     for (let i = 0; i < clauseCount; ++i) {
       const clause = await contracts.contract.methods.getClause(i + 1).call();
@@ -99,7 +97,7 @@ const SampleContract = () => {
                         </p>
                         <Button
                           className="btn-round"
-                          color="primary"
+                          color="info"
                           size="lg"
                           name={key}
                           onClick={acceptClause}

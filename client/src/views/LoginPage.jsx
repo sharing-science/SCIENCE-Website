@@ -53,8 +53,12 @@ const LoginPage = ({}) => {
       <NavBar />
       <div className="wrapper register-page">
         <div className="page-header">
-          <div className="page-header-image" />
           <div className="content">
+            <img
+              alt="..."
+              className="path"
+              src={require("assets/img/blob.png").default}
+            />
             <Container>
               <Row>
                 <Col className="offset-lg-0 offset-md-3" lg="5" md="6">
@@ -62,7 +66,7 @@ const LoginPage = ({}) => {
                     <CardHeader>
                       <CardImg
                         alt="..."
-                        src={require("assets/img/square-purple-1.png").default}
+                        src={require("assets/img/square6.png").default}
                       />
                       <CardTitle tag="h4">
                         {" "}
@@ -82,7 +86,6 @@ const LoginPage = ({}) => {
                   </Card>
                 </Col>
               </Row>
-              <div className="register-bg" />
             </Container>
           </div>
         </div>
