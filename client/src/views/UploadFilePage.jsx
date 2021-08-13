@@ -34,11 +34,6 @@ const UploadFilePage = () => {
       <div className="wrapper">
         <img
           alt="..."
-          className="dots"
-          src={require("assets/img/dots.png").default}
-        />
-        <img
-          alt="..."
           className="path"
           src={require("assets/img/path4.png").default}
         />
@@ -65,7 +60,7 @@ const UploadFilePage = () => {
                           <FormGroup>
                             <Button
                               className="btn-round"
-                              color="primary"
+                              color="info"
                               data-placement="right"
                               id="UploadFileButton"
                               type="button"
@@ -88,7 +83,7 @@ const UploadFilePage = () => {
                       </Row>
                       <Button
                         className="btn-round float-right"
-                        color="primary"
+                        color="info"
                         data-placement="right"
                         id="SubmitFilesButton"
                         type="button"
