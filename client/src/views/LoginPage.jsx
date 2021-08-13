@@ -20,7 +20,7 @@ import Context from "../Helpers/Context";
 import getWeb3 from "../Helpers/getWeb3";
 import { Redirect } from "react-router-dom/cjs/react-router-dom.min";
 
-const LoginPage = ({}) => {
+const LoginPage = () => {
   const { contextValue, dispatchContextValue } = useContext(Context);
 
   const handleLogin = async () => {
