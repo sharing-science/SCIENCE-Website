@@ -22,7 +22,6 @@ import {
   Container,
   Row,
   Col,
-  CardFooter,
 } from "reactstrap";
 
 // core components

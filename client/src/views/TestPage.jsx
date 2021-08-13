@@ -9,8 +9,7 @@ import {
   CardHeader,
   CardFooter,
   Col,
-  FormGroup,
-  Input, Row
+  Row,
 } from "reactstrap";
 
 // core components
@@ -57,15 +56,14 @@ const TestPage = () => {
     // }
   };
 
-
   const acceptClause = async (e) => {
     await contracts.contract.methods
       .acceptClause(e.target.name)
       .send({ from: contextValue.web3.accounts[0] });
-    if(e.target.name==0){
+    if (e.target.name === 0) {
       window.location.replace("http://localhost:3000/upload");
     }
-    if(e.target.name==1){
+    if (e.target.name === 1) {
       window.location.replace("http://localhost:3000/report");
     }
   };
@@ -78,17 +76,17 @@ const TestPage = () => {
   };
 
   const checkStatus = async () => {
-    const name=await contracts.contract.methods.getStateName().call();
+    const name = await contracts.contract.methods.getStateName().call();
     setState(name);
-  }
+  };
 
   const getDataLink = async () => {
-    const name=await contracts.contract.methods.getStateName().call();
-    if(name=="Active"){
+    const name = await contracts.contract.methods.getStateName().call();
+    if (name === "Active") {
       setDataLink("http://localhost:3000/Data");
-      setLinkTest("Click Here!")
+      setLinkTest("Click Here!");
     }
-  }
+  };
 
   // This runs when the webpage opens, this will connect to web3 and get instances of the contracts
   useEffect(() => {
@@ -127,69 +125,67 @@ const TestPage = () => {
             />
             <Container>
               <Row>
-              <Col xs="6">
-              <Card className="p-4 card-stats">
-                  <CardHeader>
-                    <Button onClick={getClauses}>Get Clauses</Button>
-                  </CardHeader>
-                  <CardBody>
-                    {clauseList.map((item, key) => (
-                      <span key={key + "-clause"}>
-                        <p className="text-left" key={key + "-num-Clause"}>
-                          <b>{key + 1}. </b>
-                          {item}
-                        </p>
-                        <Button
-                          className="btn-round"
-                          color="primary"
-                          size="lg"
-                          name={key}
-                          onClick={acceptClause}
-                        >
-                          Accept
+                <Col xs="6">
+                  <Card className="p-4 card-stats">
+                    <CardHeader>
+                      <Button onClick={getClauses}>Get Clauses</Button>
+                    </CardHeader>
+                    <CardBody>
+                      {clauseList.map((item, key) => (
+                        <span key={key + "-clause"}>
+                          <p className="text-left" key={key + "-num-Clause"}>
+                            <b>{key + 1}. </b>
+                            {item}
+                          </p>
+                          <Button
+                            className="btn-round"
+                            color="primary"
+                            size="lg"
+                            name={key}
+                            onClick={acceptClause}
+                          >
+                            Accept
+                          </Button>
+                        </span>
+                      ))}
+                    </CardBody>
+                    <CardFooter>
+                      <Button
+                        className="btn-round"
+                        color="info"
+                        onClick={checkAccepted}
+                      >
+                        Check
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </Col>
+                <Col xs="6">
+                  <Col xs="6">
+                    <Card className="p-4 card-stats">
+                      <CardHeader>
+                        <Button onClick={checkStatus}>
+                          Get Contract Status
                         </Button>
-                        
-                      </span>
-                    ))}
-                  </CardBody>
-                  <CardFooter>
-                    <Button
-                      className="btn-round"
-                      color="info"
-                      onClick={checkAccepted}
-                    >
-                      Check
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </Col>
-              <Col xs="6">
-                <Col xs="6">
-                  <Card className="p-4 card-stats">
-                    <CardHeader>
-                      <Button onClick={checkStatus}>Get Contract Status</Button>
-                    </CardHeader>
-                    <CardBody>
-                      <p className="text-left">
-                        {state}
-                      </p>
-                    </CardBody>
-                  </Card>
+                      </CardHeader>
+                      <CardBody>
+                        <p className="text-left">{state}</p>
+                      </CardBody>
+                    </Card>
+                  </Col>
+                  <Col xs="6">
+                    <Card className="p-4 card-stats">
+                      <CardHeader>
+                        <Button onClick={getDataLink}>Get DataSet</Button>
+                      </CardHeader>
+                      <CardBody>
+                        <p className="text-left">
+                          <a href={dataLink}>{linkText}</a>
+                        </p>
+                      </CardBody>
+                    </Card>
+                  </Col>
                 </Col>
-                <Col xs="6">
-                  <Card className="p-4 card-stats">
-                    <CardHeader>
-                      <Button onClick={getDataLink}>Get DataSet</Button>
-                    </CardHeader>
-                    <CardBody>
-                      <p className="text-left">
-                        <a href={dataLink}>{linkText}</a>
-                      </p>
-                    </CardBody>
-                  </Card>
-                </Col>
-              </Col>
-              
               </Row>
             </Container>
           </div>
