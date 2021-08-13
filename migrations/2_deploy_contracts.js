@@ -4,6 +4,7 @@ const MyToken = artifacts.require("MyToken");
 const MyTokenSales = artifacts.require("MyTokenSale");
 const KycContract = artifacts.require("KycContract");
 const Roles = artifacts.require("Roles");
+const DataUseTeam = artifacts.require("./DataUseTeam.sol");
 
 require("dotenv").config({ path: "../.env" });
 
