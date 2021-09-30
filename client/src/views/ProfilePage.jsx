@@ -29,7 +29,7 @@ import NavBar from "components/NavBar";
 import Footer from "components/Footer";
 
 const ProfilePage = () => {
-  const { contextValue, dispatchContextValue } = useContext(Context);
+  const { contextValue } = useContext(Context);
 
   const [requests, setRequests] = useState();
   const [rolesList, setRolesList] = useState({
@@ -89,12 +89,6 @@ const ProfilePage = () => {
     },
     [contextValue.web3.accounts]
   );
-
-  const handleLogout = () => {
-    dispatchContextValue({
-      type: "logout",
-    });
-  };
 
   useEffect(() => {
     const init = async () => {
@@ -224,20 +218,6 @@ const ProfilePage = () => {
                         </UncontrolledDropdown>
                       </Col>
                     </CardBody>
-                  </Card>
-                </Col>
-              </Row>
-              <Row>
-                <Col xs="12" md="3">
-                  <Card className="card-register p-4">
-                    <Button
-                      className="btn-round"
-                      color="info"
-                      size="lg"
-                      onClick={handleLogout}
-                    >
-                      Logout
-                    </Button>
                   </Card>
                 </Col>
               </Row>

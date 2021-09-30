@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 
 import {
@@ -19,7 +19,12 @@ import {
   UncontrolledTooltip,
 } from "reactstrap";
 
+import Context from "../Helpers/Context";
+
 const NavBar = () => {
+  // Context
+  const { contextValue, dispatchContextValue } = useContext(Context);
+
   // Hooks
   const [collapseOpen, setCollapseOpen] = useState(false);
   const [collapseOut, setCollapseOut] = useState("");
@@ -56,6 +61,13 @@ const NavBar = () => {
   };
   const onCollapseExited = () => {
     setCollapseOut("");
+  };
+
+  // Buttons
+  const logInButtonClick = () => {
+    dispatchContextValue({
+      type: "logout",
+    });
   };
 
   return (
@@ -174,14 +186,27 @@ const NavBar = () => {
               </DropdownMenu>
             </UncontrolledDropdown>
             <NavItem>
-              <Button
-                className="nav-link d-none d-lg-block"
-                color="info"
-                tag={Link}
-                to="/upload"
-              >
-                <i className="tim-icons icon-spaceship" /> Upload a File
-              </Button>
+              {contextValue.loggedIn ? (
+                <Button
+                  className="nav-link d-none d-lg-block"
+                  color="info"
+                  tag={Link}
+                  onClick={logInButtonClick}
+                >
+                  <i className="tim-icons icon-spaceship" />
+                  LogOut
+                </Button>
+              ) : (
+                <Button
+                  className="nav-link d-none d-lg-block"
+                  color="info"
+                  tag={Link}
+                  to="/login"
+                >
+                  <i className="tim-icons icon-spaceship" />
+                  Login
+                </Button>
+              )}
             </NavItem>
             <NavItem>
               <Button
