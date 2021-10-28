@@ -190,7 +190,6 @@ const NavBar = () => {
                 <Button
                   className="nav-link d-none d-lg-block"
                   color="info"
-                  tag={Link}
                   onClick={logInButtonClick}
                 >
                   <i className="tim-icons icon-spaceship" />
