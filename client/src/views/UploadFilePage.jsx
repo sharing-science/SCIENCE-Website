@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 // reactstrap components
 import {
@@ -23,9 +24,22 @@ const UploadFilePage = () => {
   const [uploadInput, setUploadInput] = useState();
 
   const fileUploaded = (e) => {
-    e.target.files ? console.log(e.target.files) : console.log("problem");
-
+    if (!e.target.files) {
+      console.log("Error Uploading File");
+    }
     setUploadInput(e.target.files);
+  };
+
+  const submitFile = () => {
+    // Create an object of formData
+    const formData = new FormData();
+    // Update the formData object
+    formData.append('file', uploadInput[0]);
+    formData.append('filename', uploadInput[0].name);
+
+    // Request made to the backend api
+    // Send formData object
+    axios.post("http://localhost:5000/", formData);
   };
 
   return (
@@ -50,14 +64,6 @@ const UploadFilePage = () => {
                       <Row>
                         <Col md="6">
                           <FormGroup>
-                            <label>File Name</label>
-                            <Input type="text" />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row>
-                        <Col md="6">
-                          <FormGroup>
                             <Button
                               className="btn-round"
                               color="info"
@@ -70,7 +76,7 @@ const UploadFilePage = () => {
                             </Button>
                             <UncontrolledTooltip
                               delay={0}
-                              placement="right"
+                              placement="left"
                               target="UploadFileButton"
                             >
                               {uploadInput
@@ -78,18 +84,22 @@ const UploadFilePage = () => {
                                   " was successfully uploaded"
                                 : "Click to upload your file"}
                             </UncontrolledTooltip>
+                            <Button
+                              className="btn-round"
+                              color="info"
+                              data-placement="right"
+                              id="SubmitFilesButton"
+                              type="button"
+                              onClick={submitFile}
+                            >
+                              Submit
+                            </Button>
                           </FormGroup>
                         </Col>
                       </Row>
-                      <Button
-                        className="btn-round float-right"
-                        color="info"
-                        data-placement="right"
-                        id="SubmitFilesButton"
-                        type="button"
-                      >
-                        Submit
-                      </Button>
+                      <Row>
+                        <Col md="6"></Col>
+                      </Row>
                       <UncontrolledTooltip
                         delay={0}
                         placement="right"
