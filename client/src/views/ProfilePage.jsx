@@ -48,17 +48,17 @@ const ProfilePage = () => {
   });
 
   const getRequests = async () => {
-    setRequests(
-      await contracts.Roles.methods
-        .getRequests(rolesList.encodings[rolesList.names.indexOf(activeRole)])
-        .call()
-    );
+    let r = await contracts.Roles.methods
+    .getRequests(rolesList.encodings[rolesList.names.indexOf(activeRole)])
+    .call()
+    setRequests(r);
   };
 
   const handleRequestJoin = async (key) => {
     await contracts.Roles.methods
       .requestJoin(rolesList.encodings[key])
       .send({ from: contextValue.web3.accounts[0] });
+    console.log(await contracts.Roles.methods.getRequests(rolesList.encodings[key]).call())
   };
 
   const handleAcceptRequest = async (key) => {
