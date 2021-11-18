@@ -22,7 +22,6 @@ import Footer from "components/Footer";
 
 const UploadFilePage = () => {
   const [uploadInput, setUploadInput] = useState();
-  const [fileName, setFileName] = useState("xyz");
 
   const fileUploaded = (e) => {
     if (!e.target.files) {
@@ -31,26 +30,12 @@ const UploadFilePage = () => {
     setUploadInput(e.target.files);
   };
 
-  const submitDownloadFile = () => {
-    axios({
-      url: "http://localhost:5000/?filename=" + fileName, //your url
-      method: "GET",
-      responseType: "blob", // important
-    }).then((response) => {
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", fileName); //or any other extension
-      document.body.appendChild(link);
-      link.click();
-    });
-  };
   const submitFile = () => {
     // Create an object of formData
     const formData = new FormData();
     // Update the formData object
-    formData.append('file', uploadInput[0]);
-    formData.append('filename', uploadInput[0].name);
+    formData.append("file", uploadInput[0]);
+    formData.append("filename", uploadInput[0].name);
 
     // Request made to the backend api
     // Send formData object
@@ -72,15 +57,12 @@ const UploadFilePage = () => {
               <Col md="6">
                 <Card className="card-plain">
                   <CardHeader>
-                    <h1 className="profile-title text-left">
-                      File Upload and Download
-                    </h1>
+                    <h1 className="profile-title text-left">File Upload</h1>
                   </CardHeader>
                   <CardBody>
                     <Form>
                       <Row>
                         <Col md="6">
-                          <h1>Upload</h1>
                           <FormGroup>
                             <Button
                               className="btn-round"
@@ -109,26 +91,6 @@ const UploadFilePage = () => {
                               id="SubmitFilesButton"
                               type="button"
                               onClick={submitFile}
-                            >
-                              Submit
-                            </Button>
-                          </FormGroup>
-                        </Col>
-                        <Col md="6">
-                          <h1>Download</h1>
-                          <FormGroup>
-                            Filename
-                            <Input
-                              type="text"
-                              onChange={(e) => setFileName(e.target.value)}
-                              value={fileName}
-                            />
-                            <Button
-                              className="btn-round mt-4"
-                              color="info"
-                              data-placement="right"
-                              type="button"
-                              onClick={submitDownloadFile}
                             >
                               Submit
                             </Button>
