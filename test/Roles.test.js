@@ -8,29 +8,95 @@ contract("Roles", async function (accounts) {
   const [AdminMember, Member, anotherAccount] = accounts;
 
   beforeEach(async () => {
-    this.Roles = await Roles.new(AdminMember, Member);
+    this.Roles = await Roles.new(AdminMember);
+    this.RolesList = await this.Roles.getRolesEncodings();
+  });
+
+  it("Can Create new Role", async () => {
+    let instance = this.Roles;
+    let roleEncoding = web3.utils.soliditySha3("Member");
+
+    await expect(
+      instance.addRole.sendTransaction(
+        "Member",
+        roleEncoding,
+        Member,
+        this.RolesList[0],
+        {
+          from: AdminMember,
+        }
+      )
+    ).to.eventually.be.fulfilled;
+
+    return expect(instance.getRolesEncodings())
+      .to.eventually.be.an("array")
+      .to.have.lengthOf(2);
   });
 
   it("OnlyMember is working", async () => {
     let instance = this.Roles;
-    expect(instance.testFunction.sendTransaction({ from: AdminMember })).to
-      .eventually.be.rejected;
+    let roleEncoding = web3.utils.soliditySha3("Member");
+
+    await expect(
+      instance.addRole.sendTransaction(
+        "Member",
+        roleEncoding,
+        Member,
+        this.RolesList[0],
+        {
+          from: AdminMember,
+        }
+      )
+    ).to.eventually.be.fulfilled;
+
+    await expect(instance.testFunction.sendTransaction({ from: AdminMember }))
+      .to.eventually.be.rejected;
     return expect(instance.testFunction.sendTransaction({ from: Member })).to
       .eventually.be.fulfilled;
   });
 
   it("OnlyAdmin is working", async () => {
     let instance = this.Roles;
-    expect(instance.testAdminFunction.sendTransaction({ from: AdminMember }))
-      .to.eventually.be.fulfilled;
-    return expect(
-      instance.testAdminFunction.sendTransaction({ from: Member })
-    ).to.eventually.be.rejected;
+    let roleEncoding = web3.utils.soliditySha3("Member");
+
+    await expect(
+      instance.addRole.sendTransaction(
+        "Member",
+        roleEncoding,
+        Member,
+        this.RolesList[0],
+        {
+          from: AdminMember,
+        }
+      )
+    ).to.eventually.be.fulfilled;
+
+    await expect(
+      instance.testAdminFunction.sendTransaction({ from: AdminMember })
+    ).to.eventually.be.fulfilled;
+
+    return expect(instance.testAdminFunction.sendTransaction({ from: Member }))
+      .to.eventually.be.rejected;
   });
 
   it("Requesting and joining role works", async () => {
     let instance = this.Roles;
+    let roleEncoding = web3.utils.soliditySha3("Member");
+    
+    await expect(
+      instance.addRole.sendTransaction(
+        "Member",
+        roleEncoding,
+        Member,
+        this.RolesList[0],
+        {
+          from: AdminMember,
+        }
+        )
+        ).to.eventually.be.fulfilled;
+        
     let RolesList = await instance.getRolesEncodings();
+    
     await expect(
       instance.requestJoin.sendTransaction(RolesList[1], {
         from: anotherAccount,

@@ -16,7 +16,7 @@ module.exports = async (deployer) => {
   deployer.deploy(DataUseTeam);
 
   // Roles Contract
-  deployer.deploy(Roles, addr[0], addr[1]);
+  deployer.deploy(Roles, addr[0]);
 
   // Tokens
   await deployer.deploy(MyToken, process.env.INITIAL_TOKENS);
