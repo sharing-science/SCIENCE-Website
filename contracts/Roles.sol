@@ -5,25 +5,34 @@ import "./Libraries/AccessControl.sol";
 
 /// @dev Implements a single role access control contract.
 contract Roles is AccessControl {
-    uint8 constant numRoles = 2;
-    string[numRoles] RoleNames = ["TEST_ADMIN_ROLE", "TEST_ROLE"];
-    bytes32[numRoles] RolesEncodings = [
-        keccak256("TEST_ADMIN_ROLE"),
-        keccak256("TEST_ROLE")
-    ];
+    uint8 numRoles = 1;
+    string[] RoleNames = ["DEFAULT_ADMIN_ROLE"];
+    bytes32[] RolesEncodings = [keccak256("DEFAULT_ADMIN_ROLE")];
 
     /// @dev Create the community role, with `root` as a member.
-    constructor(address test_admin_role_root, address test_role_root) public {
-        _setupRole(RolesEncodings[0], test_admin_role_root, DEFAULT_ADMIN_ROLE);
-        _setupRole(RolesEncodings[1], test_role_root, RolesEncodings[0]);
+    constructor(address adminAccount) public {
+        _setupRole(DEFAULT_ADMIN_ROLE, adminAccount, DEFAULT_ADMIN_ROLE);
     }
 
+    function addRole(
+        string memory roleName,
+        bytes32 roleEncoding,
+        address account,
+        bytes32 adminRole
+    ) public onlyMember(adminRole) {
+        ++numRoles;
+        RoleNames.push(roleName);
+        RolesEncodings.push(roleEncoding);
+        _setupRole(roleEncoding, account, adminRole);
+    }
+
+    // View functions
     function getUsersRoles(address user)
         public
         view
-        returns (bytes32[numRoles] memory)
+        returns (bytes32[] memory)
     {
-        bytes32[numRoles] memory answer;
+        bytes32[] memory answer;
         uint8 position = 0;
         for (uint256 i = 0; i < RolesEncodings.length; ++i) {
             if (hasRole(RolesEncodings[i], user)) {
@@ -37,15 +46,16 @@ contract Roles is AccessControl {
     function getRolesEncodings()
         public
         view
-        returns (bytes32[numRoles] memory)
+        returns (bytes32[] memory)
     {
         return (RolesEncodings);
     }
 
-    function getRolesNames() public view returns (string[numRoles] memory) {
+    function getRolesNames() public view returns (string[] memory) {
         return (RoleNames);
     }
 
+    // Requests
     function requestJoin(bytes32 role) public {
         _requestJoin(role);
     }
