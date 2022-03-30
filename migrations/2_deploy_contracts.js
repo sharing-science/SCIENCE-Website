@@ -4,6 +4,8 @@ const MyToken = artifacts.require("MyToken");
 const MyTokenSales = artifacts.require("MyTokenSale");
 const KycContract = artifacts.require("KycContract");
 const Roles = artifacts.require("Roles");
+const CollaborationEvent = artifacts.require("CollaborationEvent");
+const Ownership = artifacts.require("Ownership");
 
 require("dotenv").config({ path: "../.env" });
 
@@ -11,12 +13,14 @@ module.exports = async (deployer) => {
   let addr = await web3.eth.getAccounts();
 
   // Agreement Contract
-  deployer.deploy(Covid19usecase);
+  await deployer.deploy(Covid19usecase);
 
-  deployer.deploy(DataUseTeam);
+  await deployer.deploy(DataUseTeam);
 
   // Roles Contract
-  deployer.deploy(Roles, addr[0]);
+  await deployer.deploy(Roles, addr[0]);
+
+  await deployer.deploy(CollaborationEvent, addr[0], addr[1]);
 
   // Tokens
   await deployer.deploy(MyToken, process.env.INITIAL_TOKENS);
@@ -33,4 +37,8 @@ module.exports = async (deployer) => {
     MyTokenSales.address,
     process.env.INITIAL_TOKENS
   );
+
+  // Ownership Contract
+
+  await deployer.deploy(Ownership);
 };
