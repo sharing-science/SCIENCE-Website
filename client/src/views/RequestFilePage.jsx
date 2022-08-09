@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
+import axios from 'axios'
 
 // reactstrap components
 import {
@@ -10,6 +11,7 @@ import {
   CardFooter,
   Col,
   Input,
+  Row,
 } from 'reactstrap'
 
 // core components
@@ -26,9 +28,22 @@ const RequestFilePage = () => {
     contract: {},
   })
 
+  const [showTable, setShowTable] = useState(false)
+
   const [inputs, setInputs] = useState({
     fileID: '0',
   })
+
+  const [fileNames, setFileNames] = useState([])
+
+  const getFileNames = async () => {
+    const response = await axios('http://localhost:5000/api/fileNames')
+    const info = []
+    for (let i = 0; i < response.data.files.length; ++i)
+      info.push(response.data.files[i])
+    console.log(info)
+    setFileNames(info)
+  }
 
   const handleInputChange = (e) => {
     const value =
@@ -53,6 +68,7 @@ const RequestFilePage = () => {
           ...c,
           contract: Contract_instance,
         }))
+        getFileNames()
       } catch (error) {
         console.log('Error')
       }
@@ -78,32 +94,69 @@ const RequestFilePage = () => {
               src={require('assets/img/waves.png').default}
             />
             <Container>
-              <Col xs="6">
-                <Card className="p-4 card-stats">
-                  <CardHeader>
-                    <h1>File Request</h1>
-                  </CardHeader>
-                  <CardBody>
-                    <label>File ID</label>
-                    <Input
-                      name="fileID"
-                      onChange={handleInputChange}
-                      value={inputs.fileID}
-                      type="number"
-                      color="primary"
-                    />
-                    <Button
-                      type="button"
-                      className="btn-round"
-                      color="info"
-                      onClick={handleSubmit}
-                    >
-                      Request File
-                    </Button>
-                  </CardBody>
-                  <CardFooter></CardFooter>
-                </Card>
-              </Col>
+              <Row>
+                <Col xs="6">
+                  <Card className="p-4 card-stats">
+                    <CardHeader>
+                      <h1>File Request</h1>
+                    </CardHeader>
+                    <CardBody>
+                      <label>File ID</label>
+                      <Input
+                        name="fileID"
+                        onChange={handleInputChange}
+                        value={inputs.fileID}
+                        type="number"
+                        color="primary"
+                      />
+                      <Button
+                        type="button"
+                        className="btn-round"
+                        color="info"
+                        onClick={handleSubmit}
+                      >
+                        Request File
+                      </Button>
+                    </CardBody>
+                    <CardFooter></CardFooter>
+                  </Card>
+                </Col>
+                <Col xs="6">
+                  <Card className="p-4 card-stats">
+                    <CardHeader>
+                      <h1>Files</h1>
+                    </CardHeader>
+                    <CardBody>
+                      <Button
+                        onClick={async () => {
+                          setShowTable(!showTable)
+                        }}
+                      >
+                        Get Files List
+                      </Button>
+                      {showTable && (
+                        <table className="table ">
+                          <thead>
+                            <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">Name</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {fileNames.map((file, index) => (
+                              <tr key={index + 'fileRow'}>
+                                <th scope="row">{index}</th>
+                                <td>{file.file_name}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
+                    </CardBody>
+                    <CardFooter></CardFooter>
+                  </Card>
+                </Col>
+              </Row>
             </Container>
           </div>
         </div>

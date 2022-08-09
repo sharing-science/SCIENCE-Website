@@ -29,7 +29,8 @@ const CreateNewFilePage = () => {
   const [fileID, setFileID] = useState('')
 
   const [inputs, setInputs] = useState({
-    fileID: '0',
+    fileID: '',
+    fileName: '',
   })
 
   const handleInputChange = (e) => {
@@ -85,20 +86,30 @@ const CreateNewFilePage = () => {
               <Col xs="6">
                 <Card className="p-4 card-stats">
                   <CardHeader>
-                    <h1>New File</h1>
+                    <h1>Register New File</h1>
                   </CardHeader>
                   <CardBody>
+                    <label>File Name</label>
+                    <Input
+                      name="fileName"
+                      onChange={handleInputChange}
+                      value={inputs.fileName}
+                      type="text"
+                      color="primary"
+                    />
                     <Button
                       type="button"
                       className="btn-round"
                       color="info"
                       onClick={handleSubmit}
                     >
-                      Create New File
+                      Register New File
                     </Button>
                   </CardBody>
                   <CardFooter>
-                    {fileID && 'Your FileID is ' + fileID}
+                    {fileID !== '' &&
+                      'Congratulations, your new file with created with the file ID: ' +
+                        fileID}
                   </CardFooter>
                 </Card>
               </Col>
