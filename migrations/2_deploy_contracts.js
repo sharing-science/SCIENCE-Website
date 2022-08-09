@@ -1,20 +1,28 @@
-const Covid19usecase = artifacts.require("./Covid19usecase.sol");
-const ResearcherRoles = artifacts.require("./ResearcherRoles.sol");
-const MyToken = artifacts.require("./MyToken.sol");
-const MyTokenSales = artifacts.require("./MyTokenSale.sol");
-const KycContract = artifacts.require("./KycContract.sol");
+const DataUseTeam = artifacts.require("DataUseTeam");
+const Covid19usecase = artifacts.require("Covid19usecase");
+const MyToken = artifacts.require("MyToken");
+const MyTokenSales = artifacts.require("MyTokenSale");
+const KycContract = artifacts.require("KycContract");
+const Roles = artifacts.require("Roles");
+const CollaborationEvent = artifacts.require("CollaborationEvent");
+const Ownership = artifacts.require("Ownership");
 
 require("dotenv").config({ path: "../.env" });
 
 module.exports = async (deployer) => {
+  let addr = await web3.eth.getAccounts();
+
   // Agreement Contract
-  deployer.deploy(Covid19usecase);
+  await deployer.deploy(Covid19usecase);
+
+  await deployer.deploy(DataUseTeam);
 
   // Roles Contract
-  deployer.deploy(ResearcherRoles);
+  await deployer.deploy(Roles, addr[0]);
+
+  await deployer.deploy(CollaborationEvent, addr[0], addr[1]);
 
   // Tokens
-  let addr = await web3.eth.getAccounts();
   await deployer.deploy(MyToken, process.env.INITIAL_TOKENS);
   await deployer.deploy(KycContract);
   await deployer.deploy(
@@ -29,4 +37,8 @@ module.exports = async (deployer) => {
     MyTokenSales.address,
     process.env.INITIAL_TOKENS
   );
+
+  // Ownership Contract
+
+  await deployer.deploy(Ownership);
 };

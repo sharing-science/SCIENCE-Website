@@ -28,6 +28,7 @@ const SampleContract = () => {
   const [inputs, setInputs] = useState({
     kycAddress: "0x123",
     sendTo: "0x123",
+    amountToSend: 1
   });
   const [userTokens, setUserTokens] = useState(0);
   const [contracts, setContracts] = useState({
@@ -72,7 +73,7 @@ const SampleContract = () => {
 
   const handleSendToken = async () => {
     await contracts.myToken.methods
-      .transfer(inputs.sendTo, 1)
+      .transfer(inputs.sendTo, inputs.amountToSend)
       .send({ from: contextValue.web3.accounts[0] });
     updateUserTokens(contracts.myToken);
   };
@@ -175,6 +176,13 @@ const SampleContract = () => {
                     <h2>Send KUD</h2>
                     <CardBody>
                       <FormGroup>
+                      <label>Amount: </label>
+                        <Input
+                          name="amountToSend"
+                          onChange={handleInputChange}
+                          value={inputs.amountToSend}
+                          type="number"
+                        />
                         <label>Send To:</label>
                         <Input
                           name="sendTo"

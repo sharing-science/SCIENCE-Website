@@ -3,6 +3,8 @@ pragma solidity ^0.6.0;
 
 contract Covid19usecase {
     uint256 clauseCount = 0;
+    uint256 stateCount = 0;
+    uint256 reportCount = 0;
 
     struct Clause {
         uint256 id;
@@ -10,20 +12,24 @@ contract Covid19usecase {
         bool agree;
     }
 
-    enum contractState {
-        NotReady,
-        Created,
-        ReadyforRequireRequest,
-        ReadyforSubmitRequest,
-        ReadyforReview,
-        Active,
-        Inactive,
-        Aborted,
-        Terminate,
-        Expire
+    struct State {
+      uint id;
+      string name;
     }
 
-    contractState public State;
+    mapping(uint => State) public ContractStates;
+
+    string public stateName;
+    uint public Number=0;
+
+    struct Report {
+      uint256 id;
+      string reportType;
+      string reportAccount;
+      string reportReason;
+    }
+
+    mapping(uint => Report) public Reports;
 
     constructor() public {
         createClause(
@@ -41,7 +47,13 @@ contract Covid19usecase {
         createClause(
             "User(s) agree(s) to recognize the effort that Data Contributor(s) made in collecting and providing the Data and allow the following information in the approved Data Use Request to be made publicly available: non-confidential research statement of the Research Project, Project Title, Users’ names and Accessing Institution(s)"
         );
-        State = contractState.NotReady;
+        createState("NotReady");
+        createState("ReadyforRequireRequest");
+        createState("ReadyforSubmitRequest");
+        createState("ReadyforReview");
+        createState("Active");
+        createState("Inactive");
+        stateName=ContractStates[1].name;
     }
 
     mapping(uint256 => Clause) public clauses;
@@ -58,32 +70,82 @@ contract Covid19usecase {
         return clauses[num].content;
     }
 
+    function getReportCount() public view returns (uint256) {
+        return reportCount;
+    }
+
+    function getReportId(uint256 num) public view returns (uint256) {
+        return Reports[num].id;
+    }
+
+    function getReportType(uint256 num) public view returns (string memory) {
+        return Reports[num].reportType;
+    }
+
+    function getReportAccount(uint256 num) public view returns (string memory) {
+        return Reports[num].reportAccount;
+    }
+
+    function getReportReason(uint256 num) public view returns (string memory) {
+        return Reports[num].reportReason;
+    }
+/*
     function getState() public view returns (contractState) {
         return State;
     }
-
+*/
     function createClause(string memory _content) public {
         clauseCount++;
         clauses[clauseCount] = Clause(clauseCount, _content, false);
         emit ClauseCreated(clauseCount, _content, false);
     }
 
+    function createState(string memory _name) public {
+      stateCount ++;
+      ContractStates[stateCount] = State(stateCount,_name);
+    }
+/*
     function agreeClause1(bool agree) public {
         if (agree) {
             State = contractState.ReadyforRequireRequest;
         }
-    }
+    }*/
 
     function acceptClause(uint256 id) public {
         clauses[id].agree = true;
     }
-
+/*
     function submitRequest(uint256 _id) public {
         State = contractState.ReadyforReview;
         emit RequestSumbitted(_id);
-    }
+    }*/
 
     function getClauseStatus(uint256 id) public view returns (bool) {
         return clauses[id].agree;
     }
+
+    function changeState(uint id) public {
+      stateName=ContractStates[id].name;
+      //Number=1;
+    }
+
+    function getStateName() public view returns (string memory){
+      return stateName;
+    }
+
+    function getClauseAgree(uint i) public view returns (bool) {
+      return clauses[i].agree;
+    }
+
+    function getNumber() public view returns (uint){
+      return Number;
+    }
+
+    //Clause 2 and 3
+    function AddReport(string memory _type, string memory _account, string memory _name) public{
+      reportCount++;
+      Reports[reportCount] = Report(clauseCount, _type, _account, _name);
+    }
+
+
 }

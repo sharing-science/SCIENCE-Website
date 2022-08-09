@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState, useContext } from 'react'
+import { Link } from 'react-router-dom'
 
 import {
   Button,
@@ -17,49 +17,61 @@ import {
   Row,
   Col,
   UncontrolledTooltip,
-} from "reactstrap";
+} from 'reactstrap'
+
+import Context from '../Helpers/Context'
 
 const NavBar = () => {
+  // Context
+  const { contextValue, dispatchContextValue } = useContext(Context)
+
   // Hooks
-  const [collapseOpen, setCollapseOpen] = useState(false);
-  const [collapseOut, setCollapseOut] = useState("");
-  const [color, setColor] = useState("navbar-transparent");
+  const [collapseOpen, setCollapseOpen] = useState(false)
+  const [collapseOut, setCollapseOut] = useState('')
+  const [color, setColor] = useState('navbar-transparent')
 
   // Change Colors when scrolling down
   useEffect(() => {
-    window.addEventListener("scroll", changeColor);
+    window.addEventListener('scroll', changeColor)
     return () => {
-      window.removeEventListener("scroll", changeColor);
-    };
-  }, []);
+      window.removeEventListener('scroll', changeColor)
+    }
+  }, [])
   const changeColor = () => {
     if (
       document.documentElement.scrollTop > 99 ||
       document.body.scrollTop > 99
     ) {
-      setColor("bg-info");
+      setColor('bg-info')
     } else if (
       document.documentElement.scrollTop < 100 ||
       document.body.scrollTop < 100
     ) {
-      setColor("navbar-transparent");
+      setColor('navbar-transparent')
     }
-  };
+  }
 
   // Collapse NavBar
   const toggleCollapse = () => {
-    document.documentElement.classList.toggle("nav-open");
-    setCollapseOpen(!collapseOpen);
-  };
+    document.documentElement.classList.toggle('nav-open')
+    setCollapseOpen(!collapseOpen)
+  }
   const onCollapseExiting = () => {
-    setCollapseOut("collapsing-out");
-  };
+    setCollapseOut('collapsing-out')
+  }
   const onCollapseExited = () => {
-    setCollapseOut("");
-  };
+    setCollapseOut('')
+  }
+
+  // Buttons
+  const logInButtonClick = () => {
+    dispatchContextValue({
+      type: 'logout',
+    })
+  }
 
   return (
-    <Navbar className={"fixed-top " + color} color-on-scroll="100" expand="lg">
+    <Navbar className={'fixed-top ' + color} color-on-scroll="100" expand="lg">
       <Container>
         <div className="navbar-translate">
           <NavbarBrand to="/" tag={Link} id="navbar-brand">
@@ -80,7 +92,7 @@ const NavBar = () => {
           </button>
         </div>
         <Collapse
-          className={"justify-content-end " + collapseOut}
+          className={'justify-content-end ' + collapseOut}
           navbar
           isOpen={collapseOpen}
           onExiting={onCollapseExiting}
@@ -171,17 +183,49 @@ const NavBar = () => {
                   <i className="tim-icons icon-single-02" />
                   Profile Page
                 </DropdownItem>
+                <DropdownItem tag={Link} to="/upload">
+                  <i className="tim-icons icon-cloud-upload-94" />
+                  Upload Page
+                </DropdownItem>
+                <DropdownItem tag={Link} to="/approveRequests">
+                  <i className="tim-icons icon-cloud-upload-94" />
+                  Approve Requests
+                </DropdownItem>
+                <DropdownItem tag={Link} to="/request">
+                  <i className="tim-icons icon-cloud-upload-94" />
+                  Request
+                </DropdownItem>
+                <DropdownItem tag={Link} to="/newFile">
+                  <i className="tim-icons icon-cloud-upload-94" />
+                  Create New File
+                </DropdownItem>
+                <DropdownItem tag={Link} to="/check">
+                  <i className="tim-icons icon-cloud-upload-94" />
+                  Check Access
+                </DropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>
             <NavItem>
-              <Button
-                className="nav-link d-none d-lg-block"
-                color="info"
-                tag={Link}
-                to="/upload"
-              >
-                <i className="tim-icons icon-spaceship" /> Upload a File
-              </Button>
+              {contextValue.loggedIn ? (
+                <Button
+                  className="nav-link d-none d-lg-block"
+                  color="info"
+                  onClick={logInButtonClick}
+                >
+                  <i className="tim-icons icon-spaceship" />
+                  LogOut
+                </Button>
+              ) : (
+                <Button
+                  className="nav-link d-none d-lg-block"
+                  color="info"
+                  tag={Link}
+                  to="/login"
+                >
+                  <i className="tim-icons icon-spaceship" />
+                  Login
+                </Button>
+              )}
             </NavItem>
             <NavItem>
               <Button
@@ -197,7 +241,7 @@ const NavBar = () => {
         </Collapse>
       </Container>
     </Navbar>
-  );
-};
+  )
+}
 
-export default NavBar;
+export default NavBar
