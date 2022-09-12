@@ -2,6 +2,9 @@
 
 A POC made by Noe Horowitz
 
+Walkthrough tutorial video:
+https://rpi.box.com/s/gieyjk3pvzyg8yu7a9hfgc3a9sqf8lgs
+
 ## Installation
 
 There are two main parts to this application, Truffle and the Client, each with its own necessary packages.
