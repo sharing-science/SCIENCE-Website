@@ -1,160 +1,171 @@
 import React, { useState } from "react";
-import axios from "axios";
 
-// reactstrap components
-import {
-  Button,
-  Card,
-  CardHeader,
-  CardBody,
-  FormGroup,
-  Form,
-  Input,
-  Container,
-  Row,
-  Col,
-  UncontrolledTooltip,
-} from "reactstrap";
 
 // core components
-import NavBar from "components/NavBar";
-import Footer from "components/Footer";
+import { sha1, sha256, sha384, sha512 } from 'crypto-hash';
+import "assets/css/hashing.css"; 
 
 const HashTestPage = () => {
-  const [uploadInput, setUploadInput] = useState();
-  const [fileName, setFileName] = useState("...");
+  const [algorithms] = useState(['sha1', 'sha256', 'sha384', 'sha512']);
+  let [text_input, setTextInput] = useState('');
+  let [file_input, setFileInput] = useState('');
+  let [algorithm, setAlgorithm] = useState('sha1');
+  let [output, setOutput] = useState('');
+  // For handling text input
+  const handleTextInput = async (e) => {
+      // Get the value
+      let value = e.target.value;
 
-  const fileUploaded = (e) => {
-    if (!e.target.files) {
-      console.log("Error Uploading File");
-    }
-    setUploadInput(e.target.files);
-  };
+      let result = '';
 
-  const submitDownloadFile = () => {
-    axios({
-      url: "http://localhost:5000/?filename=" + fileName, //your url
-      method: "GET",
-      responseType: "blob", // important
-    }).then((response) => {
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", fileName); //or any other extension
-      document.body.appendChild(link);
-      link.click();
-    });
-  };
-  const submitFile = () => {
-    // Create an object of formData
-    const formData = new FormData();
-    // Update the formData object
-    formData.append('file', uploadInput[0]);
-    formData.append('filename', uploadInput[0].name);
+      // Get the current active algorithm and hash the value using it.
+      if (algorithm == 'sha1') {
+          result = await sha1(value);
+      } else if (algorithm == 'sha256') {
+          result = await sha256(value);
+      } else if (algorithm == 'sha384') {
+          result = await sha384(value);
+      } else if (algorithm == 'sha512') {
+          result = await sha512(value);
+      }
 
-    // Request made to the backend api
-    // Send formData object
-    axios.post("http://localhost:5000/", formData);
-  };
+      // Set the hashed text as output
+      setOutput(result);
+
+      // Set the value of the text input
+      setTextInput(value);
+  }
+
+  // For handling file input
+  const handleFileInput = (e) => {
+
+      // Initializing the file reader
+      const fr = new FileReader();
+
+      // Listening to when the file has been read.
+      fr.onload = async () => {
+
+          let result = '';
+
+          // Hashing the content based on the active algorithm
+          if (algorithm == 'sha1') {
+              result = await sha1(fr.result);
+          } else if (algorithm == 'sha256') {
+              result = await sha256(fr.result);
+          } else if (algorithm == 'sha384') {
+              result = await sha384(fr.result);
+          } else if (algorithm == 'sha512') {
+              result = await sha512(fr.result);
+          }
+
+          // Setting the hashed text as the output
+          setOutput(result);
+
+          // Setting the content of the file as file input
+          setFileInput(fr.result);
+      }
+
+      // Reading the file.
+      fr.readAsText(e.target.files[0]);
+  }
+
+  // For handling algorithm change
+  const handleAlgorithmChange = async (e) => {
+
+      // Get the selected algorithm
+      let value = e.target.value;
+
+      let result = '';
+
+      // Check if we have a text input
+      if (text_input) {
+
+          // Hash the text based on the selected algorithm
+          if (value == 'sha1') {
+              result = await sha1(text_input);
+          } else if (value == 'sha256') {
+              result = await sha256(text_input);
+          }
+          else if (value == 'sha384') {
+              result = await sha384(text_input);
+          }
+          else if (value == 'sha512') {
+              result = await sha512(text_input);
+          }
+
+      }
+
+      // Check if we have a file input
+      if (file_input) {
+
+          // Hash the file content based on the selected algorithm
+          if (value == 'sha1') {
+              result = await sha1(file_input);
+          } else if (value == 'sha256') {
+              result = await sha256(file_input);
+          } else if (value == 'sha384') {
+              result = await sha384(file_input);
+          } else if (value == 'sha512') {
+              result = await sha512(file_input);
+          }
+
+      }
+
+      // Set the selected algorithm
+      setAlgorithm(value);
+
+      // Set the hashed text
+      setOutput(result);
+  }
 
   return (
-    <>
-      <NavBar />
-      <div className="wrapper">
-        <img
-          alt="..."
-          className="path"
-          src={require("assets/img/path4.png").default}
-        />
-        <section className="section">
-          <Container>
-            <Row>
-              <Col md="6">
-                <Card className="card-plain">
-                  <CardHeader>
-                    <h1 className="profile-title text-left">
-                      Hash
-                    </h1>
-                  </CardHeader>
-                  <CardBody>
-                    <Form>
-                      <Row>
-                        <Col md="6">
-                          <h1>Upload for Hash</h1>
-                          <FormGroup>
-                            <Button
-                              className="btn-round"
-                              color="info"
-                              data-placement="right"
-                              id="UploadFileButton"
-                              type="button"
-                            >
-                              {uploadInput ? "File Uploaded" : "Upload File for hash"}
-                              <Input type="file" onChange={fileUploaded} />
-                            </Button>
-                            <UncontrolledTooltip
-                              delay={0}
-                              placement="left"
-                              target="UploadFileButton"
-                            >
-                              {uploadInput
-                                ? uploadInput[0].name +
-                                  " was successfully uploaded"
-                                : "Click to upload your file"}
-                            </UncontrolledTooltip>
-                            <Button
-                              className="btn-round"
-                              color="info"
-                              data-placement="right"
-                              id="SubmitFilesButton"
-                              type="button"
-                              onClick={submitFile}
-                            >
-                              Submit
-                            </Button>
-                          </FormGroup>
-                        </Col>
-                        <Col md="6">
-                          <h1>Download</h1>
-                          <FormGroup>
-                            Filename
-                            <Input
-                              type="text"
-                              onChange={(e) => setFileName(e.target.value)}
-                              value={fileName}
-                            />
-                            <Button
-                              className="btn-round mt-4"
-                              color="info"
-                              data-placement="right"
-                              type="button"
-                              onClick={submitDownloadFile}
-                            >
-                              Submit
-                            </Button>
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row>
-                        <Col md="6"></Col>
-                      </Row>
-                      <UncontrolledTooltip
-                        delay={0}
-                        placement="right"
-                        target="SubmitFilesButton"
-                      >
-                        Click to submit your file
-                      </UncontrolledTooltip>
-                    </Form>
-                  </CardBody>
-                </Card>
-              </Col>
-            </Row>
-          </Container>
-        </section>
-        <Footer />
+      <div className='hashing-container'>
+          <div className='hashing-content'>
+
+              <div className="hashing-form">
+                  <h4 className="hashing-form-heading">Input</h4>
+                  <form>
+                      <div className="form-group">
+                          <label htmlFor="text-input">Text</label>
+                          <input type="text" className="form-control" id="text-input" placeholder='Write some text' value={text_input} onChange={handleTextInput} />
+                      </div>
+                      <div className="form-group">
+                          <label htmlFor="file-input">File Input</label>
+                          <input type="file" className="form-control" id="file-input" onChange={handleFileInput} />
+                      </div>
+                  </form>
+              </div>
+
+              <div className="hashing-algorithms">
+                  <h4 className="hashing-algorithms-heading">Algorithms</h4>
+                  <div className="hashing-algorithms-list">
+                      {
+                          algorithms.map(algo => {
+                              return (
+                                  <div className="form-check" key={algo}>
+                                      <input className="form-check-input" type="radio" name="algorithm" id={algo} value={algo} checked={algorithm === algo} onChange={handleAlgorithmChange} />
+                                      <label className="form-check-label" htmlFor={algo}>
+                                          {algo}
+                                      </label>
+                                  </div>
+                              )
+                          }
+                          )}
+                  </div>
+              </div>
+
+              <div className="hashed-output">
+                  <h4 className="hashed-algorithm-heading">Output</h4>
+                  <div className="hashed-algorithm-container">
+                      <p className="hashed-algorithm-text">
+                          {output}
+                      </p>
+                  </div>
+              </div>
+
+          </div>
       </div>
-    </>
+
   );
 };
 
