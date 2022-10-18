@@ -1,7 +1,24 @@
 import React, { useState } from "react";
 
+// reactstrap components
+import {
+  Button,
+  Card,
+  CardHeader,
+  CardBody,
+  FormGroup,
+  Form,
+  Input,
+  Container,
+  Row,
+  Col,
+  UncontrolledTooltip,
+} from "reactstrap";
 
 // core components
+import NavBar from "components/NavBar";
+import Footer from "components/Footer";
+//Specific crypto-hash
 import { sha1, sha256, sha384, sha512 } from 'crypto-hash';
 import "assets/css/hashing.css"; 
 
@@ -19,13 +36,13 @@ const HashTestPage = () => {
       let result = '';
 
       // Get the current active algorithm and hash the value using it.
-      if (algorithm == 'sha1') {
+      if (algorithm === 'sha1') {
           result = await sha1(value);
-      } else if (algorithm == 'sha256') {
+      } else if (algorithm === 'sha256') {
           result = await sha256(value);
-      } else if (algorithm == 'sha384') {
+      } else if (algorithm === 'sha384') {
           result = await sha384(value);
-      } else if (algorithm == 'sha512') {
+      } else if (algorithm === 'sha512') {
           result = await sha512(value);
       }
 
@@ -48,13 +65,13 @@ const HashTestPage = () => {
           let result = '';
 
           // Hashing the content based on the active algorithm
-          if (algorithm == 'sha1') {
+          if (algorithm === 'sha1') {
               result = await sha1(fr.result);
-          } else if (algorithm == 'sha256') {
+          } else if (algorithm === 'sha256') {
               result = await sha256(fr.result);
-          } else if (algorithm == 'sha384') {
+          } else if (algorithm === 'sha384') {
               result = await sha384(fr.result);
-          } else if (algorithm == 'sha512') {
+          } else if (algorithm === 'sha512') {
               result = await sha512(fr.result);
           }
 
@@ -81,15 +98,15 @@ const HashTestPage = () => {
       if (text_input) {
 
           // Hash the text based on the selected algorithm
-          if (value == 'sha1') {
+          if (value === 'sha1') {
               result = await sha1(text_input);
-          } else if (value == 'sha256') {
+          } else if (value === 'sha256') {
               result = await sha256(text_input);
           }
-          else if (value == 'sha384') {
+          else if (value === 'sha384') {
               result = await sha384(text_input);
           }
-          else if (value == 'sha512') {
+          else if (value === 'sha512') {
               result = await sha512(text_input);
           }
 
@@ -99,13 +116,13 @@ const HashTestPage = () => {
       if (file_input) {
 
           // Hash the file content based on the selected algorithm
-          if (value == 'sha1') {
+          if (value === 'sha1') {
               result = await sha1(file_input);
-          } else if (value == 'sha256') {
+          } else if (value === 'sha256') {
               result = await sha256(file_input);
-          } else if (value == 'sha384') {
+          } else if (value === 'sha384') {
               result = await sha384(file_input);
-          } else if (value == 'sha512') {
+          } else if (value === 'sha512') {
               result = await sha512(file_input);
           }
 
