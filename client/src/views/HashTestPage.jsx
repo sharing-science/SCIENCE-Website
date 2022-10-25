@@ -28,6 +28,7 @@ const HashTestPage = () => {
   let [file_input, setFileInput] = useState('');
   let [algorithm, setAlgorithm] = useState('sha1');
   let [output, setOutput] = useState('');
+  let [inputType, setType] = useState("");
   // For handling text input
   const handleTextInput = async (e) => {
       // Get the value
@@ -48,6 +49,7 @@ const HashTestPage = () => {
 
       // Set the hashed text as output
       setOutput(result);
+      setType("Text:");
 
       // Set the value of the text input
       setTextInput(value);
@@ -77,6 +79,7 @@ const HashTestPage = () => {
 
           // Setting the hashed text as the output
           setOutput(result);
+          setType("File:");
 
           // Setting the content of the file as file input
           setFileInput(fr.result);
@@ -136,53 +139,70 @@ const HashTestPage = () => {
   }
 
   return (
-      <div className='hashing-container'>
-          <div className='hashing-content'>
+    <>
+      <NavBar />
+        <div className="wrapper register-page">
+          <div className="page-header">
+            <div className="page-header-image" />
+            <div className="content">
+              <img
+                alt="..."
+                className="path"
+                src={require('assets/img/waves.png').default}
+              />
+              <Container>
+                <div className='hashing-container'>
+                    <div className='hashing-content'>
 
-              <div className="hashing-form">
-                  <h4 className="hashing-form-heading">Input</h4>
-                  <form>
-                      <div className="form-group">
-                          <label htmlFor="text-input">Text</label>
-                          <input type="text" className="form-control" id="text-input" placeholder='Write some text' value={text_input} onChange={handleTextInput} />
-                      </div>
-                      <div className="form-group">
-                          <label htmlFor="file-input">File Input</label>
-                          <input type="file" className="form-control" id="file-input" onChange={handleFileInput} />
-                      </div>
-                  </form>
-              </div>
+                        <div className="hashing-form">
+                            <h4 className="hashing-form-heading">Input</h4>
+                            <form>
+                                <div className="form-group">
+                                    <label htmlFor="text-input">Text</label>
+                                    <input type="text" className="form-control" id="text-input" placeholder='Write some text' value={text_input} onChange={handleTextInput} />
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="file-input">File Input</label>
+                                    <input type="file" className="form-control" id="file-input" onChange={handleFileInput} />
+                                </div>
+                            </form>
+                        </div>
 
-              <div className="hashing-algorithms">
-                  <h4 className="hashing-algorithms-heading">Algorithms</h4>
-                  <div className="hashing-algorithms-list">
-                      {
-                          algorithms.map(algo => {
-                              return (
-                                  <div className="form-check" key={algo}>
-                                      <input className="form-check-input" type="radio" name="algorithm" id={algo} value={algo} checked={algorithm === algo} onChange={handleAlgorithmChange} />
-                                      <label className="form-check-label" htmlFor={algo}>
-                                          {algo}
-                                      </label>
-                                  </div>
-                              )
-                          }
-                          )}
-                  </div>
-              </div>
+                        <div className="hashing-algorithms">
+                            <h4 className="hashing-algorithms-heading">Algorithms</h4>
+                            <div className="hashing-algorithms-list">
+                                {
+                                    algorithms.map(algo => {
+                                        return (
+                                            <div className="form-check" key={algo}>
+                                                <input className="form-check-input" type="radio" name="algorithm" id={algo} value={algo} checked={algorithm === algo} onChange={handleAlgorithmChange} />
+                                                <label className="form-check-label" htmlFor={algo}>
+                                                    {algo}
+                                                </label>
+                                            </div>
+                                        )
+                                    }
+                                    )}
+                            </div>
+                        </div>
 
-              <div className="hashed-output">
-                  <h4 className="hashed-algorithm-heading">Output</h4>
-                  <div className="hashed-algorithm-container">
-                      <p className="hashed-algorithm-text">
-                          {output}
-                      </p>
-                  </div>
-              </div>
+                        <div className="hashed-output">
+                            <h4 className="hashed-algorithm-heading">Output</h4>
+                            <div className="hashed-algorithm-container">
+                                <p className="hashed-algorithm-text">
+                                    {inputType} {output}
+                                </p>
+                            </div>
+                        </div>
 
+                    </div>
+                </div>
+            </Container>
           </div>
+        </div>
+        <Footer />
       </div>
-
+    </>
   );
 };
 
