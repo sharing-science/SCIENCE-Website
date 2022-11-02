@@ -32,6 +32,7 @@ const RequestFilePage = () => {
 
   const [inputs, setInputs] = useState({
     fileID: '0',
+    numberOfDays: '0',
   })
 
   const [fileNames, setFileNames] = useState([])
@@ -77,8 +78,8 @@ const RequestFilePage = () => {
   }, [contextValue.web3.networkId])
 
   const handleSubmit = async () => {
-    await contracts.contract.methods.requestAccess(inputs.fileID).send({
-      from: contextValue.web3.accounts[0],
+    await contracts.contract.methods.requestAccess(inputs.fileID,
+      inputs.numberOfDays).send({from: contextValue.web3.accounts[0],
     })
   }
   return (
@@ -107,6 +108,14 @@ const RequestFilePage = () => {
                         onChange={handleInputChange}
                         value={inputs.fileID}
                         type="number"
+                        color="primary"
+                      />
+                      <label>Number of Days</label>
+                      <Input
+                        name="numberOfDays"
+                        onChange={handleInputChange}
+                        value={inputs.numberOfDays}
+                        type="text"
                         color="primary"
                       />
                       <Button

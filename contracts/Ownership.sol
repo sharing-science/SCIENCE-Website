@@ -6,7 +6,9 @@ contract Ownership {
     mapping(uint256 => address) public owners;
     mapping(uint256 => uint256) public requestCounters;
     mapping(uint256 => mapping(address => bool)) public access;
+    mapping(uint256 => mapping(address => uint256)) public deadline;
     mapping(uint256 => mapping(uint256 => address)) public requests;
+    mapping(uint256 => mapping(uint256 => uint256)) public requestTime;
 
     constructor() public {
         fileCounter = 0;
@@ -45,13 +47,16 @@ contract Ownership {
         return answer;
     }
 
-    function allowAccess(uint256 fileID, address newUser)
+    //Owner grants newUser permission without request
+    function allowAccess(uint256 fileID, address newUser, uint256 numberOfDays)
         public
         onlyOwner(fileID)
     {
         access[fileID][newUser] = true;
+        deadline[fileID][newUser] = now + (numberOfDays * 1 days);
     }
 
+    //Owner addresses request
     function fulfillRequest(
         uint256 fileID,
         uint256 requestID,
@@ -59,20 +64,42 @@ contract Ownership {
     ) public onlyOwner(fileID) {
         if (approve) {
             access[fileID][requests[fileID][requestID]] = true;
+            deadline[fileID][requests[fileID][requestID]] = now + (requestTime[fileID][requestID] * 1 days);
         }
         delete requests[fileID][requestID];
+        delete requestTime[fileID][requestID];
     }
 
+    //Msg.sender checks access of specified user for given fileID
     function checkAccess(uint256 fileID, address user)
         public
-        view
         returns (bool)
     {
-        return access[fileID][user];
+        if(access[fileID][user]){
+            if(deadline[fileID][user] >= now){
+                return true;
+            }
+            //if access is true but past deadline, update access
+            access[fileID][user] = false;
+        }
+        return false;
     }
 
-    function requestAccess(uint256 fileID) public {
+    //Msg.sender checks the days remaining of specified user's access for given fileID
+    function checkDaysRemaining(uint256 fileID, address user)
+        public
+        returns (uint256)
+    {
+        if(checkAccess(fileID, user)){
+            return (deadline[fileID][user] - now) / 1 days;
+        }
+        return 0;
+    }
+
+    //Msg.sender requests access to fileID for numberOfDays
+    function requestAccess(uint256 fileID, uint256 numberOfDays) public {
         requests[fileID][requestCounters[fileID]] = msg.sender;
+        requestTime[fileID][requestCounters[fileID]] = numberOfDays;
         ++requestCounters[fileID];
     }
 }
