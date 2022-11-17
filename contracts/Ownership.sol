@@ -47,6 +47,18 @@ contract Ownership {
         return answer;
     }
 
+    function getFileRequestDays(uint256 fileID)
+        public
+        view
+        returns (uint256[] memory)
+    {
+        uint256[] memory answer = new uint256[](requestCounters[fileID]);
+        for (uint256 i = 0; i < requestCounters[fileID]; ++i){
+            answer[i] = requestTime[fileID][i];
+        }
+        return answer;
+    }
+
     //Owner grants newUser permission without request
     function allowAccess(uint256 fileID, address newUser, uint256 numberOfDays)
         public
