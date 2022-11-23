@@ -6,6 +6,7 @@ contract Ownership {
     mapping(uint256 => address) public owners;
     mapping(uint256 => uint256) public requestCounters;
     mapping(uint256 => mapping(address => bool)) public access;
+    mapping(uint256 => mapping(address => bool)) public isTimedAccess;
     mapping(uint256 => mapping(address => uint256)) public deadline;
     mapping(uint256 => mapping(uint256 => address)) public requests;
     mapping(uint256 => mapping(uint256 => uint256)) public requestTime;
@@ -60,12 +61,22 @@ contract Ownership {
     }
 
     //Owner grants newUser permission without request
-    function allowAccess(uint256 fileID, address newUser, uint256 numberOfDays)
+    function allowAccess(uint256 fileID, address newUser)
+        public
+        onlyOwner(fileID)
+    {
+        access[fileID][newUser] = true;
+        isTimedAccess[fileID][newUser] = false;
+    }
+
+    //Owner grants newUser timed permission without request
+    function allowLimitedAccess(uint256 fileID, address newUser, uint256 numberOfDays)
         public
         onlyOwner(fileID)
     {
         access[fileID][newUser] = true;
         deadline[fileID][newUser] = now + (numberOfDays * 1 days);
+        isTimedAccess[fileID][newUser] = true;
     }
 
     //Owner addresses request
@@ -74,12 +85,15 @@ contract Ownership {
         uint256 requestID,
         bool approve
     ) public onlyOwner(fileID) {
+        address requester = requests[fileID][requestID];
         if (approve) {
-            access[fileID][requests[fileID][requestID]] = true;
-            deadline[fileID][requests[fileID][requestID]] = now + (requestTime[fileID][requestID] * 1 days);
+            access[fileID][requester] = true;
+            if(isTimedAccess[fileID][requester] == true){
+                deadline[fileID][requester] = now + (requestTime[fileID][requestID] * 1 days);
+            }
         }
         delete requests[fileID][requestID];
-        delete requestTime[fileID][requestID];
+        if(isTimedAccess[fileID][requester] == true) {delete requestTime[fileID][requestID];}
     }
 
     //Msg.sender checks access of specified user for given fileID
@@ -88,11 +102,14 @@ contract Ownership {
         returns (bool)
     {
         if(access[fileID][user]){
-            if(deadline[fileID][user] >= now){
-                return true;
-            }
-            //if access is true but past deadline, update access
-            access[fileID][user] = false;
+            if(isTimedAccess[fileID][newUser] == true){
+                if(deadline[fileID][user] >= now){
+                    return true;
+                }
+                access[fileID][user] = false;
+                return false;
+            }     
+            return true;       
         }
         return false;
     }
@@ -102,16 +119,24 @@ contract Ownership {
         public
         returns (uint256)
     {
-        if(checkAccess(fileID, user)){
+        if(checkAccess(fileID, user) && isTimedAccess[fileID][requestCounters[fileID]] == true){
             return (deadline[fileID][user] - now) / 1 days;
         }
         return 0;
     }
 
     //Msg.sender requests access to fileID for numberOfDays
-    function requestAccess(uint256 fileID, uint256 numberOfDays) public {
+    function requestAccess(uint256 fileID) public {
         requests[fileID][requestCounters[fileID]] = msg.sender;
+        isTimedAccess[fileID][requestCounters[fileID]] = false;
+        ++requestCounters[fileID];
+    }
+
+    //Msg.sender requests limited access to fileID for numberOfDays
+    function requestLimitedAccess(uint256 fileID, uint256 numberOfDays) public {
         requestTime[fileID][requestCounters[fileID]] = numberOfDays;
+        requests[fileID][requestCounters[fileID]] = msg.sender;
+        isTimedAccess[fileID][requestCounters[fileID]] = true;
         ++requestCounters[fileID];
     }
 }
