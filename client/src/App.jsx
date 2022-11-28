@@ -13,6 +13,7 @@ import Context from './Helpers/Context'
 import DataCommitteePage from './views/DataCommitteePage'
 import ReportPage from './views/ReportPage'
 import TeamPage from './views/TeamPage'
+import RequestLimitedFilePage from './views/RequestLimitedFilePage'
 import RequestFilePage from './views/RequestFilePage'
 import CreateNewFilePage from 'views/CreateNewFilePage'
 import ApproveRequestsPage from 'views/ApproveRequestsPage'
@@ -35,6 +36,7 @@ const App = () => {
           <PrivateRoute exact path="/upload" component={UploadFilePage} />
           <PrivateRoute exact path="/contract" component={SampleContract} />
           <PrivateRoute exact path="/request" component={RequestFilePage} />
+          <PrivateRoute exact path="/limited" component={RequestLimitedFilePage} />
           <PrivateRoute exact path="/profile" component={ProfilePage} />
           <PrivateRoute exact path="/tokens" component={TokensPage} />
           <PrivateRoute exact path="/test" component={TestPage} />

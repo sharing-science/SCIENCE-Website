@@ -195,6 +195,10 @@ const NavBar = () => {
                   <i className="tim-icons icon-cloud-upload-94" />
                   Request
                 </DropdownItem>
+                <DropdownItem tag={Link} to="/limited">
+                  <i className="tim-icons icon-cloud-upload-94" />
+                  Limited Request
+                </DropdownItem>
                 <DropdownItem tag={Link} to="/newFile">
                   <i className="tim-icons icon-cloud-upload-94" />
                   Create New File
@@ -202,6 +206,10 @@ const NavBar = () => {
                 <DropdownItem tag={Link} to="/check">
                   <i className="tim-icons icon-cloud-upload-94" />
                   Check Access
+                </DropdownItem>
+                <DropdownItem tag={Link} to="/hash">
+                  <i className="tim-icons icon-cloud-upload-94" />
+                  Hash
                 </DropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>
