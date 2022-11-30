@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.6.0;
+pragma solidity >=0.6.0;
 
 contract Ownership {
     uint256 fileCounter;
@@ -29,6 +29,8 @@ contract Ownership {
         owners[fileCounter] = msg.sender;
         requestCounters[fileCounter] = 0;
         access[fileCounter][msg.sender] = true;
+        //isTimedAccess[fileCounter][msg.sender] = false;
+        //deadline[fileCounter][msg.sender] = 0;
         ++fileCounter;
     }
 
@@ -77,7 +79,7 @@ contract Ownership {
     {
         access[fileID][newUser] = true;
         isTimedAccess[fileID][newUser] = true;
-        deadline[fileID][newUser] = now + (numberOfDays * 1 days);
+        deadline[fileID][newUser] = block.timestamp + (numberOfDays * 1 days);
     }
 
     //Owner addresses request
@@ -90,7 +92,7 @@ contract Ownership {
         if (approve) {
             access[fileID][requester] = true;
             if(isTimedAccess[fileID][requester] == true){
-                deadline[fileID][requester] = now + (requestTime[fileID][requestID] * 1 days);
+                deadline[fileID][requester] = block.timestamp + (requestTime[fileID][requestID] * 1 days);
             }
         }
         if(isTimedAccess[fileID][requester] == true) {delete requestTime[fileID][requestID];}
@@ -104,7 +106,7 @@ contract Ownership {
     {
         if(access[fileID][user]){
             if(isTimedAccess[fileID][user] == true){
-                if(deadline[fileID][user] >= now){
+                if(deadline[fileID][user] >= block.timestamp){
                     return true;
                 }
                 access[fileID][user] = false;
@@ -122,7 +124,7 @@ contract Ownership {
         returns (uint256)
     {
         if(checkAccess(fileID, user) && isTimedAccess[fileID][user] == true){
-            return (deadline[fileID][user] - now) / 1 days;
+            return (deadline[fileID][user] - block.timestamp) / 1 days;
         }
         return 0;
     }
