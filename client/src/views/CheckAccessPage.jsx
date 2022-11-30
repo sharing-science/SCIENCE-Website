@@ -27,17 +27,31 @@ const CheckAccessPage = () => {
   })
 
   const [answer, setAnswer] = useState('')
+  const [owner, setOwner] = useState('')
+  const [fileCount, setFileCount] = useState('')
 
-  const [inputs, setInputs] = useState({
+  const [inputs1, setInputs1] = useState({
     fileID: '0',
     address: '0x123',
   })
+  const [inputs2, setInputs2] = useState({
+    fileID: '0',
+  })
 
-  const handleInputChange = (e) => {
+  const handleInputChange1 = (e) => {
     const value =
       e.target.type === 'checkbox' ? e.target.checked : e.target.value
-    setInputs({
-      ...inputs,
+    setInputs1({
+      ...inputs1,
+      [e.target.name]: value,
+    })
+  }
+
+  const handleInputChange2 = (e) => {
+    const value =
+      e.target.type === 'checkbox' ? e.target.checked : e.target.value
+    setInputs2({
+      ...inputs2,
       [e.target.name]: value,
     })
   }
@@ -63,11 +77,23 @@ const CheckAccessPage = () => {
     init()
   }, [contextValue.web3.networkId])
 
-  const handleSubmit = async () => {
+  const handleSubmit1 = async () => {
     const res = await contracts.contract.methods
-      .checkAccess(inputs.fileID, inputs.address)
+      .checkAccess(inputs1.fileID, inputs1.address)
       .call()
     setAnswer(res)
+  }
+  const handleSubmit2 = async () => {
+    const own = await contracts.contract.methods
+      .getFileOwner(inputs2.fileID)
+      .call()
+    setOwner(own)
+  }
+  const handleSubmit3 = async () => {
+    const count = await contracts.contract.methods
+      .getFileCounter()
+      .call()
+    setFileCount(count)
   }
   return (
     <>
@@ -90,16 +116,16 @@ const CheckAccessPage = () => {
                   <label>File ID</label>
                   <Input
                     name="fileID"
-                    onChange={handleInputChange}
-                    value={inputs.fileID}
+                    onChange={handleInputChange1}
+                    value={inputs1.fileID}
                     type="number"
                     color="primary"
                   />
                   <label>Account Address</label>
                   <Input
                     name="address"
-                    onChange={handleInputChange}
-                    value={inputs.address}
+                    onChange={handleInputChange1}
+                    value={inputs1.address}
                     type="text"
                     color="primary"
                   />
@@ -108,13 +134,66 @@ const CheckAccessPage = () => {
                       type="button"
                       className="btn-round"
                       color="info"
-                      onClick={handleSubmit}
+                      onClick={handleSubmit1}
                     >
                       Submit
                     </Button>
                   </CardBody>
                   <CardFooter>
                     {answer !== '' && 'The Answer is ' + answer}
+                  </CardFooter>
+                </Card>
+              </Col>
+            </Container>
+            <Container>
+              <Col xs="6">
+                <Card className="p-4 card-stats">
+                  <CardHeader>
+                    <h1>Get Owner</h1>
+                  </CardHeader>
+                  <label>File ID</label>
+                  <Input
+                    name="fileID"
+                    onChange={handleInputChange2}
+                    value={inputs2.fileID}
+                    type="number"
+                    color="primary"
+                  />
+                  <CardBody>
+                    <Button
+                      type="button"
+                      className="btn-round"
+                      color="info"
+                      onClick={handleSubmit2}
+                    >
+                      Submit
+                    </Button>
+                  </CardBody>
+                  <CardFooter>
+                    {owner !== '' && 'The Owner is ' + owner}
+                  </CardFooter>
+                </Card>
+              </Col>
+            </Container>
+            <Container>
+              <Col xs="6">
+                <Card className="p-4 card-stats">
+                  <CardHeader>
+                    <h1>Get File Counter</h1>
+                  </CardHeader>
+                  
+                  <CardBody>
+                    <Button
+                      type="button"
+                      className="btn-round"
+                      color="info"
+                      onClick={handleSubmit3}
+                    >
+                      Submit
+                    </Button>
+                  </CardBody>
+                  <CardFooter>
+                    {fileCount !== '' && 'The file count is ' + fileCount}
                   </CardFooter>
                 </Card>
               </Col>
