@@ -11,7 +11,7 @@ contract Ownership {
     mapping(uint256 => mapping(uint256 => address)) public requests;
     mapping(uint256 => mapping(uint256 => uint256)) public requestTime;
 
-    constructor() public {
+    constructor() public { //dont think this public is necessary, will change after i debug rest of issues
         fileCounter = 0;
     }
 
@@ -29,7 +29,7 @@ contract Ownership {
         owners[fileCounter] = msg.sender;
         requestCounters[fileCounter] = 0;
         access[fileCounter][msg.sender] = true;
-        //isTimedAccess[fileCounter][msg.sender] = false;
+        isTimedAccess[fileCounter][msg.sender] = false;
         //deadline[fileCounter][msg.sender] = 0;
         ++fileCounter;
     }
@@ -69,6 +69,7 @@ contract Ownership {
         onlyOwner(fileID)
     {
         access[fileID][newUser] = true;
+        isTimedAccess[fileID][newUser] = false;
     }
 
     //NOT CURRENTLY IN USE
@@ -80,6 +81,15 @@ contract Ownership {
         access[fileID][newUser] = true;
         isTimedAccess[fileID][newUser] = true;
         deadline[fileID][newUser] = block.timestamp + (numberOfDays * 1 days);
+    }
+
+    //Owner removes newUser permission
+    function removeAccess(uint256 fileID, address newUser)
+        public
+        onlyOwner(fileID)
+    {
+        access[fileID][newUser] = false;
+        isTimedAccess[fileID][newUser] = false;
     }
 
     //Owner addresses request
@@ -112,7 +122,7 @@ contract Ownership {
                 access[fileID][user] = false;
                 return false;
             }     
-            return true;       
+            return true;
         }
         return false;
     }
