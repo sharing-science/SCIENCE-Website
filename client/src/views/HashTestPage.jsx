@@ -48,7 +48,7 @@ const HashTestPage = () => {
       }
 
       // Set the hashed text as output
-      setOutput(result);
+      setOutput(parseInt(result,16));
       setType("Text:");
 
       // Set the value of the text input
@@ -78,7 +78,7 @@ const HashTestPage = () => {
           }
 
           // Setting the hashed text as the output
-          setOutput(result);
+          setOutput(parseInt(result,16));
           setType("File:");
 
           // Setting the content of the file as file input
@@ -135,7 +135,7 @@ const HashTestPage = () => {
       setAlgorithm(value);
 
       // Set the hashed text
-      setOutput(result);
+      setOutput(parseInt(result,16));
   }
 
   return (
