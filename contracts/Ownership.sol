@@ -25,15 +25,17 @@ contract Ownership {
         return owners[fileID];
     }
 
-    function newFile() public {
-        owners[fileCounter] = msg.sender;
-        requestCounters[fileCounter] = 0;
-        access[fileCounter][msg.sender] = true;
-        isTimedAccess[fileCounter][msg.sender] = false;
-        //deadline[fileCounter][msg.sender] = 0;
-        ++fileCounter;
+    //UPDATE TO TAKE IN NEW HASH
+    function newFile(uint256 fileID) public { //take in HashID argument
+        owners[fileID] = msg.sender; //change file counter to hash
+        requestCounters[fileID] = 0;
+        access[fileID][msg.sender] = true;
+        isTimedAccess[fileID][msg.sender] = false;
+        //deadline[fileID][msg.sender] = 0;
+        ++fileCounter;  //not neccesary for operations
     }
 
+    //Not necessary for operations
     function getFileCounter() public view returns (uint256) {
         return fileCounter;
     }
