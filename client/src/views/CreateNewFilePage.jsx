@@ -33,6 +33,7 @@ const CreateNewFilePage = () => {
   })
 
   const [fileID, setFileID] = useState('')
+  const [hash, setHash] = useState('')
 
   const [inputs, setInputs] = useState({
     fileID: '',
@@ -82,6 +83,7 @@ const CreateNewFilePage = () => {
         result = await sha256(fr.result);
 
         // Setting the hashed text as the output
+        setHash(result);
         setFileID(parseInt(result,16));
 
         // Setting the content of the file as file input
@@ -155,7 +157,7 @@ const CreateNewFilePage = () => {
                   <CardFooter>
                     {fileID !== '' &&
                       'Congratulations, your new file with created with the file ID: ' +
-                        fileID}
+                        hash}
                   </CardFooter>
                 </Card>
               </Col>
