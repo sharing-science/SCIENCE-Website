@@ -27,15 +27,6 @@ contract Ownership {
     mapping(address => mapping(uint256 => File) ) public ownersFiles;        //Owner, fileID = File
 
 
-    //mapping(uint256 => uint256) public requestCounters;                     //fileID, Counter       //replaced
-    //mapping(uint256 => mapping(address => bool)) public access;             //fileID, User, T/F     //replaced
-    //mapping(uint256 => mapping(address => bool)) public isTimedAccess;      //fileID, User, T/F     //replaced
-    //mapping(uint256 => mapping(address => uint256)) public deadline;        //fileID, User, Time    //replaced
-    //mapping(uint256 => mapping(uint256 => address)) public requests;        //fileId, requestID, requesterAddress   //replaced
-    //mapping(uint256 => mapping(uint256 => uint256)) public requestTime;     //fileID, requestID, Time               //replaced
-    //mapping(uint256 => mapping(address => uint104)) public typeAccess;      //fileID, User, Type    //replaced
-
-
     constructor()  {
         fileCounter = 0;
     }
@@ -79,16 +70,10 @@ contract Ownership {
         File memory file = idToFile[_fileID];
         Perms[] memory answer = file.requests;
         return answer;
-
-        // address[] memory answer = new address[](requestCounters[fileID]);
-        // for (uint256 i = 0; i < requestCounters[fileID]; ++i){
-        //     answer[i] = requests[fileID][i];
-        // }
-        // return answer;
     }
 
     //Update allowedUsers list in file
-    function addAllowedPerm(uint256 _fileID, Perms memory _newPerm) public {
+    function addAllowedPerm(uint256 _fileID, Perms memory _newPerm) public view {
         //Get File
         File memory file = idToFile[_fileID];
         
@@ -106,7 +91,7 @@ contract Ownership {
     }
 
     //Update requests list in file
-    function addRequestPerm(uint256 _fileID, Perms memory _newPerm) public {
+    function addRequestPerm(uint256 _fileID, Perms memory _newPerm) public view {
         //Get File
         File memory file = idToFile[_fileID];
         
@@ -173,8 +158,7 @@ contract Ownership {
 
     //Owner addresses request
     function fulfillRequest(uint256 _fileID, uint256 _requestID, bool _approve)
-        public
-        onlyOwner(_fileID)
+        public        view        onlyOwner(_fileID)
     {
         File memory file = idToFile[_fileID];
         //Find request
@@ -195,8 +179,7 @@ contract Ownership {
 
     //Msg.sender checks access of specified user for given fileID
     function checkAccess(uint256 _fileID, address _user)
-        public
-        returns (bool)
+        public        view        returns (bool)
     {
         File memory file = idToFile[_fileID];
         for (uint i = 0; i < file.allowedUsers.length; i++) {
@@ -214,14 +197,23 @@ contract Ownership {
         return false;
     }
 
-    //NEEDS ADJUSTMENT!!!!!!!!!!!!!!!!
     //Msg.sender checks the days remaining of specified user's access for given fileID
+    //Returns zero if no days remaining or 100000 if not timed
     function checkDaysRemaining(uint256 _fileID, address _user)
-        public
-        returns (uint256)
+        public        view        returns (uint256)
     {
-        if(checkAccess(_fileID, _user) && true/*isTimedAccess[fileID][user] == true*/){ //needs adjustment!!!!!!!
-            return (block.timestamp/*deadline[fileID][user]*/ - block.timestamp) / 1 days;
+        File memory file = idToFile[_fileID];
+        for (uint i = 0; i < file.allowedUsers.length; i++) {
+            if (file.allowedUsers[i].user == _user) {
+                if(file.allowedUsers[i].isTimed){
+                    if(file.allowedUsers[i].deadline >= block.timestamp){
+                        return (file.allowedUsers[i].deadline - block.timestamp) / 1 days;
+                    }
+                    delete file.allowedUsers[i];
+                    return 0;
+                }
+                return 100000;
+            }
         }
         return 0;
     }
