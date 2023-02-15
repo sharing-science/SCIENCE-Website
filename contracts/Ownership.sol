@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.6.0;
 
+pragma experimental ABIEncoderV2;
+
 contract Ownership {
 
     struct File {
         uint256 fileID;
-        Perms[] requests;
+        Perms[] requests;       //gonna have to change to mapping: fileID => Perms[] list
         Perms[] allowedUsers;
     }
 
@@ -27,7 +29,7 @@ contract Ownership {
     mapping(address => mapping(uint256 => File) ) public ownersFiles;        //Owner, fileID = File
 
 
-    constructor()  {
+    constructor() public {
         fileCounter = 0;
     }
 
@@ -66,7 +68,7 @@ contract Ownership {
         view
         returns (Perms[] memory)
     {
-        address owner = getFileOwner(_fileID);
+        //address owner = getFileOwner(_fileID);
         File memory file = idToFile[_fileID];
         Perms[] memory answer = file.requests;
         return answer;
