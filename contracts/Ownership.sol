@@ -15,16 +15,16 @@ contract Ownership {
         bool     isAllowed;
     }
     
-    uint256 fileCounter = 0;  //Do i need to initialize?!?!?!!
+    uint256 fileCounter = 0;
     uint requestIDCounter = 0;
     uint constant PERM_LENGTH = 50;
     mapping(uint256 => address) public isfileOwner;                         //fileID = Owner
     //mapping(address => uint256[]) public ownersFiles;                     //Owner = fileID //NEEDS TO BE IMPLEMENTED EVENTUALLY
     
-    mapping(uint256 => Perms[PERM_LENGTH]) public fileRequests;                      //fileID = requests
+    mapping(uint256 => Perms[PERM_LENGTH]) public fileRequests;             //fileID = requests
     mapping(uint256 => uint104) public fileRequestCounter;                  //fileID = requestsCounter
 
-    mapping(uint256 => Perms[PERM_LENGTH]) public fileAllowed;                       //fileID = allowedUsers
+    mapping(uint256 => Perms[PERM_LENGTH]) public fileAllowed;              //fileID = allowedUsers
     mapping(uint256 => uint104) public fileAllowedCounter;                  //fileID = allowedCounter
 
     mapping(address => uint256) public ownerFilesLength;                    //Owner = number of files owned
