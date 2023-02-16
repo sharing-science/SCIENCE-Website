@@ -5,12 +5,6 @@ pragma experimental ABIEncoderV2;
 
 contract Ownership {
 
-    struct File {
-        uint256 fileID;
-        Perms[] requests;       //gonna have to change to mapping: fileID => Perms[] list
-        Perms[] allowedUsers;
-    }
-
     struct Perms{
         uint     id;
         address  user;
@@ -23,15 +17,22 @@ contract Ownership {
     
     uint256 fileCounter = 0;  //Do i need to initialize?!?!?!!
     uint requestIDCounter = 0;
+    uint constant PERM_LENGTH = 50;
     mapping(uint256 => address) public isfileOwner;                         //fileID = Owner
+    //mapping(address => uint256[]) public ownersFiles;                     //Owner = fileID //NEEDS TO BE IMPLEMENTED EVENTUALLY
+    
+    mapping(uint256 => Perms[PERM_LENGTH]) public fileRequests;                      //fileID = requests
+    mapping(uint256 => uint104) public fileRequestCounter;                  //fileID = requestsCounter
+
+    mapping(uint256 => Perms[PERM_LENGTH]) public fileAllowed;                       //fileID = allowedUsers
+    mapping(uint256 => uint104) public fileAllowedCounter;                  //fileID = allowedCounter
+
     mapping(address => uint256) public ownerFilesLength;                    //Owner = number of files owned
-    mapping(uint256 => File)    public idToFile;                            //fileID = File
-    mapping(address => mapping(uint256 => File) ) public ownersFiles;        //Owner, fileID = File
 
 
-    constructor() public {
-        fileCounter = 0;
-    }
+    // constructor() public {
+    //     fileCounter = 0;
+    // }
 
     /// @dev Restricted to owner
     modifier onlyOwner(uint256 _fileID) {
@@ -46,14 +47,13 @@ contract Ownership {
     
     function newFile(uint256 _fileID) public { //take in HashID argument
         isfileOwner[_fileID] = msg.sender;
-        File memory file = File({
-            fileID: _fileID,
-            requests: new Perms[](0),
-            allowedUsers: new Perms[](0)
-        });
-        idToFile[_fileID] = file;
-        ownersFiles[msg.sender][_fileID] = file;
-        ++ownerFilesLength[msg.sender];
+        // fileRequests[_fileID] = new Perms[](0);
+        // fileAllowed[_fileID] = new Perms[](0);
+
+        fileRequestCounter[_fileID] = 0;
+        fileAllowedCounter[_fileID] = 0;
+
+       ++ownerFilesLength[msg.sender];
         ++fileCounter;
     }
 
@@ -66,54 +66,50 @@ contract Ownership {
     function getFileRequests(uint256 _fileID)
         public
         view
-        returns (Perms[] memory)
+        returns (Perms[50] memory)
     {
         //address owner = getFileOwner(_fileID);
-        File memory file = idToFile[_fileID];
-        Perms[] memory answer = file.requests;
+        Perms[50] memory answer = fileRequests[_fileID];
         return answer;
     }
 
     //Update allowedUsers list in file
-    function addAllowedPerm(uint256 _fileID, Perms memory _newPerm) public view {
-        //Get File
-        File memory file = idToFile[_fileID];
-        
-        //Create new list with +1 len
-        Perms[] memory newAllowedUsers = new Perms[](file.allowedUsers.length + 1);
-        //Copy old list into new list
-        for (uint i = 0; i < file.allowedUsers.length; i++) {
-            newAllowedUsers[i] = file.allowedUsers[i];
-        }
+    function addAllowedPerm(uint256 _fileID, Perms memory _newPerm) public returns(bool) {
         //Add new Perm
-        newAllowedUsers[file.allowedUsers.length] = _newPerm;
-        
-        //Update Original List
-        file.allowedUsers = newAllowedUsers;
+        if(fileAllowedCounter[_fileID] < PERM_LENGTH){
+            fileAllowed[_fileID][fileAllowedCounter[_fileID]++] = _newPerm;
+            return true;
+        }
+        return false;
     }
 
     //Update requests list in file
-    function addRequestPerm(uint256 _fileID, Perms memory _newPerm) public view {
-        //Get File
-        File memory file = idToFile[_fileID];
-        
-        //Create new list with +1 len
-        Perms[] memory newRequests = new Perms[](file.requests.length + 1);
-        //Copy old list into new list
-        for (uint i = 0; i < file.requests.length; i++) {
-            newRequests[i] = file.requests[i];
+    function addRequestPerm(uint256 _fileID, Perms memory _newPerm) public returns(bool) {
+        if(fileRequestCounter[_fileID] < PERM_LENGTH){
+            fileRequests[_fileID][fileRequestCounter[_fileID]++] = _newPerm;
+            return true;
         }
-        //Add new Perm
-        newRequests[file.requests.length] = _newPerm;
+        return false;
+        // //Create new list with +1 len
+        // Perms[] memory newRequests = new Perms[](fileRequests[_fileID].length + 1);
+
+        // //Copy old list into new list
+        // for (uint i = 0; i < fileRequests[_fileID].length; i++) {
+        //     newRequests[i] = fileRequests[_fileID][i];
+        // }
+        // //Add new Perm
+        // newRequests[fileRequests[_fileID].length] = _newPerm;
         
-        //Update Original List
-        file.requests = newRequests;
+        // //Update Original List
+        // delete fileRequests[_fileID];
+        // fileRequests[_fileID] = newRequests;
     }
 
     //Owner grants newUser permission without request
     function allowAccess(uint256 _fileID, address _user, uint104 _type)
         public
         onlyOwner(_fileID)
+        returns(bool)
     {
         //Create new Perm
         Perms memory newPerm = Perms({
@@ -125,13 +121,14 @@ contract Ownership {
             deadline: 0,
             isAllowed: true
         });
-        addAllowedPerm(_fileID, newPerm);
+        return addAllowedPerm(_fileID, newPerm);
     }
 
     //Owner grants newUser timed permission without request
     function allowLimitedAccess(uint256 _fileID, address _user, uint256 _numberOfDays, uint104 _type)
         public
         onlyOwner(_fileID)
+        returns(bool)
     {
         Perms memory newPerm = Perms({
             id: requestIDCounter++, //will this do what I want?!?!?!
@@ -142,86 +139,100 @@ contract Ownership {
             deadline: ( block.timestamp + (_numberOfDays * 1 days) ),
             isAllowed: true
         });
-        addAllowedPerm(_fileID, newPerm);
+        return addAllowedPerm(_fileID, newPerm);
     }
 
     //Owner removes newUser permission
     function removeAccess(uint256 _fileID, address _user)
-        public          view          onlyOwner(_fileID)
+        public          onlyOwner(_fileID)
+        returns(bool)
     {
-        File memory file = idToFile[_fileID];
-        for (uint i = 0; i < file.allowedUsers.length; i++) {
-            if (file.allowedUsers[i].user == _user) {
-                delete file.allowedUsers[i];
-                break;
-            }
-        }
-    }
-
-    //Owner addresses request
-    function fulfillRequest(uint256 _fileID, uint256 _requestID, bool _approve)
-        public        view        onlyOwner(_fileID)
-    {
-        File memory file = idToFile[_fileID];
-        //Find request
-        for (uint i = 0; i < file.requests.length; i++) {
-            if (file.requests[i].id == _requestID) { //Request found
-                if(_approve){
-                    file.requests[i].isAllowed = true;
-                    if(file.requests[i].isTimed){
-                        file.requests[i].deadline = block.timestamp + (file.requests[i].time * 1 days);
-                    }
-                    addAllowedPerm(_fileID, file.requests[i]);
-                }
-                delete file.requests[i]; //Will this delete the Perm moved to isAllowed list as well?!?!?! if so: make copy, delete OG, push copy to isAllowed
-                break;
-            }
-        }
-    }
-
-    //Msg.sender checks access of specified user for given fileID
-    function checkAccess(uint256 _fileID, address _user)
-        public        view        returns (bool)
-    {
-        File memory file = idToFile[_fileID];
-        for (uint i = 0; i < file.allowedUsers.length; i++) {
-            if (file.allowedUsers[i].user == _user) {
-                if(file.allowedUsers[i].isTimed){
-                    if(file.allowedUsers[i].deadline >= block.timestamp){
-                        return true;
-                    }
-                    delete file.allowedUsers[i];
-                    return false;
-                }
+        for (uint i = 0; i < fileAllowed[_fileID].length; i++) {
+            if (fileAllowed[_fileID][i].user == _user) {
+                //Replace this with end, delete end: [i] = [counter], delete [counter]
+                fileAllowed[_fileID][i] = fileAllowed[_fileID][(--fileAllowedCounter[_fileID])];
+                delete fileAllowed[_fileID][fileAllowedCounter[_fileID]];
                 return true;
             }
         }
         return false;
     }
 
+    //Owner addresses request
+    function fulfillRequest(uint256 _fileID, uint256 _requestID, bool _approve)
+        public        onlyOwner(_fileID)
+        returns(bool)
+    {
+        bool answer = false;
+        //Find request
+        for (uint i = 0; i < fileRequests[_fileID].length; i++) {
+            if (fileRequests[_fileID][i].id == _requestID) { //Request found
+                if(_approve){
+                    fileRequests[_fileID][i].isAllowed = true;
+                    //If timed, start timer
+                    if(fileRequests[_fileID][i].isTimed){
+                        fileRequests[_fileID][i].deadline = block.timestamp + (fileRequests[_fileID][i].time * 1 days);
+                    }
+                    //Try to move perm from requests to Allowed
+                    answer = addAllowedPerm(_fileID, fileRequests[_fileID][i]);
+                }
+                //Remove request Perm regardless of if it was accepted and able to be added or not; we are done with the request
+                fileRequests[_fileID][i] = fileRequests[_fileID][(--fileRequestCounter[_fileID])];
+                delete fileRequests[_fileID][fileRequestCounter[_fileID]];
+                break;
+            }
+        }
+        return answer;
+    }
+
+    //Msg.sender checks access of specified user for given fileID
+    function checkAccess(uint256 _fileID, address _user)
+        public        returns (bool)
+    {
+        for (uint i = 0; i < fileAllowed[_fileID].length; i++) {
+            if (fileAllowed[_fileID][i].user == _user) {
+                if(fileAllowed[_fileID][i].isTimed){
+                    if(fileAllowed[_fileID][i].deadline >= block.timestamp){
+                        return true;
+                    }
+                    fileAllowed[_fileID][i] = fileAllowed[_fileID][(--fileAllowedCounter[_fileID])];
+                    delete fileAllowed[_fileID][fileAllowedCounter[_fileID]];
+                    return false;
+                }
+                return true;
+            }
+        }
+        //If here, couldnt find
+        return false;
+    }
+
     //Msg.sender checks the days remaining of specified user's access for given fileID
     //Returns zero if no days remaining or 100000 if not timed
     function checkDaysRemaining(uint256 _fileID, address _user)
-        public        view        returns (uint256)
+        public        returns (uint256)
     {
-        File memory file = idToFile[_fileID];
-        for (uint i = 0; i < file.allowedUsers.length; i++) {
-            if (file.allowedUsers[i].user == _user) {
-                if(file.allowedUsers[i].isTimed){
-                    if(file.allowedUsers[i].deadline >= block.timestamp){
-                        return (file.allowedUsers[i].deadline - block.timestamp) / 1 days;
+        for (uint i = 0; i < fileAllowed[_fileID].length; i++) {
+            if (fileAllowed[_fileID][i].user == _user) {
+                if(fileAllowed[_fileID][i].isTimed){
+                    if(fileAllowed[_fileID][i].deadline >= block.timestamp){
+                        //If allowed timed and not past deadine:
+                        return (fileAllowed[_fileID][i].deadline - block.timestamp) / 1 days;
                     }
-                    delete file.allowedUsers[i];
+                    //If Allowed timed but past deadline:
+                    fileAllowed[_fileID][i] = fileAllowed[_fileID][(--fileAllowedCounter[_fileID])];
+                    delete fileAllowed[_fileID][fileAllowedCounter[_fileID]];
                     return 0;
                 }
+                //If allowed but not timed:
                 return 100000;
             }
         }
+        //If not in allowed:
         return 0;
     }
 
     //Msg.sender requests access to fileID for numberOfDays
-    function requestAccess(uint256 _fileID, uint104 _type) public {
+    function requestAccess(uint256 _fileID, uint104 _type) public returns(bool) {
         Perms memory newPerm = Perms({
             id: requestIDCounter++, //will this do what I want?!?!?!
             user: msg.sender,
@@ -231,11 +242,11 @@ contract Ownership {
             deadline: 0,
             isAllowed: false
         });
-        addRequestPerm(_fileID, newPerm);
+        return addRequestPerm(_fileID, newPerm);
     }
 
     //Msg.sender requests limited access to fileID for numberOfDays
-    function requestLimitedAccess(uint256 _fileID, uint256 _numberOfDays, uint104 _type) public {
+    function requestLimitedAccess(uint256 _fileID, uint256 _numberOfDays, uint104 _type) public returns(bool) {
         Perms memory newPerm = Perms({
             id: requestIDCounter++, //will this do what I want?!?!?!
             user: msg.sender,
@@ -245,6 +256,6 @@ contract Ownership {
             deadline: 0,
             isAllowed: false
         });
-        addRequestPerm(_fileID, newPerm);
+        return addRequestPerm(_fileID, newPerm);
     }
 }
