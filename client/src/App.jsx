@@ -46,11 +46,7 @@ const App = () => {
           <PrivateRoute exact path="/newFile" component={CreateNewFilePage} />
           <PrivateRoute exact path="/check" component={CheckAccessPage} />
           <PrivateRoute exact path="/hash" component={HashTestPage} />
-          <PrivateRoute
-            exact
-            path="/approveRequests"
-            component={ApproveRequestsPage}
-          />
+          <PrivateRoute exact path="/approveRequests" component={ApproveRequestsPage} />
 
           {/* Public Routes */}
           <PublicRoute exact path="/login" component={LoginPage} />
