@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardFooter,
   Col,
+  Input,
   Table,
 } from 'reactstrap'
 
@@ -26,7 +27,8 @@ const ApproveRequestsPage = () => {
     contract: {},
   })
 
-  const [fileIDs, setFileIDs] = useState('')
+  //const [fileIDs, setFileIDs] = useState('')
+  const [perms, setPerms] = useState([]);
 
   useEffect(() => {
     const init = async () => {
@@ -49,33 +51,80 @@ const ApproveRequestsPage = () => {
     init()
   }, [contextValue.web3.networkId])
 
-  const getFiles = async () => {
-    const fileCount = await contracts.contract.methods.getFileCounter().call()
-    const answer = []
-    for (let i = 0; i < fileCount; ++i) {
-      let fileOwner = await contracts.contract.methods.getFileOwner(i).call()
-      if (fileOwner === contextValue.web3.accounts[0]) {
-        answer.push(i)
-      }
-    }
-    return answer
-  }
+  // const getFiles = async () => {
+  //   const accounts = await web3.eth.getAccounts();
+  //   const address = accounts[0];
+  //   const files = await contracts.contract.methods.getOwnersFiles(address).call();
+  //   return files;
+  // }
+
+  // const getFileLength = async () => {
+  //   const accounts = await web3.eth.getAccounts();
+  //   const address = accounts[0];
+  //   const filesLength = await contracts.contract.methods.getOwnerFileLength(address).call();
+  //   return filesLength;
+  // }
+
+  // const fetchPerms = async () => {
+  //   const allPerms = await contracts.contract.methods.getAllRequests().call();
+  //   setPerms(allPerms);
+  //   setFileIDs(allPerms);
+  // }
+
   const handleSubmit = async () => {
-    const files = await getFiles()
-    const answer = []
-    for (let i = 0; i < files.length; ++i) {
-      let reqs = await contracts.contract.methods.getFileRequests(i).call()
-      answer.push(reqs)
-    }
-    setFileIDs(answer)
+    const allPerms = await contracts.contract.methods.getAllRequests().call();
+    setPerms(allPerms);
+    // setFileIDs(allPerms);
   }
 
-  const fulfillRequest = async (fileID, requestID, approve) => {
-    await contracts.contract.methods
-      .fulfillRequest(fileID, requestID, approve)
-      .send({ from: contextValue.web3.accounts[0] })
-    await handleSubmit()
+  // const fulfillRequest = async (fileID, requestID, approve) => {
+  //   await contracts.contract.methods
+  //     .fulfillRequest(fileID, requestID, approve)
+  //     .send({ from: contextValue.web3.accounts[0] })
+  //   await handleSubmit()
+  // }
+
+  const [input, setInput] = useState({
+    index: '',
+  })
+
+  const handleInputChange = (e) => {
+    const value =
+      e.target.type === 'checkbox' ? e.target.checked : e.target.value
+      setInput({
+      ...input,
+      [e.target.name]: value,
+    })
   }
+
+  const [isAccepted, setIsAccepted] = useState('')
+  const handleSubmit2 = async () => {
+    let acceptedPerm = perms[input.index]
+    const isAccepted = await contracts.contract.methods
+      .fulfillRequest(acceptedPerm.fileID, acceptedPerm.id, true)
+      .call()
+    setIsAccepted(isAccepted)
+  }
+
+  const [isDenied, setIsDenied] = useState('')
+  const handleSubmit3 = async () => {
+    let acceptedPerm = perms[input.index]
+    const isDenied = await contracts.contract.methods
+      .fulfillRequest(acceptedPerm.fileID, acceptedPerm.id, false)
+      .call()
+    setIsDenied(isDenied)
+  }
+  // {perms.map((perm, index) => (
+  //   <div key={index}>
+  //     <p>id: {perm.id}</p>
+  //     <p>user: {perm.user}</p>
+  //     <p>fileType: {perm.fileType}</p>
+  //     <p>isTimed: {perm.isTimed}</p>
+  //     <p>time: {perm.time}</p>
+  //     <p>deadline: {perm.deadline}</p>
+  //     <p>isAllowed: {perm.isAllowed}</p>
+  //   </div>
+  // ))
   return (
     <>
       <NavBar />
@@ -103,17 +152,38 @@ const ApproveRequestsPage = () => {
                     >
                       See Requests
                     </Button>
-                    {fileIDs && (
+                    {perms && (
                       <Table responsive>
                         <thead>
                           <tr>
                             <th className="text-center">#</th>
+                            {/* <th>Requester</th>
+                            <th>Action</th> */}
+                            <th>ID</th>
+                            <th>FileID</th>
                             <th>Requester</th>
+                            <th>Permission</th>
+                            <th>Timed</th>
+                            <th>Days</th>
                             <th>Action</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {fileIDs.map((value0, key0) =>
+                          {perms.map((perm, index) => (
+                            <div key={index}>
+                              <p>id: {perm.id}</p>
+                              <p>user: {perm.user}</p>
+                              <p>fileID: {perm.fileID}</p>
+                              <p>fileType: {perm.fileType}</p>
+                              <p>isTimed: {perm.isTimed}</p>
+                              <p>time: {perm.time}</p>
+                              <p>deadline: {perm.deadline}</p>
+                              <p>isAllowed: {perm.isAllowed}</p>
+                            </div>
+                          ))
+                          
+                          
+                          /* {fileIDs.map((value0, key0) =>
                             value0.map((value1, key1) => {
                               if (
                                 value1 !==
@@ -151,12 +221,72 @@ const ApproveRequestsPage = () => {
                                 return ''
                               }
                             }),
-                          )}
+                          )} */}
                         </tbody>
                       </Table>
                     )}
                   </CardBody>
                   <CardFooter></CardFooter>
+                </Card>
+              </Col>
+            </Container>
+            <Container>
+              <Col xs="6">
+                <Card className="p-4 card-stats">
+                  <CardHeader>
+                    <h1>Accept Request</h1>
+                  </CardHeader>
+                  <label>Request #</label>
+                  <Input
+                    name="Index"
+                    onChange={handleInputChange}
+                    value={input.index}
+                    type="number"
+                    color="primary"
+                  />
+                  <CardBody>
+                    <Button
+                      type="button"
+                      className="btn-round"
+                      color="info"
+                      onClick={handleSubmit2}
+                    >
+                      Submit
+                    </Button>
+                  </CardBody>
+                  <CardFooter>
+                    {isAccepted !== '' && 'The request was fulfilled: ' + isAccepted}
+                  </CardFooter>
+                </Card>
+              </Col>
+            </Container>
+            <Container>
+              <Col xs="6">
+                <Card className="p-4 card-stats">
+                  <CardHeader>
+                    <h1>Deny Request</h1>
+                  </CardHeader>
+                  <label>Request #</label>
+                  <Input
+                    name="Index"
+                    onChange={handleInputChange}
+                    value={input.index}
+                    type="number"
+                    color="primary"
+                  />
+                  <CardBody>
+                    <Button
+                      type="button"
+                      className="btn-round"
+                      color="info"
+                      onClick={handleSubmit3}
+                    >
+                      Submit
+                    </Button>
+                  </CardBody>
+                  <CardFooter>
+                    {isDenied !== '' && 'The request was fulfilled: ' + isDenied}
+                  </CardFooter>
                 </Card>
               </Col>
             </Container>
