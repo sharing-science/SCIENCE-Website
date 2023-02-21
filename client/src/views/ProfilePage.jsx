@@ -1,24 +1,24 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
-import classnames from "classnames";
+import React, { /*useState, useEffect,*/ useContext, /*useCallback */} from "react";
+// import classnames from "classnames";
 
 // web3 imports
-import Roles from "../contracts/Roles.json";
+// import Roles from "../contracts/Roles.json";
 import Context from "../Helpers/Context";
-import getWeb3 from "../Helpers/getWeb3";
+// import getWeb3 from "../Helpers/getWeb3";
 
 // reactstrap components
 import {
-  Button,
+  // Button,
   Card,
   CardHeader,
-  CardBody,
-  NavItem,
-  NavLink,
-  Nav,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
+  // CardBody,
+  // NavItem,
+  // NavLink,
+  // Nav,
+  // UncontrolledDropdown,
+  // DropdownToggle,
+  // DropdownMenu,
+  // DropdownItem,
   Container,
   Row,
   Col,
@@ -31,93 +31,93 @@ import Footer from "components/Footer";
 const ProfilePage = () => {
   const { contextValue } = useContext(Context);
 
-  const [requests, setRequests] = useState();
-  const [rolesList, setRolesList] = useState({
-    names: [],
-    encodings: [],
-  });
-  const [contracts, setContracts] = useState({
-    Roles: {},
-  });
+  // const [requests, setRequests] = useState();
+  // const [rolesList, setRolesList] = useState({
+  //   names: [],
+  //   encodings: [],
+  // });
+  // const [contracts, setContracts] = useState({
+  //   Roles: {},
+  // });
 
-  const [activeRole, setActiveRole] = useState("");
+  // const [activeRole, setActiveRole] = useState("");
 
-  const [roles, setRoles] = useState({
-    names: [],
-    encodings: [],
-  });
+  // const [roles, setRoles] = useState({
+  //   names: [],
+  //   encodings: [],
+  // });
 
-  const getRequests = async () => {
-    let r = await contracts.Roles.methods
-    .getRequests(rolesList.encodings[rolesList.names.indexOf(activeRole)])
-    .call()
-    setRequests(r);
-  };
+  // const getRequests = async () => {
+  //   let r = await contracts.Roles.methods
+  //   .getRequests(rolesList.encodings[rolesList.names.indexOf(activeRole)])
+  //   .call()
+  //   setRequests(r);
+  // };
 
-  const handleRequestJoin = async (key) => {
-    await contracts.Roles.methods
-      .requestJoin(rolesList.encodings[key])
-      .send({ from: contextValue.web3.accounts[0] });
-    console.log(await contracts.Roles.methods.getRequests(rolesList.encodings[key]).call())
-  };
+  // const handleRequestJoin = async (key) => {
+  //   await contracts.Roles.methods
+  //     .requestJoin(rolesList.encodings[key])
+  //     .send({ from: contextValue.web3.accounts[0] });
+  //   console.log(await contracts.Roles.methods.getRequests(rolesList.encodings[key]).call())
+  // };
 
-  const handleAcceptRequest = async (key) => {
-    console.log(key);
-    await contracts.Roles.methods
-      .acceptRequest(rolesList.encodings[1], key)
-      .send({ from: contextValue.web3.accounts[0] });
-  };
+  // const handleAcceptRequest = async (key) => {
+  //   console.log(key);
+  //   await contracts.Roles.methods
+  //     .acceptRequest(rolesList.encodings[1], key)
+  //     .send({ from: contextValue.web3.accounts[0] });
+  // };
 
-  const updateRoles = useCallback(
-    async (instance, { roleNames, rolesEncodings }) => {
-      const _roles = await instance.methods
-        .getUsersRoles(contextValue.web3.accounts[0])
-        .call();
-      let rolesNames = [];
-      for (let i = 0; i < _roles.length; ++i) {
-        if (
-          _roles[i] !==
-          "0x0000000000000000000000000000000000000000000000000000000000000000"
-        ) {
-          rolesNames.push(roleNames[rolesEncodings.indexOf(_roles[i])]);
-        }
-      }
-      setRoles({
-        names: rolesNames,
-        encodings: _roles,
-      });
-    },
-    [contextValue.web3.accounts]
-  );
+  // const updateRoles = useCallback(
+  //   async (instance, { roleNames, rolesEncodings }) => {
+  //     const _roles = await instance.methods
+  //       .getUsersRoles(contextValue.web3.accounts[0])
+  //       .call();
+  //     let rolesNames = [];
+  //     for (let i = 0; i < _roles.length; ++i) {
+  //       if (
+  //         _roles[i] !==
+  //         "0x0000000000000000000000000000000000000000000000000000000000000000"
+  //       ) {
+  //         rolesNames.push(roleNames[rolesEncodings.indexOf(_roles[i])]);
+  //       }
+  //     }
+  //     setRoles({
+  //       names: rolesNames,
+  //       encodings: _roles,
+  //     });
+  //   },
+  //   [contextValue.web3.accounts]
+  // );
 
-  useEffect(() => {
-    const init = async () => {
-      try {
-        const web3 = await getWeb3();
-        const instance = new web3.eth.Contract(
-          Roles.abi,
-          Roles.networks[contextValue.web3.networkId] &&
-            Roles.networks[contextValue.web3.networkId].address
-        );
-        const roleNames = await instance.methods.getRolesNames().call();
-        const rolesEncodings = await instance.methods
-          .getRolesEncodings()
-          .call();
-        setRolesList({
-          names: roleNames,
-          encodings: rolesEncodings,
-        });
-        updateRoles(instance, { roleNames, rolesEncodings });
-        setContracts((c) => ({
-          ...c,
-          Roles: instance,
-        }));
-      } catch (error) {
-        console.log("Error: " + error);
-      }
-    };
-    if (contextValue.loggedIn) init();
-  }, [contextValue.loggedIn, contextValue.web3.networkId, updateRoles]);
+  // useEffect(() => {
+  //   const init = async () => {
+  //     try {
+  //       const web3 = await getWeb3();
+  //       const instance = new web3.eth.Contract(
+  //         Roles.abi,
+  //         Roles.networks[contextValue.web3.networkId] &&
+  //           Roles.networks[contextValue.web3.networkId].address
+  //       );
+  //       const roleNames = await instance.methods.getRolesNames().call();
+  //       const rolesEncodings = await instance.methods
+  //         .getRolesEncodings()
+  //         .call();
+  //       setRolesList({
+  //         names: roleNames,
+  //         encodings: rolesEncodings,
+  //       });
+  //       updateRoles(instance, { roleNames, rolesEncodings });
+  //       setContracts((c) => ({
+  //         ...c,
+  //         Roles: instance,
+  //       }));
+  //     } catch (error) {
+  //       console.log("Error: " + error);
+  //     }
+  //   };
+  //   if (contextValue.loggedIn) init();
+  // }, [contextValue.loggedIn, contextValue.web3.networkId, updateRoles]);
 
   return (
     <>
@@ -137,7 +137,7 @@ const ProfilePage = () => {
                     <CardHeader>
                       Your public key is: {contextValue.web3.accounts[0]}
                     </CardHeader>
-                    <CardBody>
+                    {/* <CardBody>
                       <h3>Choose active role:</h3>
                       <h4 className="mb-4">Your roles are:</h4>
                       <Nav className="nav-pills-info nav-pills-icons" pills>
@@ -157,11 +157,11 @@ const ProfilePage = () => {
                           </NavItem>
                         ))}
                       </Nav>
-                    </CardBody>
+                    </CardBody> */}
                   </Card>
                 </Col>
                 <Col className="offset-lg-0 offset-md-3" xs="12" md="6">
-                  <Card className="card-register p-4 h-50">
+                  {/* <Card className="card-register p-4 h-50">
                     <Row>
                       <Col md="4">
                         <Button onClick={getRequests}>Get Requests</Button>
@@ -192,8 +192,8 @@ const ProfilePage = () => {
                         <></>
                       )}
                     </Row>
-                  </Card>
-                  <Card className="card-register p-4 h-75">
+                  </Card> */}
+                  {/* <Card className="card-register p-4 h-75">
                     <h3>Request to join Role</h3>
                     <CardBody>
                       <Col>
@@ -218,7 +218,7 @@ const ProfilePage = () => {
                         </UncontrolledDropdown>
                       </Col>
                     </CardBody>
-                  </Card>
+                  </Card> */}
                 </Col>
               </Row>
             </Container>
