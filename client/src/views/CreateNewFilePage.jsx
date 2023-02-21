@@ -20,11 +20,15 @@ import getWeb3 from 'Helpers/getWeb3'
 import Ownership from '../contracts/Ownership.json'
 //Specific crypto-hash
 import {sha256} from 'crypto-hash';
+// import {MD5} from 'crypto-js';
 //import "assets/css/hashing.css"; 
+
+import BigNumber from 'bignumber.js';
+
+
 
 const CreateNewFilePage = () => {
   //let [file_input, setFileInput] = useState('');
-  //let [fileID, setFileID] = useState('');
   
   const { contextValue } = useContext(Context)
 
@@ -32,7 +36,7 @@ const CreateNewFilePage = () => {
     contract: {},
   })
 
-  const [fileID, setFileID] = useState('')
+  //const [fileID, setFileID] = useState('')
   const [hash, setHash] = useState('')
 
   const [inputs, setInputs] = useState({
@@ -84,7 +88,8 @@ const CreateNewFilePage = () => {
 
         // Setting the hashed text as the output
         setHash(result);
-        setFileID(parseInt(result,16));
+        
+        //setFileID(BigNumber(hash, 16));
 
         // Setting the content of the file as file input
         //setFileInput(fr.result);
@@ -95,10 +100,15 @@ const CreateNewFilePage = () => {
   }
 
   //When file and name completed, register file with blockchain via newFile() smart contract
+  const [isRegistered, setIsRegistered] = useState('')
   const handleSubmit = async () => {
-    await contracts.contract.methods.newFile(fileID).send({
+    console.log('hash:', hash);
+    const myBigInt = BigNumber(hash, 16);
+    console.log('myBigInt:', myBigInt);
+    let isRegistered = await contracts.contract.methods.newFile(myBigInt).send({
       from: contextValue.web3.accounts[0],
     })
+    setIsRegistered(isRegistered)
   }
   
   return (
@@ -140,7 +150,7 @@ const CreateNewFilePage = () => {
                         <h4 className="hashed-algorithm-heading">File ID</h4>
                         <div className="hashed-algorithm-container">
                           <p className="hashed-algorithm-text">
-                            Your file File ID is: {fileID}
+                            Your file Hash ID is: {hash}
                           </p>
                         </div>
                       </div>
@@ -155,8 +165,8 @@ const CreateNewFilePage = () => {
                       </Button>
                   </CardBody>
                   <CardFooter>
-                    {fileID !== '' &&
-                      'Congratulations, your new file with created with the file ID: ' +
+                    {isRegistered === true && hash !== '' &&
+                      'Congratulations, your new file with created with the Hash ID: ' +
                         hash}
                   </CardFooter>
                 </Card>
