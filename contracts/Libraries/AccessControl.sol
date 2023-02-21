@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.6.0 <0.8.0;
+pragma solidity >=0.6.0;
 
-import "@openzeppelin/contracts/utils/EnumerableSet.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/utils/Context.sol";
+import "../../node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "../../node_modules/@openzeppelin/contracts/utils/Address.sol";
+import "../../node_modules/@openzeppelin/contracts/utils/Context.sol";
 
 /**
  * @dev Contract module that allows children to implement role-based access
