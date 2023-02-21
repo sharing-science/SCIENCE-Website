@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.0;
+pragma solidity >=0.6.0;
 
 //this contract is for controlling other members in the same team with the Covid19usecase contract creator.
 //which is a sub-contract of Covid19usecase.
