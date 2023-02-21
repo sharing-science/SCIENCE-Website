@@ -40,7 +40,6 @@ const CreateNewFilePage = () => {
   const [hash, setHash] = useState('')
 
   const [inputs, setInputs] = useState({
-    fileID: '',
     fileName: '',
   })
 

@@ -18,6 +18,7 @@ import Footer from 'components/Footer'
 import Context from 'Helpers/Context'
 import getWeb3 from 'Helpers/getWeb3'
 import Ownership from '../contracts/Ownership.json'
+import BigNumber from 'bignumber.js';
 
 const CheckAccessPage = () => {
   const { contextValue } = useContext(Context)
@@ -31,11 +32,11 @@ const CheckAccessPage = () => {
   const [fileCount, setFileCount] = useState('')
 
   const [inputs1, setInputs1] = useState({
-    fileID: '0',
+    hash: '',
     address: '0x123',
   })
   const [inputs2, setInputs2] = useState({
-    fileID: '0',
+    hash: '',
   })
 
   const handleInputChange1 = (e) => {
@@ -78,14 +79,20 @@ const CheckAccessPage = () => {
   }, [contextValue.web3.networkId])
 
   const handleSubmit1 = async () => {
+    console.log('hash:', inputs1.hash);
+    const myBigInt1 = BigNumber(inputs1.hash, 16);
+    console.log('myBigInt:', myBigInt1);
     const res = await contracts.contract.methods
-      .checkAccess(inputs1.fileID, inputs1.address)
+      .checkAccess(myBigInt1, inputs1.address)
       .call()
     setAnswer(res)
   }
   const handleSubmit2 = async () => {
+    console.log('hash:', inputs2.hash);
+    const myBigInt2 = BigNumber(inputs2.hash, 16);
+    console.log('myBigInt:', myBigInt2);
     const own = await contracts.contract.methods
-      .getFileOwner(inputs2.fileID)
+      .getFileOwner(myBigInt2)
       .call()
     setOwner(own)
   }
@@ -113,12 +120,12 @@ const CheckAccessPage = () => {
                   <CardHeader>
                     <h1>Check Access</h1>
                   </CardHeader>
-                  <label>File ID</label>
+                  <label>File Hash</label>
                   <Input
-                    name="fileID"
+                    name="hash"
                     onChange={handleInputChange1}
-                    value={inputs1.fileID}
-                    type="number"
+                    value={inputs1.hash}
+                    type="text"
                     color="primary"
                   />
                   <label>Account Address</label>
@@ -151,12 +158,12 @@ const CheckAccessPage = () => {
                   <CardHeader>
                     <h1>Get Owner</h1>
                   </CardHeader>
-                  <label>File ID</label>
+                  <label>File Hash</label>
                   <Input
-                    name="fileID"
+                    name="hash"
                     onChange={handleInputChange2}
-                    value={inputs2.fileID}
-                    type="number"
+                    value={inputs2.hash}
+                    type="text"
                     color="primary"
                   />
                   <CardBody>

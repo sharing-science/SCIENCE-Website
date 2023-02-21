@@ -20,9 +20,12 @@ import Footer from 'components/Footer'
 import Context from 'Helpers/Context'
 import getWeb3 from 'Helpers/getWeb3'
 import Ownership from '../contracts/Ownership.json'
+import BigNumber from 'bignumber.js';
 
 const RequestLimitedFilePage = () => {
   const { contextValue } = useContext(Context)
+
+  const[requested, setRequested] = useState()
 
   const [contracts, setContracts] = useState({
     contract: {},
@@ -31,7 +34,7 @@ const RequestLimitedFilePage = () => {
   const [showTable, setShowTable] = useState(false)
 
   const [inputs, setInputs] = useState({
-    fileID: '0',
+    hash: '',
     numberOfDays: '0',
   })
 
@@ -78,9 +81,11 @@ const RequestLimitedFilePage = () => {
   }, [contextValue.web3.networkId])
 
   const handleSubmit = async () => {
-    await contracts.contract.methods.requestLimitedAccess(inputs.fileID,
+    const myBigInt = BigNumber(inputs.hash, 16);
+    const requested = await contracts.contract.methods.requestLimitedAccess(myBigInt,
       inputs.numberOfDays).send({from: contextValue.web3.accounts[0],
     })
+    setRequested(requested);
   }
   return (
     <>
@@ -102,12 +107,12 @@ const RequestLimitedFilePage = () => {
                       <h1>File Request</h1>
                     </CardHeader>
                     <CardBody>
-                      <label>File ID</label>
+                      <label>File Hash</label>
                       <Input
-                        name="fileID"
+                        name="hash"
                         onChange={handleInputChange}
-                        value={inputs.fileID}
-                        type="number"
+                        value={inputs.hash}
+                        type="text"
                         color="primary"
                       />
                       <label>Number of Days</label>
@@ -115,7 +120,7 @@ const RequestLimitedFilePage = () => {
                         name="numberOfDays"
                         onChange={handleInputChange}
                         value={inputs.numberOfDays}
-                        type="text"
+                        type="number"
                         color="primary"
                       />
                       <Button
@@ -127,7 +132,12 @@ const RequestLimitedFilePage = () => {
                         Request File
                       </Button>
                     </CardBody>
-                    <CardFooter></CardFooter>
+                    <CardFooter>
+                      {requested !== '' && requested === true &&
+                      'Request Made'}
+                      {requested !== '' && requested === false &&
+                      'Request Denied'}
+                    </CardFooter>
                   </Card>
                 </Col>
                 <Col xs="6">
