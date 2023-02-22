@@ -25,6 +25,8 @@ import BigNumber from 'bignumber.js';
 const RequestFilePage = () => {
   const { contextValue } = useContext(Context)
 
+  let requestsMade = 0
+
   const[requested, setRequested] = useState()
 
   const [contracts, setContracts] = useState({
@@ -81,9 +83,10 @@ const RequestFilePage = () => {
 
   const handleSubmit = async () => {
     const myBigInt = BigNumber(inputs.hash, 16);
-    const requested = await contracts.contract.methods.requestAccess(myBigInt).send({
+    const requested = await contracts.contract.methods.requestAccess(myBigInt, 7).send({
       from: contextValue.web3.accounts[0],
     })
+    requestsMade++;
     setRequested(requested);
   }
   return (
@@ -124,6 +127,7 @@ const RequestFilePage = () => {
                       </Button>
                     </CardBody>
                     <CardFooter>
+                      {'Debugging - Requests Made: ' + requestsMade}
                       {requested !== '' && requested === true &&
                       'Request Made'}
                       {requested !== '' && requested === false &&
