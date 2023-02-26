@@ -1,5 +1,5 @@
 // // SPDX-License-Identifier: UNLICENSED
-// pragma solidity >=0.6.0;
+pragma solidity >=0.6.0;
 //commented bc this is causing problems for a contract that is not even used
 // import "../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
