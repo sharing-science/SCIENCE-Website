@@ -71,6 +71,19 @@ contract Ownership {
         return answer;
     }
 
+    function getFileAllowedLength(uint256 _fileID) public view returns (uint) {
+        return fileAllowedCounter[_fileID];
+    }
+    
+    function getFileAllowed(uint256 _fileID, uint _requestID)
+        public
+        view
+        returns (Perms memory)
+    {
+        Perms memory answer = fileAllowed[_fileID][_requestID];
+        return answer;
+    }
+
     function getFileCounter() public view returns (uint){
         return fileCounter;
     }
@@ -95,6 +108,32 @@ contract Ownership {
             uint fileRequestLength = getFileRequestLength(currentFile);
             for(uint requestID = 0; requestID < fileRequestLength; ++requestID){
                 answer[index] = getFileRequest(currentFile, requestID);
+                index++;
+            }
+        }
+        return answer;
+    }
+
+    function getAllAllowed() public view returns (Perms[] memory){
+        uint256[FILE_LENGTH] memory files = getOwnersFiles();
+        uint fileLength = getOwnerFileLength();
+        uint totalPermsCount = 0;
+
+        //Get number of total Perms under owner
+        for (uint i = 0; i < fileLength; ++i) {
+            uint currentFile = files[i];
+            uint fileAllowedLength = getFileAllowedLength(currentFile);
+            totalPermsCount += fileAllowedLength;
+        }
+
+        //Combine all Perms into answer
+        Perms[] memory answer = new Perms[](totalPermsCount);
+        uint index = 0;
+        for (uint i = 0; i < fileLength; ++i) {
+            uint currentFile = files[i];
+            uint fileRequestLength = getFileAllowedLength(currentFile);
+            for(uint requestID = 0; requestID < fileRequestLength; ++requestID){
+                answer[index] = getFileAllowed(currentFile, requestID);
                 index++;
             }
         }

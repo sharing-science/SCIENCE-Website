@@ -207,6 +207,10 @@ const NavBar = () => {
                   <i className="tim-icons icon-cloud-upload-94" />
                   Check Access
                 </DropdownItem>
+                <DropdownItem tag={Link} to="/approved">
+                  <i className="tim-icons icon-cloud-upload-94" />
+                  Approved List
+                </DropdownItem>
                 {/* <DropdownItem tag={Link} to="/hash">
                   <i className="tim-icons icon-cloud-upload-94" />
                   Hash

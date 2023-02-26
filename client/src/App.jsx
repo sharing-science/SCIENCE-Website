@@ -21,6 +21,7 @@ import { contextReducer } from 'Helpers/reducers'
 import { getLocalStorageObject } from 'Helpers/helperFunctions'
 import { PrivateRoute, PublicRoute } from './Helpers/Routes'
 import CheckAccessPage from 'views/CheckAccessPage'
+import SeeApprovedPage from 'views/SeeApprovedPage'
 // import HashTestPage from 'views/HashTestPage'  //no longer needed
 
 const App = () => {
@@ -45,6 +46,7 @@ const App = () => {
           <PrivateRoute exact path="/team" component={TeamPage} />
           <PrivateRoute exact path="/newFile" component={CreateNewFilePage} />
           <PrivateRoute exact path="/check" component={CheckAccessPage} />
+          <PrivateRoute exact path="/approved" component={SeeApprovedPage} />
           {/* <PrivateRoute exact path="/hash" component={HashTestPage} /> */}
           <PrivateRoute exact path="/approveRequests" component={ApproveRequestsPage} />
 
