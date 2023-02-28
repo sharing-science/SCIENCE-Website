@@ -23,22 +23,20 @@ contract Ownership {
 
     mapping(uint256 => address) public isfileOwner;                         //fileID = Owner
     mapping(address => uint256[FILE_LENGTH]) public ownersFiles;            //Owner = fileID //NEEDS TO BE IMPLEMENTED EVENTUALLY
-    mapping(address => uint) public ownerFilesLength;                    //Owner = number of files owned
+    mapping(address => uint) public ownerFilesLength;                       //Owner = number of files owned
     
     mapping(uint256 => Perms[PERM_LENGTH]) public fileRequests;             //fileID = requests
-    mapping(uint256 => uint) public fileRequestCounter;                  //fileID = requestsCounter
+    mapping(uint256 => uint) public fileRequestCounter;                     //fileID = requestsCounter
 
     mapping(uint256 => Perms[PERM_LENGTH]) public fileAllowed;              //fileID = allowedUsers
     mapping(uint256 => uint104) public fileAllowedCounter;                  //fileID = allowedCounter
 
+    mapping(address => mapping(uint => uint256)) public filesAccessed;      //Address = FileID[i] (List of users files)
+    mapping(address => uint) public fileAccessCounter;                      //Address = counter
+
 
     //Test
     //ownersFiles[0x1e53025688ca6e730139a97d6830b02ee9323760][0] = 1; 
-
-
-    // constructor() public {
-    //     fileCounter = 0;
-    // }
 
     /// @dev Restricted to owner
     modifier onlyOwner(uint256 _fileID) {
@@ -114,7 +112,7 @@ contract Ownership {
         return answer;
     }
 
-    function getAllAllowed() public view returns (Perms[] memory){
+    function getAllAllowed() public view returns (Perms[] memory) {
         uint256[FILE_LENGTH] memory files = getOwnersFiles();
         uint fileLength = getOwnerFileLength();
         uint totalPermsCount = 0;
@@ -140,6 +138,52 @@ contract Ownership {
         return answer;
     }
 
+    //Takes user and owner address
+    //Returns all the files user has once gotten from owner
+    function getUserOwnerAccessed(address _user, address _owner) public view returns(uint256[] memory) {
+        //Get number of matches
+        uint matches = 0;
+        //Go through all files _user accesses
+        for(uint i = 0; i < fileAccessCounter[_user]; i++) {
+            uint256 currentUserFile = filesAccessed[_user][i];
+            //Go through all files of _owner
+            for(uint h = 0; h < ownerFilesLength[_owner]; h++){
+                uint currentOwnerFile = ownersFiles[_owner][h];
+                //If match user file with owner file
+                if(currentUserFile == currentOwnerFile){
+                    matches++;
+                }
+            }
+        }
+
+        //Get list of fileIDs _user owes _owner
+        uint256[] memory answer = new uint256[](matches);
+        uint index = 0;
+        //Go through all files _user accesses
+        for(uint i = 0; i < fileAccessCounter[_user]; i++) {
+            uint256 currentUserFile = filesAccessed[_user][i];
+            //Go through all files of _owner
+            for(uint h = 0; h < ownerFilesLength[_owner]; h++){
+                uint currentOwnerFile = ownersFiles[_owner][h];
+                //If match user file with owner file
+                if(currentUserFile == currentOwnerFile){
+                    answer[index++] = currentUserFile;
+                }
+            }
+        }
+        return answer;
+    }
+
+    //Takes _user address
+    //Returns all fileID's given to _user
+    function getAllUserAccessed(address _user) public view returns(uint256[] memory) {
+        uint256[] memory answer = new uint256[](fileAccessCounter[_user]);
+        for(uint i = 0; i < fileAccessCounter[_user]; i++) {
+            answer[i] = filesAccessed[_user][i];
+        }
+        return answer;
+    }
+
     function newFile(uint256 _fileID) public returns(bool) { //take in HashID argument
         if(ownerFilesLength[msg.sender] == FILE_LENGTH){
             return false;
@@ -157,16 +201,13 @@ contract Ownership {
         return true;
     }
 
-    //Not necessary for operations
-    function getOwnerFileCounter() public view returns (uint256) {
-        return ownerFilesLength[msg.sender];
-    }
-
     //Update allowedUsers list in file
     function addAllowedPerm(uint256 _fileID, Perms memory _newPerm) public returns(bool) {
         //Add new Perm
         if(fileAllowedCounter[_fileID] < PERM_LENGTH){
             fileAllowed[_fileID][fileAllowedCounter[_fileID]++] = _newPerm;
+            //Store for user side
+            filesAccessed[_newPerm.user][fileAccessCounter[_newPerm.user]++] = _fileID;
             return true;
         }
         return false;
