@@ -35,7 +35,7 @@ contract Ownership {
     mapping(address => uint) public fileAccessCounter;                      //Address = counter
 
 
-    //Test
+    //Test testing push from desktop to pull on remote
     //ownersFiles[0x1e53025688ca6e730139a97d6830b02ee9323760][0] = 1; 
 
     /// @dev Restricted to owner
