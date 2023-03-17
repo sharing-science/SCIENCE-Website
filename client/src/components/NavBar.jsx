@@ -167,10 +167,6 @@ const NavBar = () => {
                   <i className="tim-icons icon-badge" />
                   Login Page
                 </DropdownItem>
-                {/* <DropdownItem tag={Link} to="/contract">
-                  <i className="tim-icons icon-bullet-list-67" />
-                  Sample Contract
-                </DropdownItem> */}
                 {/* <DropdownItem tag={Link} to="/tokens">
                   <i className="tim-icons icon-coins" />
                   Tokens
@@ -211,9 +207,13 @@ const NavBar = () => {
                   <i className="tim-icons icon-cloud-upload-94" />
                   Approved List
                 </DropdownItem>
-                {/* <DropdownItem tag={Link} to="/hash">
+                {/* <DropdownItem tag={Link} to="/upload">  //!!!!!!!!FFFIIIXIXX
                   <i className="tim-icons icon-cloud-upload-94" />
-                  Hash
+                  Upload
+                </DropdownItem>
+                <DropdownItem tag={Link} to="/download">
+                  <i className="tim-icons icon-cloud-upload-94" />
+                  Download
                 </DropdownItem> */}
               </DropdownMenu>
             </UncontrolledDropdown>

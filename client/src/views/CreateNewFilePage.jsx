@@ -13,10 +13,10 @@ import {
 } from 'reactstrap'
 
 // core components
-import NavBar from 'components/NavBar'
-import Footer from 'components/Footer'
-import Context from 'Helpers/Context'
-import getWeb3 from 'Helpers/getWeb3'
+import NavBar from '../components/NavBar'
+import Footer from '../components/Footer'
+import Context from '../Helpers/Context'
+import getWeb3 from '../Helpers/getWeb3'
 import Ownership from '../contracts/Ownership.json'
 //Specific crypto-hash
 import {sha256} from 'crypto-hash';
@@ -77,34 +77,23 @@ const CreateNewFilePage = () => {
   const handleFileInput = (e) => {
     // Initializing the file reader
     const fr = new FileReader();
-
-    // Listening to when the file has been read.
     fr.onload = async () => {
-
         let result = '';
-
         result = await sha256(fr.result);
-
-        // Setting the hashed text as the output
         setHash(result);
-        
-        //setFileID(BigNumber(hash, 16));
-
-        // Setting the content of the file as file input
-        //setFileInput(fr.result);
     }
-
-    // Reading the file.
     fr.readAsText(e.target.files[0]);
   }
 
   //When file and name completed, register file with blockchain via newFile() smart contract
   const [isRegistered, setIsRegistered] = useState('')
+
   const handleSubmit = async () => {
+    //Handle Blockchain Contract
     console.log('hash:', hash);
     const myBigInt = BigNumber(hash, 16);
     console.log('myBigInt:', myBigInt);
-    let isRegistered = await contracts.contract.methods.newFile(myBigInt).send({
+    let isRegistered = await contracts.contract.methods.newFile(myBigInt).send({ //!!!!Will need to add a key
       from: contextValue.web3.accounts[0],
     })
     setIsRegistered(isRegistered)
@@ -120,7 +109,7 @@ const CreateNewFilePage = () => {
             <img
               alt="..."
               className="path"
-              src={require('assets/img/waves.png').default}
+              src={require('../assets/img/waves.png').default}
             />
             <Container>
               <Col xs="6">

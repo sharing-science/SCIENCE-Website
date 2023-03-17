@@ -1,8 +1,8 @@
 import React from "react";
 
 // core components
-import NavBar from "components/NavBar";
-import Footer from "components/Footer";
+import NavBar from "../components/NavBar";
+import Footer from "../components/Footer";
 import { Container } from "reactstrap";
 
 const LandingPage = () => {
@@ -15,7 +15,7 @@ const LandingPage = () => {
             <img
               alt="..."
               className="path"
-              src={require("assets/img/path1.png").default}
+              src={require("../assets/img/path1.png").default}
             />
             <div className="content-center brand">
               <img src="https://sanfordbernsteincenter.org/sites/default/files/civicrm/persist/contribute/images/Research%20Image.jpg" alt="" />

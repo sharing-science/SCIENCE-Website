@@ -13,10 +13,10 @@ import {
 } from 'reactstrap'
 
 // core components
-import NavBar from 'components/NavBar'
-import Footer from 'components/Footer'
-import Context from 'Helpers/Context'
-import getWeb3 from 'Helpers/getWeb3'
+import NavBar from '../components/NavBar'
+import Footer from '../components/Footer'
+import Context from '../Helpers/Context'
+import getWeb3 from '../Helpers/getWeb3'
 import Ownership from '../contracts/Ownership.json'
 import BigNumber from 'bignumber.js';
 
@@ -112,7 +112,7 @@ const CheckAccessPage = () => {
             <img
               alt="..."
               className="path"
-              src={require('assets/img/waves.png').default}
+              src={require('../assets/img/waves.png').default}
             />
             <Container>
               <Col xs="6">
