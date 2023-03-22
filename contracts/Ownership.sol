@@ -214,8 +214,6 @@ contract Ownership {
 
         isfileOwner[_fileID] = msg.sender;
         fileToPass[_fileID] = _password;
-        // fileRequests[_fileID] = new Perms[](0);
-        // fileAllowed[_fileID] = new Perms[](0);
 
         fileRequestCounter[_fileID] = 0;
         fileAllowedCounter[_fileID] = 0;
@@ -240,7 +238,7 @@ contract Ownership {
         if(!found) return false;
 
         //create new file
-        newFile(_citationID, "c"); //c is the password for citations
+        if(!newFile(_citationID, "c")) return false; //c is the password for citations
 
         //give owedOwner access to citation
         address owedOwner = isfileOwner[_fileID];
