@@ -17,7 +17,8 @@ import { PrivateRoute, PublicRoute } from './Helpers/Routes'
 import CheckAccessPage from './views/CheckAccessPage'
 import SeeApprovedPage from './views/SeeApprovedPage'
 import Up from './views/uploadTest1'//!!!!!!!!!!!FFFFIIIXXX
-import Down from './views/downloadTest1'
+// import Down from './views/downloadTest1'
+import DownloadPage from './views/DownloadPage'
 
 const App = () => {
   const [contextValue, dispatchContextValue] = useReducer(contextReducer, {
@@ -29,7 +30,6 @@ const App = () => {
       <Router>
         <Switch>
           {/* Private Routes */}
-          {/* <PrivateRoute exact path="/upload" component={UploadFilePage} /> */}
           <PrivateRoute exact path="/request" component={RequestFilePage} />
           <PrivateRoute exact path="/limited" component={RequestLimitedFilePage} />
           <PrivateRoute exact path="/profile" component={ProfilePage} />
@@ -39,7 +39,7 @@ const App = () => {
           <PrivateRoute exact path="/approved" component={SeeApprovedPage} />
           
           <PrivateRoute exact path="/upload" component={Up} />
-          <PrivateRoute exact path="/download" component={Down} />
+          <PrivateRoute exact path="/download" component={DownloadPage} />
 
           {/* Public Routes */}
           <PublicRoute exact path="/login" component={LoginPage} />

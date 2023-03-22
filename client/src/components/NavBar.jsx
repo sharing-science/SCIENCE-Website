@@ -183,6 +183,10 @@ const NavBar = () => {
                   <i className="tim-icons icon-cloud-upload-94" />
                   Upload Page
                 </DropdownItem> */}
+                <DropdownItem tag={Link} to="/download">
+                  <i className="tim-icons icon-cloud-upload-94" />
+                  Download Page
+                </DropdownItem>
                 <DropdownItem tag={Link} to="/approveRequests">
                   <i className="tim-icons icon-cloud-upload-94" />
                   Approve Requests
@@ -207,14 +211,6 @@ const NavBar = () => {
                   <i className="tim-icons icon-cloud-upload-94" />
                   Approved List
                 </DropdownItem>
-                {/* <DropdownItem tag={Link} to="/upload">  //!!!!!!!!FFFIIIXIXX
-                  <i className="tim-icons icon-cloud-upload-94" />
-                  Upload
-                </DropdownItem>
-                <DropdownItem tag={Link} to="/download">
-                  <i className="tim-icons icon-cloud-upload-94" />
-                  Download
-                </DropdownItem> */}
               </DropdownMenu>
             </UncontrolledDropdown>
             <NavItem>

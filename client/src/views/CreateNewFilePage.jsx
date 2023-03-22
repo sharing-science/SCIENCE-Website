@@ -18,39 +18,23 @@ import Footer from '../components/Footer'
 import Context from '../Helpers/Context'
 import getWeb3 from '../Helpers/getWeb3'
 import Ownership from '../contracts/Ownership.json'
-//Specific crypto-hash
-import {sha256} from 'crypto-hash';
-// import {MD5} from 'crypto-js';
-//import "assets/css/hashing.css"; 
 
+import CryptoJS from 'crypto-js';
 import BigNumber from 'bignumber.js';
 
 
 
 const CreateNewFilePage = () => {
-  //let [file_input, setFileInput] = useState('');
+
+  const [file, setFile] = useState(null);
+  const [password, setPassword] = useState('');
+  const [hash, setHash] = useState(null);
   
   const { contextValue } = useContext(Context)
 
   const [contracts, setContracts] = useState({
     contract: {},
   })
-
-  //const [fileID, setFileID] = useState('')
-  const [hash, setHash] = useState('')
-
-  const [inputs, setInputs] = useState({
-    fileName: '',
-  })
-
-  const handleFileNameChange = (e) => {
-    const value =
-      e.target.type === 'checkbox' ? e.target.checked : e.target.value
-    setInputs({
-      ...inputs,
-      [e.target.name]: value,
-    })
-  }
 
   useEffect(() => {
     const init = async () => {
@@ -73,31 +57,48 @@ const CreateNewFilePage = () => {
     init()
   }, [contextValue.web3.networkId])
 
+  const handlePasswordChange = (event) => {
+    setPassword(event.target.value);
+  };
+
   //Calculates hash of file when uploaded and sets hash as file ID
-  const handleFileInput = (e) => {
-    // Initializing the file reader
-    const fr = new FileReader();
-    fr.onload = async () => {
-        let result = '';
-        result = await sha256(fr.result);
-        setHash(result);
-    }
-    fr.readAsText(e.target.files[0]);
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
   }
 
   //When file and name completed, register file with blockchain via newFile() smart contract
   const [isRegistered, setIsRegistered] = useState('')
 
   const handleSubmit = async () => {
+    //Upload
+    handleUpload()
+
     //Handle Blockchain Contract
     console.log('hash:', hash);
     const myBigInt = BigNumber(hash, 16);
-    console.log('myBigInt:', myBigInt);
-    let isRegistered = await contracts.contract.methods.newFile(myBigInt).send({ //!!!!Will need to add a key
+    let isRegistered = await contracts.contract.methods.newFile(myBigInt, password).send({ //!!!!Will need to add a key
       from: contextValue.web3.accounts[0],
     })
     setIsRegistered(isRegistered)
   }
+
+  //Encrypt and Upload
+  const handleUpload = () => {
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const fileData = reader.result;
+      const encryptedData = CryptoJS.AES.encrypt(fileData, password);
+      const formData = new FormData();
+      formData.append('file', new Blob([encryptedData.toString()], { type: 'text/plain' }));
+      const response = await fetch('https://ipfs.infura.io:5001/api/v0/add', {
+        method: 'POST',
+        body: formData
+      });
+      const result = await response.json();
+      setHash(result.Hash);
+    };
+    reader.readAsText(file);
+  };
   
   return (
     <>
@@ -115,32 +116,17 @@ const CreateNewFilePage = () => {
               <Col xs="6">
                 <Card className="p-4 card-stats">
                   <CardHeader>
-                    <h1>Register New File</h1>
+                    <h1>Register and Upload New File</h1>
                   </CardHeader>
                   <CardBody>
-                    <div className="Get-Name">
-                      <label>File Name</label>
-                      <Input
-                        name="fileName"
-                        onChange={handleFileNameChange}
-                        value={inputs.fileName}
-                        type="text"
-                        color="primary"
-                      />
+                    <div className="Get-Password">
+                      <label>Password</label>
+                      <Input type="password" value={password} onChange={handlePasswordChange} />
                       </div>
 
                       <div className="File-Input">
                         <label htmlFor="file-input">File Input</label>
-                        <input type="file" className="form-control" id="file-input" onChange={handleFileInput} />
-                      </div>
-
-                      <div className="hashed-output">
-                        <h4 className="hashed-algorithm-heading">File ID</h4>
-                        <div className="hashed-algorithm-container">
-                          <p className="hashed-algorithm-text">
-                            Your file Hash ID is: {hash}
-                          </p>
-                        </div>
+                        <input type="file" className="form-control" id="file-input" onChange={handleFileChange} />
                       </div>
 
                       <Button
@@ -149,13 +135,13 @@ const CreateNewFilePage = () => {
                         color="info"
                         onClick={handleSubmit}
                       >
-                        Register New File
+                        Register and Upload
                       </Button>
                   </CardBody>
                   <CardFooter>
                     {isRegistered === true && hash !== '' &&
                       'Congratulations, your new file with created with the Hash ID: ' +
-                        hash}
+                        hash + 'and password: ' + password}
                   </CardFooter>
                 </Card>
               </Col>

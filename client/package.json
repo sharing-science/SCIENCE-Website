@@ -13,9 +13,12 @@
     "crypto-hash": "1.1",
     "ipfs": "^0.66.0",
     "ipfs-core": "^0.18.0",
+    "ipfs-http-client": "^60.0.0",
     "jwt-decode": "^3.1.2",
+    "loader-utils": "^2.0.4",
     "node-sass": "^8.0.0",
     "nouislider": "^14.6.4",
+    "npm": "^9.6.2",
     "perfect-scrollbar": "^1.5.0",
     "react": "^17.0.2",
     "react-chartjs-2": "^2.11.1",
@@ -28,10 +31,8 @@
     "web3": "^1.8.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "SET NODE_OPTIONS=--openssl-legacy-provider && react-scripts start",
+    "build": "SET NODE_OPTIONS=--openssl-legacy-provider && react-scripts build"
   },
   "eslintConfig": {
     "extends": [
@@ -50,5 +51,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "webpack": "^4.44.2"
   }
 }

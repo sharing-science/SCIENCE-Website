@@ -1,123 +1,153 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useContext, useEffect, useState } from 'react'
 
 // reactstrap components
 import {
   Button,
-  Card,
-  CardHeader,
-  CardBody,
-  FormGroup,
-  Form,
-  Input,
   Container,
-  Row,
+  Card,
+  CardBody,
+  CardHeader,
+  CardFooter,
   Col,
-  UncontrolledTooltip,
-} from "reactstrap";
+  Input,
+} from 'reactstrap'
 
 // core components
-import NavBar from "components/NavBar";
-import Footer from "components/Footer";
+import NavBar from '../components/NavBar'
+import Footer from '../components/Footer'
+import Context from '../Helpers/Context'
+import getWeb3 from '../Helpers/getWeb3'
+import Ownership from '../contracts/Ownership.json'
 
-const UploadFilePage = () => {
-  const [uploadInput, setUploadInput] = useState();
+import CryptoJS from 'crypto-js';
+import BigNumber from 'bignumber.js';
 
-  const fileUploaded = (e) => {
-    if (!e.target.files) {
-      console.log("Error Uploading File");
+
+
+const CreateNewFilePage = () => {
+
+  const [hash, setHash] = useState(null);
+  const [password, setPassword] = useState('');
+  const [fileData, setFileData] = useState(null);
+  const [isAllowed, setIsAllowed] = useState(null);
+  
+  const { contextValue } = useContext(Context)
+
+  const [contracts, setContracts] = useState({
+    contract: {},
+  })
+
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const web3 = await getWeb3()
+        const Contract_instance = new web3.eth.Contract(
+          Ownership.abi,
+          Ownership.networks[contextValue.web3.networkId] &&
+            Ownership.networks[contextValue.web3.networkId].address,
+        )
+
+        setContracts((c) => ({
+          ...c,
+          contract: Contract_instance,
+        }))
+      } catch (error) {
+        console.log('Error')
+      }
     }
-    setUploadInput(e.target.files);
+    init()
+  }, [contextValue.web3.networkId])
+
+  const handleHashChange = (event) => {
+    setHash(event.target.value);
   };
 
-  const submitFile = () => {
-    // Create an object of formData
-    const formData = new FormData();
-    // Update the formData object
-    formData.append("file", uploadInput[0]);
-    formData.append("filename", uploadInput[0].name);
+  //When file and name completed, register file with blockchain via newFile() smart contract
+  const handleSubmit = async () => {
+    //Check Access
+    const myBigInt = BigNumber(hash, 16);
+    let access = await contracts.contract.methods.checkAccess(myBigInt, contextValue.web3.accounts[0]).send({
+      from: contextValue.web3.accounts[0],
+    })
+    setIsAllowed(access);
 
-    // Request made to the backend api
-    // Send formData object
-    axios.post("http://localhost:5000/", formData);
+    //If Access:
+    if(isAllowed){
+      //Get Password
+      let pass = await contracts.contract.methods.getPassword(myBigInt, contextValue.web3.accounts[0]).send({
+        from: contextValue.web3.accounts[0],
+      })
+      console.log('password:', pass); //!!!!!!!!Will have to remove this
+      setPassword(pass);
+
+      //Download
+      handleDownload()
+    }
+  }
+
+  //Decrypt and Download
+  const handleDownload = async () => {
+    const response = await fetch(`https://ipfs.infura.io/ipfs/${hash}`);
+    const encryptedData = await response.text();
+    const decryptedData = CryptoJS.AES.decrypt(encryptedData, password).toString(CryptoJS.enc.Utf8);
+    setFileData(decryptedData);
+    handleSave(); //maybe?!?!?
   };
 
+  const handleSave = () => {
+    const blob = new Blob([fileData], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'file.txt';
+    link.click();
+  };
+  
   return (
     <>
       <NavBar />
-      <div className="wrapper">
-        <img
-          alt="..."
-          className="path"
-          src={require("assets/img/path4.png").default}
-        />
-        <section className="section">
-          <Container>
-            <Row>
-              <Col md="6">
-                <Card className="card-plain">
+      <div className="wrapper register-page">
+        <div className="page-header">
+          <div className="page-header-image" />
+          <div className="content">
+            <img
+              alt="..."
+              className="path"
+              src={require('../assets/img/waves.png').default}
+            />
+            <Container>
+              <Col xs="6">
+                <Card className="p-4 card-stats">
                   <CardHeader>
-                    <h1 className="profile-title text-left">File Upload</h1>
+                    <h1>Download</h1>
                   </CardHeader>
                   <CardBody>
-                    <Form>
-                      <Row>
-                        <Col md="6">
-                          <FormGroup>
-                            <Button
-                              className="btn-round"
-                              color="info"
-                              data-placement="right"
-                              id="UploadFileButton"
-                              type="button"
-                            >
-                              {uploadInput ? "File Uploaded" : "Upload File"}
-                              <Input type="file" onChange={fileUploaded} />
-                            </Button>
-                            <UncontrolledTooltip
-                              delay={0}
-                              placement="left"
-                              target="UploadFileButton"
-                            >
-                              {uploadInput
-                                ? uploadInput[0].name +
-                                  " was successfully uploaded"
-                                : "Click to upload your file"}
-                            </UncontrolledTooltip>
-                            <Button
-                              className="btn-round"
-                              color="info"
-                              data-placement="right"
-                              id="SubmitFilesButton"
-                              type="button"
-                              onClick={submitFile}
-                            >
-                              Submit
-                            </Button>
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row>
-                        <Col md="6"></Col>
-                      </Row>
-                      <UncontrolledTooltip
-                        delay={0}
-                        placement="right"
-                        target="SubmitFilesButton"
+                    <div className="Get-CID">
+                      <label>File Hash</label>
+                      <Input type="text" value={hash} onChange={handleHashChange} />
+                      </div>
+
+                      <Button
+                        type="button"
+                        className="btn-round"
+                        color="info"
+                        onClick={handleSubmit}
                       >
-                        Click to submit your file
-                      </UncontrolledTooltip>
-                    </Form>
+                        Download
+                      </Button>
                   </CardBody>
+                  <CardFooter>
+                    {isAllowed === true && 'Downloading...'}
+                  </CardFooter>
                 </Card>
               </Col>
-            </Row>
-          </Container>
-        </section>
+            </Container>
+          </div>
+        </div>
         <Footer />
       </div>
     </>
-  );
-};
+  )
+}
 
-export default UploadFilePage;
+export default CreateNewFilePage

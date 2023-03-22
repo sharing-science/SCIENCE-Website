@@ -1,56 +1,68 @@
-// import React, { useState } from 'react';
-// import CryptoJS from 'crypto-js';
-// import * as IPFS from 'ipfs-core';
-// import axios from 'axios';
+import React, { useState } from 'react';
+import CryptoJS from 'crypto-js';
+import NavBar from '../components/NavBar'
+import Footer from '../components/Footer'
 
-// function DownloadFile() {
-//   const [ipfsHash, setIpfsHash] = useState('');
-//   const [decryptedFile, setDecryptedFile] = useState(null);
-//   const [key, setKey] = useState('');
+function DownloadPage() {
+  const [hash, setHash] = useState('');
+  const [password, setPassword] = useState('');
+  const [fileData, setFileData] = useState(null);
 
-//   const handleHashChange = (event) => {
-//     setIpfsHash(event.target.value);
-//   };
+  const handleHashChange = (event) => {
+    setHash(event.target.value);
+  };
 
-//   const handleKeyChange = (event) => {
-//     setKey(event.target.value);
-//   };
+  const handlePasswordChange = (event) => {
+    setPassword(event.target.value);
+  };
 
-//   const handleDownloadFile = async () => {
-//     const node = await IPFS.create();
-//     const stream = node.cat(ipfsHash);
-//     const chunks = [];
-//     for await (const chunk of stream) {
-//       chunks.push(chunk);
-//     }
-//     const encryptedData = new Uint8Array(Buffer.concat(chunks)).toString();
-//     const decryptedData = CryptoJS.AES.decrypt(encryptedData, key).toString(CryptoJS.enc.Utf8);
-//     const url = URL.createObjectURL(new Blob([decryptedData]));
-//     setDecryptedFile(decryptedData);
-//     axios({
-//       url: url,
-//       method: 'GET',
-//       responseType: 'blob',
-//     }).then((response) => {
-//       setDecryptedFile(response.data);
-//     });
-//   };
+  const handleDownload = async () => {
+    const response = await fetch(`https://ipfs.infura.io/ipfs/${hash}`);
+    const encryptedData = await response.text();
+    const decryptedData = CryptoJS.AES.decrypt(encryptedData, password).toString(CryptoJS.enc.Utf8);
+    setFileData(decryptedData);
+  };
 
-//   return (
-//     <div>
-//       <h1>File downloader</h1>
-//       <input type="text" placeholder="IPFS hash" onChange={handleHashChange} />
-//       <br />
-//       <input type="password" placeholder="Key" onChange={handleKeyChange} />
-//       <br />
-//       <button onClick={handleDownloadFile}>Download file</button>
-//       {decryptedFile && (
-//         <a href={URL.createObjectURL(decryptedFile)} download>
-//           Downloaded file
-//         </a>
-//       )}
-//     </div>
-//   );
-// }
+  const handleSave = () => {
+    const blob = new Blob([fileData], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'file.txt';
+    link.click();
+  };
 
-// export default DownloadFile;
+  return (
+    <>
+    <NavBar />
+    <div>
+      <h1>Download Page</h1>
+      <div>
+        <label>
+          IPFS Hash:
+          <input type="text" value={hash} onChange={handleHashChange} />
+        </label>
+      </div>
+      <div>
+        <label>
+          Password:
+          <input type="password" value={password} onChange={handlePasswordChange} />
+        </label>
+      </div>
+      <div>
+        <button onClick={handleDownload}>Download</button>
+      </div>
+      {fileData && (
+        <div>
+          <p>Downloaded file:</p>
+          <pre>{fileData}</pre>
+          <button onClick={handleSave}>Save file</button>
+        </div>
+      )}
+    </div>
+    <Footer />
+    </>
+  );
+}
+
+export default DownloadPage;

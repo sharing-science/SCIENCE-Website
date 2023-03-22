@@ -39,6 +39,7 @@ contract Ownership {
     mapping(address => uint) public fileOwedCounter;                        //Address = counter
     mapping(uint256 => uint256) citationToFile;                             //citationID = fileID
 
+    mapping(uint256 => string) public fileToPass;                           //fileID = password
 
     //ownersFiles[0x1e53025688ca6e730139a97d6830b02ee9323760][0] = 1; 
 
@@ -198,14 +199,21 @@ contract Ownership {
         return answer;
     }
 
+    function getPassword(uint256 _fileID, address _user) public returns(string memory) {
+        bool access = checkAccess(_fileID, _user);
+        if(!access) return "";
+        return fileToPass[_fileID];
+    }
 
 
     //Creates new data to be used
-    function newFile(uint256 _fileID) public returns(bool) { //take in HashID argument
+    function newFile(uint256 _fileID, string memory _password) public returns(bool) { //take in HashID argument
         if(ownerFilesLength[msg.sender] == FILE_LENGTH){
             return false;
         }
+
         isfileOwner[_fileID] = msg.sender;
+        fileToPass[_fileID] = _password;
         // fileRequests[_fileID] = new Perms[](0);
         // fileAllowed[_fileID] = new Perms[](0);
 
@@ -232,7 +240,7 @@ contract Ownership {
         if(!found) return false;
 
         //create new file
-        newFile(_citationID);
+        newFile(_citationID, "c"); //c is the password for citations
 
         //give owedOwner access to citation
         address owedOwner = isfileOwner[_fileID];
