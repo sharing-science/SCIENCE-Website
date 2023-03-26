@@ -21,6 +21,7 @@ import Ownership from '../contracts/Ownership.json'
 
 import CryptoJS from 'crypto-js';
 import BigNumber from 'bignumber.js';
+import Pinata from '@pinata/sdk';
 
 
 
@@ -76,28 +77,39 @@ const CreateNewFilePage = () => {
     //Handle Blockchain Contract
     console.log('hash:', hash);
     const myBigInt = BigNumber(hash, 16);
-    let isRegistered = await contracts.contract.methods.newFile(myBigInt, password).send({ //!!!!Will need to add a key
+    let isRegistered = await contracts.contract.methods.newFile(myBigInt, password).send({
       from: contextValue.web3.accounts[0],
     })
     setIsRegistered(isRegistered)
   }
 
-  //Encrypt and Upload
-  const handleUpload = () => {
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const fileData = reader.result;
-      const encryptedData = CryptoJS.AES.encrypt(fileData, password);
-      const formData = new FormData();
-      formData.append('file', new Blob([encryptedData.toString()], { type: 'text/plain' }));
-      const response = await fetch('https://ipfs.infura.io:5001/api/v0/add', {
-        method: 'POST',
-        body: formData
+  // PINATA::::
+  const [uploading, setUploading] = useState(false);
+  const handleUpload = async () => {
+    try {
+      setUploading(true);
+
+      // Read the file content
+      const fileReader = new FileReader();
+      fileReader.readAsArrayBuffer(file);
+      await new Promise((resolve) => {
+        fileReader.onload = resolve;
       });
-      const result = await response.json();
-      setHash(result.Hash);
-    };
-    reader.readAsText(file);
+
+      // Encrypt the file with the password
+      const fileContent = new Uint8Array(fileReader.result);
+      const encryptedFile = CryptoJS.AES.encrypt(fileContent, password).toString();
+
+      // Upload the encrypted file to IPFS using Pinata
+      const pinata = Pinata('bf7e53515b52c12fd824', '9c5db7703ac8cb82707ebb46684f8303c07159759ce02faef98f16ac11aa19a0');
+      const result = await pinata.pinFromIPFS(encryptedFile);
+      setHash(result.IpfsHash);
+
+      setUploading(false);
+    } catch (error) {
+      console.error(error);
+      setUploading(false);
+    }
   };
   
   return (
@@ -120,7 +132,7 @@ const CreateNewFilePage = () => {
                   </CardHeader>
                   <CardBody>
                     <div className="Get-Password">
-                      <label>Password</label>
+                      <label>Encryption Password</label>
                       <Input type="password" value={password} onChange={handlePasswordChange} />
                       </div>
 
@@ -134,14 +146,17 @@ const CreateNewFilePage = () => {
                         className="btn-round"
                         color="info"
                         onClick={handleSubmit}
+                        disabled={!file || !password || uploading}
                       >
                         Register and Upload
                       </Button>
                   </CardBody>
                   <CardFooter>
-                    {isRegistered === true && hash !== '' &&
-                      'Congratulations, your new file with created with the Hash ID: ' +
-                        hash + 'and password: ' + password}
+                  {hash && isRegistered && (
+                    <div>
+                      <p>File uploaded successfully with hash: {hash}</p>
+                    </div>
+                  )}
                   </CardFooter>
                 </Card>
               </Col>
