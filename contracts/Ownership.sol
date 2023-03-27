@@ -7,99 +7,65 @@ contract Ownership {
 
     struct Perms{
         uint     id;
-        uint256 fileID;
+        string fileID;
         address  user;
-        uint104  fileType;  //types = 000, 001, ..., 110, 111. These combos will be converted from base 2 to base 10 (0,1,...,6,7) representing type combinations
+        uint  fileType;  //types = 000, 001, ..., 110, 111. These combos will be converted from base 2 to base 10 (0,1,...,6,7) representing type combinations
                             //Citation: type = 0 (000), Research: +2^0 (__1), Commercial: +2^1 (_1_), Teaching: +2^2 (1__)
         bool     isTimed;
-        uint256  time;
-        uint256  deadline;
+        uint  time;
+        uint  deadline;
         bool     isAllowed;
     }
     
-    uint256 fileCounter = 0;
+    uint fileCounter = 0;
     uint requestIDCounter = 0;
     uint constant PERM_LENGTH = 50;
     uint constant FILE_LENGTH = 50;
 
-    mapping(uint256 => address) public isfileOwner;                         //fileID = Owner
-    mapping(address => uint256[FILE_LENGTH]) public ownersFiles;            //Owner = fileID //NEEDS TO BE IMPLEMENTED EVENTUALLY
+    mapping(string => address) public isfileOwner;                         //fileID = Owner
+    mapping(address => string[FILE_LENGTH]) public ownersFiles;            //Owner = fileID //NEEDS TO BE IMPLEMENTED EVENTUALLY
     mapping(address => uint) public ownerFilesLength;                       //Owner = number of files owned
     
-    mapping(uint256 => Perms[PERM_LENGTH]) public fileRequests;             //fileID = requests
-    mapping(uint256 => uint) public fileRequestCounter;                     //fileID = requestsCounter
+    mapping(string => Perms[PERM_LENGTH]) public fileRequests;             //fileID = requests
+    mapping(string => uint) public fileRequestCounter;                     //fileID = requestsCounter
 
-    mapping(uint256 => Perms[PERM_LENGTH]) public fileAllowed;              //fileID = allowedUsers
-    mapping(uint256 => uint104) public fileAllowedCounter;                  //fileID = allowedCounter
+    mapping(string => Perms[PERM_LENGTH]) public fileAllowed;              //fileID = allowedUsers
+    mapping(string => uint) public fileAllowedCounter;                  //fileID = allowedCounter
 
-    mapping(address => mapping(uint => uint256)) public filesAccessed;      //Address = FileID[i] (List of users files)
+    mapping(address => mapping(uint => string)) public filesAccessed;      //Address = FileID[i] (List of users files)
     mapping(address => uint) public fileAccessCounter;                      //Address = counter
 
-    mapping(address => mapping(uint => uint256)) public filesOwed;          //Address = FileID[i] (List of users files)
+    mapping(address => mapping(uint => string)) public filesOwed;          //Address = FileID[i] (List of users files)
     mapping(address => uint) public fileOwedCounter;                        //Address = counter
-    mapping(uint256 => uint256) citationToFile;                             //citationID = fileID
+    mapping(string => string) citationToFile;                             //citationID = fileID
 
-    mapping(uint256 => string) public fileToPass;                           //fileID = password
+    mapping(string => string) public fileToPass;                           //fileID = password
 
     //ownersFiles[0x1e53025688ca6e730139a97d6830b02ee9323760][0] = 1; 
 
     /// @dev Restricted to owner
-    modifier onlyOwner(uint256 _fileID) {
+    modifier onlyOwner(string calldata _fileID) {
         require(msg.sender == isfileOwner[_fileID], "Restricted to Account's Owner.");
         _;
-    }
-
-    function getFileOwner(uint256 _fileID) public view returns (address) {
-        return isfileOwner[_fileID];
     }
 
     function getOwnerFileLength() public view returns (uint) {
         return ownerFilesLength[msg.sender];
     }
 
-    function getOwnersFiles() public view returns (uint256[FILE_LENGTH] memory) {
+    function getOwnersFiles() public view returns (string[FILE_LENGTH] memory) {
         return ownersFiles[msg.sender];
     }
 
-    function getFileRequestLength(uint256 _fileID) public view returns (uint) {
-        return fileRequestCounter[_fileID];
-    }
-    
-    function getFileRequest(uint256 _fileID, uint _requestID)
-        public
-        view
-        returns (Perms memory)
-    {
-        Perms memory answer = fileRequests[_fileID][_requestID];
-        return answer;
-    }
-
-    function getFileAllowedLength(uint256 _fileID) public view returns (uint) {
-        return fileAllowedCounter[_fileID];
-    }
-    
-    function getFileAllowed(uint256 _fileID, uint _requestID)
-        public
-        view
-        returns (Perms memory)
-    {
-        Perms memory answer = fileAllowed[_fileID][_requestID];
-        return answer;
-    }
-
-    function getFileCounter() public view returns (uint){
-        return fileCounter;
-    }
-
     function getAllRequests() public view returns (Perms[] memory){
-        uint256[FILE_LENGTH] memory files = getOwnersFiles();
+        string[FILE_LENGTH] memory files = getOwnersFiles();
         uint fileLength = getOwnerFileLength();
         uint totalPermsCount = 0;
 
         //Get number of total Perms under owner
         for (uint i = 0; i < fileLength; ++i) {
-            uint currentFile = files[i];
-            uint fileRequestLength = getFileRequestLength(currentFile);
+            string memory currentFile = files[i];
+            uint fileRequestLength = fileRequestCounter[currentFile];
             totalPermsCount += fileRequestLength;
         }
 
@@ -107,10 +73,10 @@ contract Ownership {
         Perms[] memory answer = new Perms[](totalPermsCount);
         uint index = 0;
         for (uint i = 0; i < fileLength; ++i) {
-            uint currentFile = files[i];
-            uint fileRequestLength = getFileRequestLength(currentFile);
+            string memory currentFile = files[i];
+            uint fileRequestLength = fileRequestCounter[currentFile];
             for(uint requestID = 0; requestID < fileRequestLength; ++requestID){
-                answer[index] = getFileRequest(currentFile, requestID);
+                answer[index] = fileRequests[currentFile][requestID];
                 index++;
             }
         }
@@ -118,14 +84,14 @@ contract Ownership {
     }
 
     function getAllAllowed() public view returns (Perms[] memory) {
-        uint256[FILE_LENGTH] memory files = getOwnersFiles();
+        string[FILE_LENGTH] memory files = getOwnersFiles();
         uint fileLength = getOwnerFileLength();
         uint totalPermsCount = 0;
 
         //Get number of total Perms under owner
         for (uint i = 0; i < fileLength; ++i) {
-            uint currentFile = files[i];
-            uint fileAllowedLength = getFileAllowedLength(currentFile);
+            string memory currentFile = files[i];
+            uint fileAllowedLength = fileAllowedCounter[currentFile];
             totalPermsCount += fileAllowedLength;
         }
 
@@ -133,10 +99,10 @@ contract Ownership {
         Perms[] memory answer = new Perms[](totalPermsCount);
         uint index = 0;
         for (uint i = 0; i < fileLength; ++i) {
-            uint currentFile = files[i];
-            uint fileRequestLength = getFileAllowedLength(currentFile);
-            for(uint requestID = 0; requestID < fileRequestLength; ++requestID){
-                answer[index] = getFileAllowed(currentFile, requestID);
+            string memory currentFile = files[i];
+            uint fileRequestLength = fileAllowedCounter[currentFile];
+            for (uint requestID = 0; requestID < fileRequestLength; ++requestID){
+                answer[index] = fileAllowed[currentFile][requestID];
                 index++;
             }
         }
@@ -145,33 +111,33 @@ contract Ownership {
 
     //Takes user and owner address
     //Returns all the files user has once gotten from owner
-    function getUserOwnerAccessed(address _user, address _owner) public view returns(uint256[] memory) {
+    function getUserOwnerAccessed(address _user, address _owner) public view returns(string[] memory) {
         //Get number of matches
         uint matches = 0;
         //Go through all files _user accesses
         for(uint i = 0; i < fileAccessCounter[_user]; i++) {
-            uint256 currentUserFile = filesAccessed[_user][i];
+            string memory currentUserFile = filesAccessed[_user][i];
             //Go through all files of _owner
             for(uint h = 0; h < ownerFilesLength[_owner]; h++){
-                uint currentOwnerFile = ownersFiles[_owner][h];
+                string memory currentOwnerFile = ownersFiles[_owner][h];
                 //If match user file with owner file
-                if(currentUserFile == currentOwnerFile){
+                if(keccak256(abi.encodePacked(currentUserFile)) == keccak256(abi.encodePacked(currentOwnerFile))){
                     matches++;
                 }
             }
         }
 
         //Get list of fileIDs _user owes _owner
-        uint256[] memory answer = new uint256[](matches);
+        string[] memory answer = new string[](matches);
         uint index = 0;
         //Go through all files _user accesses
         for(uint i = 0; i < fileAccessCounter[_user]; i++) {
-            uint256 currentUserFile = filesAccessed[_user][i];
+            string memory currentUserFile = filesAccessed[_user][i];
             //Go through all files of _owner
             for(uint h = 0; h < ownerFilesLength[_owner]; h++){
-                uint currentOwnerFile = ownersFiles[_owner][h];
+                string memory currentOwnerFile = ownersFiles[_owner][h];
                 //If match user file with owner file
-                if(currentUserFile == currentOwnerFile){
+                if(keccak256(abi.encodePacked(currentUserFile)) == keccak256(abi.encodePacked(currentOwnerFile))){
                     answer[index++] = currentUserFile;
                 }
             }
@@ -181,8 +147,8 @@ contract Ownership {
 
     //Takes _user address
     //Returns all fileID's given to _user
-    function getAllUserAccessed(address _user) public view returns(uint256[] memory) {
-        uint256[] memory answer = new uint256[](fileAccessCounter[_user]);
+    function getAllUserAccessed(address _user) public view returns(string[] memory) {
+        string[] memory answer = new string[](fileAccessCounter[_user]);
         for(uint i = 0; i < fileAccessCounter[_user]; i++) {
             answer[i] = filesAccessed[_user][i];
         }
@@ -191,15 +157,15 @@ contract Ownership {
 
     //Takes _user address
     //Returns all fileID's _user owes
-    function getOwedFiles(address _user) public view returns(uint256[] memory) {
-        uint256[] memory answer = new uint256[](fileOwedCounter[_user]);
+    function getOwedFiles(address _user) public view returns(string[] memory) {
+        string[] memory answer = new string[](fileOwedCounter[_user]);
         for(uint i = 0; i < fileOwedCounter[_user]; i++) {
             answer[i] = filesOwed[_user][i];
         }
         return answer;
     }
 
-    function getPassword(uint256 _fileID, address _user) public returns(string memory) {
+    function getPassword(string calldata _fileID, address _user) public returns(string memory) {
         bool access = checkAccess(_fileID, _user);
         if(!access) return "";
         return fileToPass[_fileID];
@@ -207,7 +173,7 @@ contract Ownership {
 
 
     //Creates new data to be used
-    function newFile(uint256 _fileID, string memory _password) public returns(bool) { //take in HashID argument
+    function newFile(string calldata _fileID, string memory _password) public returns(bool) { //take in HashID argument
         if(ownerFilesLength[msg.sender] == FILE_LENGTH){
             return false;
         }
@@ -225,12 +191,12 @@ contract Ownership {
     }
 
     //Creates new citation to be returned
-    function newCitation(uint256 _fileID, uint256 _citationID) public returns(bool) {
+    function newCitation(string calldata _fileID, string calldata _citationID) public returns(bool) {
         //find file owed (asserting that _fileID is owed)
         bool found = false;
         address _user = msg.sender;
         for(uint i = 0; i < fileOwedCounter[_user]; i++) {
-            if(_fileID == filesOwed[_user][i]){
+            if(keccak256(abi.encodePacked(_fileID)) == keccak256(abi.encodePacked(filesOwed[_user][i])) ){
                 found = true;
                 break;
             }
@@ -249,9 +215,9 @@ contract Ownership {
     }
 
     //Approve citation
-    function approveCitation(uint256 _fileID, uint256 _citationID) public returns(bool){  //!!!!! WHAT IF DENIED, SHOULD BORROWER BE INFORMED?????
+    function approveCitation(string calldata _fileID, string calldata _citationID) public returns(bool){  //!!!!! WHAT IF DENIED, SHOULD BORROWER BE INFORMED?????
         //Assert: msg.sender is owner && _citationID is a citation for _fileID
-        if(!(msg.sender == isfileOwner[_fileID] && citationToFile[_citationID] == _fileID)) return false;
+        if(!(msg.sender == isfileOwner[_fileID] && keccak256(abi.encodePacked(citationToFile[_citationID])) == keccak256(abi.encodePacked(_fileID))) ) return false;
         
         address borrower = isfileOwner[_citationID];
 
@@ -259,14 +225,14 @@ contract Ownership {
         uint index = 0;    //find index of _fileID in filesOwed[borrower]
         bool found = false;
         for(uint i = 0; i < fileOwedCounter[borrower]; i++){
-            if(filesOwed[borrower][i] == _fileID){
+            if(keccak256(abi.encodePacked(filesOwed[borrower][i])) == keccak256(abi.encodePacked(_fileID))){
                 index = i;
                 found = true;
                 break;
             }
         }
         uint endIndex = fileOwedCounter[borrower] - 1;  //find end file
-        uint256 endFile = filesOwed[borrower][endIndex];
+        string memory endFile = filesOwed[borrower][endIndex];
         filesOwed[borrower][index] = endFile;  //replace deleted file with end
         delete filesOwed[borrower][endIndex];  //delete end copy
         fileOwedCounter[borrower]--;  //decrement
@@ -274,7 +240,7 @@ contract Ownership {
         return true;
     }
 
-    function recordOwedFile(uint _fileID, address _borrower) public {
+    function recordOwedFile(string calldata _fileID, address _borrower) public {
         filesOwed[_borrower][fileOwedCounter[_borrower]] = _fileID;
         fileOwedCounter[_borrower]++;
     }
@@ -282,7 +248,7 @@ contract Ownership {
 
 
     //Update allowedUsers list in file
-    function addAllowedPerm(uint256 _fileID, Perms memory _newPerm) public returns(bool) {
+    function addAllowedPerm(string calldata _fileID, Perms memory _newPerm) public returns(bool) {
         //Add new Perm
         if(fileAllowedCounter[_fileID] < PERM_LENGTH){
             fileAllowed[_fileID][fileAllowedCounter[_fileID]++] = _newPerm;
@@ -294,7 +260,7 @@ contract Ownership {
     }
 
     //Owner grants newUser unlimited permission without request
-    function allowAccess(uint256 _fileID, address _user, uint104 _type)
+    function allowAccess(string calldata _fileID, address _user, uint _type)
         public
         onlyOwner(_fileID)
         returns(bool)
@@ -318,7 +284,7 @@ contract Ownership {
     }
 
     //Owner grants newUser timed permission without request
-    function allowLimitedAccess(uint256 _fileID, address _user, uint256 _numberOfDays, uint104 _type)
+    function allowLimitedAccess(string calldata _fileID, address _user, uint _numberOfDays, uint _type)
         public
         onlyOwner(_fileID)
         returns(bool)
@@ -339,7 +305,7 @@ contract Ownership {
 
 
     //Update requests list in file
-    function addRequestPerm(uint256 _fileID, Perms memory _newPerm) public returns(bool) {
+    function addRequestPerm(string calldata _fileID, Perms memory _newPerm) public returns(bool) {
         if(fileRequestCounter[_fileID] < PERM_LENGTH){
             fileRequests[_fileID][fileRequestCounter[_fileID]++] = _newPerm;
             return true;
@@ -361,7 +327,7 @@ contract Ownership {
     }
 
     //Msg.sender requests access to fileID for numberOfDays
-    function requestAccess(uint256 _fileID, uint104 _type) public returns(bool) {
+    function requestAccess(string calldata _fileID, uint _type) public returns(bool) {
         Perms memory newPerm = Perms({
             id: requestIDCounter++, //will this do what I want?!?!?!
             fileID: _fileID,
@@ -376,7 +342,7 @@ contract Ownership {
     }
 
     //Msg.sender requests limited access to fileID for numberOfDays
-    function requestLimitedAccess(uint256 _fileID, uint256 _numberOfDays, uint104 _type) public returns(bool) {
+    function requestLimitedAccess(string calldata _fileID, uint _numberOfDays, uint _type) public returns(bool) {
         Perms memory newPerm = Perms({
             id: requestIDCounter++, //will this do what I want?!?!?!
             fileID: _fileID,
@@ -393,7 +359,7 @@ contract Ownership {
 
 
     //Owner removes newUser permission
-    function removeAccess(uint256 _fileID, address _user)
+    function removeAccess(string calldata _fileID, address _user)
         public          onlyOwner(_fileID)
         returns(bool)
     {
@@ -409,7 +375,7 @@ contract Ownership {
     }
 
     //Msg.sender checks access of specified user for given fileID
-    function checkAccess(uint256 _fileID, address _user)
+    function checkAccess(string calldata _fileID, address _user)
         public        returns (bool)
     {
         for (uint i = 0; i < fileAllowed[_fileID].length; i++) {
@@ -431,8 +397,8 @@ contract Ownership {
 
     //Msg.sender checks the days remaining of specified user's access for given fileID
     //Returns zero if no days remaining or 100000 if not timed
-    function checkDaysRemaining(uint256 _fileID, address _user)
-        public        returns (uint256)
+    function checkDaysRemaining(string calldata _fileID, address _user)
+        public        returns (uint)
     {
         for (uint i = 0; i < fileAllowed[_fileID].length; i++) {
             if (fileAllowed[_fileID][i].user == _user) {
@@ -455,7 +421,7 @@ contract Ownership {
     }
 
     //Owner addresses request
-    function fulfillRequest(uint256 _fileID, uint256 _requestID, bool _approve)
+    function fulfillRequest(string calldata _fileID, uint _requestID, bool _approve)
         public        onlyOwner(_fileID)
         returns(bool)
     {
