@@ -21,6 +21,7 @@ import Ownership from '../contracts/Ownership.json'
 
 import { encrypt } from '../Helpers/cryptography';
 import Pinata from '@pinata/sdk';
+import fs from 'fs';
 
 
 
@@ -75,7 +76,7 @@ const CreateNewFilePage = () => {
     setEncrypted(encrypt(file, password));
 
     //Upload
-    handleUpload()
+    handleUpload();
 
     //Handle Blockchain Contract
     console.log('hash:', hash);
@@ -92,9 +93,35 @@ const CreateNewFilePage = () => {
       setUploading(true);
 
       // Upload the encrypted file to IPFS using Pinata
-      const pinata = Pinata('bf7e53515b52c12fd824', '9c5db7703ac8cb82707ebb46684f8303c07159759ce02faef98f16ac11aa19a0');
-      const result = pinata.pinFromIPFS(encryptedFile);
+      console.log('Name:', file.name);
+      console.log('1');
+      const pinata = new Pinata({ pinataJWTKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJlZDBhNzBjMC1iYmJiLTRjNWEtYmQ4Zi1mNzUyNWI0OGEyNTkiLCJlbWFpbCI6ImpvaG4uY29oZW4ud29ya0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJpZCI6IkZSQTEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX0seyJpZCI6Ik5ZQzEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiMWM2N2E5MDdmMjY5NjJhZjM3YWEiLCJzY29wZWRLZXlTZWNyZXQiOiIwMTdhOGIwNmE4ODUzMTA2YjUxY2RjN2UyZWU5NTEwYjk5ZjlmNjRmZmFiOGNiNTM2YjUwYzdkM2I4OTBiYjcxIiwiaWF0IjoxNjc5OTc0MzEwfQ.4ACpYrC8PJtMnF0SjPRYgawlR4Z6KHspGLSwTkUeNmc'});
+      console.log('2');
+      pinata.testAuthentication().then((result) => {
+        //handle successful authentication here
+        console.log(result);
+    }).catch((err) => {
+        //handle error here
+        console.log(err);
+    });
+      console.log('3');
+      const options = {
+        pinataMetadata: {
+            name: file.name,
+            keyvalues: {
+                customKey: 'customValue',
+                customKey2: 'customValue2'
+            }
+        },
+        pinataOptions: {
+            cidVersion: 0
+        }
+      };
+      console.log('4');
+      const result = pinata.pinFileToIPFS(file, options);
+      console.log('5');
       setHash(result.IpfsHash);
+      console.log('6');
 
       setUploading(false);
     } catch (error) {
@@ -102,7 +129,25 @@ const CreateNewFilePage = () => {
       setUploading(false);
     }
   };
-  
+
+  // const uploadFile = async () => {
+  //   const fileName = 'brvv';
+  //   const filePath = 'C:\Users\John\Desktop\bruh.txt';
+  //   const pinata = new Pinata({ pinataJWTKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJlZDBhNzBjMC1iYmJiLTRjNWEtYmQ4Zi1mNzUyNWI0OGEyNTkiLCJlbWFpbCI6ImpvaG4uY29oZW4ud29ya0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJpZCI6IkZSQTEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX0seyJpZCI6Ik5ZQzEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiMWM2N2E5MDdmMjY5NjJhZjM3YWEiLCJzY29wZWRLZXlTZWNyZXQiOiIwMTdhOGIwNmE4ODUzMTA2YjUxY2RjN2UyZWU5NTEwYjk5ZjlmNjRmZmFiOGNiNTM2YjUwYzdkM2I4OTBiYjcxIiwiaWF0IjoxNjc5OTc0MzEwfQ.4ACpYrC8PJtMnF0SjPRYgawlR4Z6KHspGLSwTkUeNmc'});
+  //   const { IpfsHash } = await pinata.pinFileToIPFS(
+  //     fs.createReadStream(filePath),
+  //     {
+  //       pinataMetadata: {
+  //         name: fileName,
+  //       },
+  //       pinataOptions: {
+  //         cidVersion: 0,
+  //       },
+  //     },
+  //   );
+  //   return IpfsHash;
+  // };
+
   return (
     <>
       <NavBar />
@@ -137,7 +182,7 @@ const CreateNewFilePage = () => {
                         className="btn-round"
                         color="info"
                         onClick={handleSubmit}
-                        disabled={!file || password === '' || uploading}
+                        disabled={!file || password === ''} //ADD "|| uploading"
                       >
                         Register and Upload
                       </Button>
