@@ -18,7 +18,6 @@ import Footer from '../components/Footer'
 import Context from '../Helpers/Context'
 import getWeb3 from '../Helpers/getWeb3'
 import Ownership from '../contracts/Ownership.json'
-import BigNumber from 'bignumber.js';
 
 const CheckAccessPage = () => {
   const { contextValue } = useContext(Context)
@@ -80,19 +79,15 @@ const CheckAccessPage = () => {
 
   const handleSubmit1 = async () => {
     console.log('hash:', inputs1.hash);
-    const myBigInt1 = BigNumber(inputs1.hash, 16);
-    console.log('myBigInt:', myBigInt1);
     const res = await contracts.contract.methods
-      .checkAccess(myBigInt1, inputs1.address)
+      .checkAccess(inputs1.hash, inputs1.address)
       .call()
     setAnswer(res)
   }
   const handleSubmit2 = async () => {
     console.log('hash:', inputs2.hash);
-    const myBigInt2 = BigNumber(inputs2.hash, 16);
-    console.log('myBigInt:', myBigInt2);
     const own = await contracts.contract.methods
-      .getFileOwner(myBigInt2)
+      .getFileOwner(inputs2.hash)
       .call()
     setOwner(own)
   }

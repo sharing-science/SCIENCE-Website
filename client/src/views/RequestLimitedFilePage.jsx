@@ -20,7 +20,6 @@ import Footer from '../components/Footer'
 import Context from '../Helpers/Context'
 import getWeb3 from '../Helpers/getWeb3'
 import Ownership from '../contracts/Ownership.json'
-import BigNumber from 'bignumber.js';
 
 const RequestLimitedFilePage = () => {
   const { contextValue } = useContext(Context)
@@ -81,8 +80,7 @@ const RequestLimitedFilePage = () => {
   }, [contextValue.web3.networkId])
 
   const handleSubmit = async () => {
-    const myBigInt = BigNumber(inputs.hash, 16);
-    const requested = await contracts.contract.methods.requestLimitedAccess(myBigInt,
+    const requested = await contracts.contract.methods.requestLimitedAccess(inputs.hash,
       inputs.numberOfDays).send({from: contextValue.web3.accounts[0],
     })
     setRequested(requested);
