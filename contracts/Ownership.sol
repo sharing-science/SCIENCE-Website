@@ -167,7 +167,7 @@ contract Ownership {
 
     function getPassword(string calldata _fileID, address _user) public returns(string memory) {
         bool access = checkAccess(_fileID, _user);
-        if(!access) return "";
+        if(!access) return '';
         return fileToPass[_fileID];
     }
 

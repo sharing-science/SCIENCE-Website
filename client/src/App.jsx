@@ -16,9 +16,10 @@ import { getLocalStorageObject } from './Helpers/helperFunctions'
 import { PrivateRoute, PublicRoute } from './Helpers/Routes'
 import CheckAccessPage from './views/CheckAccessPage'
 import SeeApprovedPage from './views/SeeApprovedPage'
-import Up from './views/uploadTest1'//!!!!!!!!!!!FFFFIIIXXX
+// import Up from './views/uploadTest1'//!!!!!!!!!!!FFFFIIIXXX
 // import Down from './views/downloadTest1'
 import DownloadPage from './views/DownloadPage'
+// import EnDeTest from './views/EnDeTest'
 
 const App = () => {
   const [contextValue, dispatchContextValue] = useReducer(contextReducer, {
@@ -33,13 +34,12 @@ const App = () => {
           <PrivateRoute exact path="/request" component={RequestFilePage} />
           <PrivateRoute exact path="/limited" component={RequestLimitedFilePage} />
           <PrivateRoute exact path="/profile" component={ProfilePage} />
-          {/* <PrivateRoute exact path="/tokens" component={TokensPage} /> */}
-          <PrivateRoute exact path="/newFile" component={CreateNewFilePage} />
+          <PrivateRoute exact path="/upload" component={CreateNewFilePage} />
           <PrivateRoute exact path="/check" component={CheckAccessPage} />
           <PrivateRoute exact path="/approved" component={SeeApprovedPage} />
           
-          <PrivateRoute exact path="/upload" component={Up} />
           <PrivateRoute exact path="/download" component={DownloadPage} />
+          {/* <PrivateRoute exact path="/crypt" component={EnDeTest} /> */}
 
           {/* Public Routes */}
           <PublicRoute exact path="/login" component={LoginPage} />

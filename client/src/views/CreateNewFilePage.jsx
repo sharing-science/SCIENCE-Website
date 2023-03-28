@@ -19,8 +19,7 @@ import Context from '../Helpers/Context'
 import getWeb3 from '../Helpers/getWeb3'
 import Ownership from '../contracts/Ownership.json'
 
-import CryptoJS from 'crypto-js';
-import BigNumber from 'bignumber.js';
+import { encrypt } from '../Helpers/cryptography';
 import Pinata from '@pinata/sdk';
 
 
@@ -29,7 +28,8 @@ const CreateNewFilePage = () => {
 
   const [file, setFile] = useState(null);
   const [password, setPassword] = useState('');
-  const [hash, setHash] = useState(null);
+  const [encryptedFile, setEncrypted] = useState(null);
+  const [hash, setHash] = useState('');
   
   const { contextValue } = useContext(Context)
 
@@ -65,44 +65,35 @@ const CreateNewFilePage = () => {
   //Calculates hash of file when uploaded and sets hash as file ID
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
-  }
+  };
 
   //When file and name completed, register file with blockchain via newFile() smart contract
   const [isRegistered, setIsRegistered] = useState('')
 
-  const handleSubmit = async () => {
+  function handleSubmit() {
+    //Encrypt File
+    setEncrypted(encrypt(file, password));
+
     //Upload
     handleUpload()
 
     //Handle Blockchain Contract
     console.log('hash:', hash);
-    const myBigInt = BigNumber(hash, 16);
-    let isRegistered = await contracts.contract.methods.newFile(myBigInt, password).send({
+    let isRegistered =  contracts.contract.methods.newFile(hash, password).send({
       from: contextValue.web3.accounts[0],
     })
     setIsRegistered(isRegistered)
-  }
+  };
 
   // PINATA::::
   const [uploading, setUploading] = useState(false);
-  const handleUpload = async () => {
+  function handleUpload() {
     try {
       setUploading(true);
 
-      // Read the file content
-      const fileReader = new FileReader();
-      fileReader.readAsArrayBuffer(file);
-      await new Promise((resolve) => {
-        fileReader.onload = resolve;
-      });
-
-      // Encrypt the file with the password
-      const fileContent = new Uint8Array(fileReader.result);
-      const encryptedFile = CryptoJS.AES.encrypt(fileContent, password).toString();
-
       // Upload the encrypted file to IPFS using Pinata
       const pinata = Pinata('bf7e53515b52c12fd824', '9c5db7703ac8cb82707ebb46684f8303c07159759ce02faef98f16ac11aa19a0');
-      const result = await pinata.pinFromIPFS(encryptedFile);
+      const result = pinata.pinFromIPFS(encryptedFile);
       setHash(result.IpfsHash);
 
       setUploading(false);
@@ -128,7 +119,7 @@ const CreateNewFilePage = () => {
               <Col xs="6">
                 <Card className="p-4 card-stats">
                   <CardHeader>
-                    <h1>Register and Upload New File</h1>
+                    <h1>Upload New File</h1>
                   </CardHeader>
                   <CardBody>
                     <div className="Get-Password">
@@ -146,7 +137,7 @@ const CreateNewFilePage = () => {
                         className="btn-round"
                         color="info"
                         onClick={handleSubmit}
-                        disabled={!file || !password || uploading}
+                        disabled={!file || password === '' || uploading}
                       >
                         Register and Upload
                       </Button>

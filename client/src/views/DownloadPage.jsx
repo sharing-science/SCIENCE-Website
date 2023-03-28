@@ -20,17 +20,17 @@ import getWeb3 from '../Helpers/getWeb3'
 import Ownership from '../contracts/Ownership.json'
 
 import CryptoJS from 'crypto-js';
-import BigNumber from 'bignumber.js';
 import Pinata from '@pinata/sdk';
+import { convertWordArrayToUint8Array } from '../Helpers/cryptography';
 
 
 
-const CreateNewFilePage = () => {
+
+const DownloadPage = () => {
 
   const [hash, setHash] = useState("");
   const [password, setPassword] = useState('');
-  // const [fileData, setFileData] = useState(null);
-  const [isAllowed, setIsAllowed] = useState(null);
+  const [isAllowed, setIsAllowed] = useState(false);
   
   const { contextValue } = useContext(Context)
 
@@ -64,44 +64,53 @@ const CreateNewFilePage = () => {
   };
 
   //When file and name completed, register file with blockchain via newFile() smart contract
-  const handleSubmit = async () => {
-    //Check Access
-    const myBigInt = BigNumber(hash, 16);
-    let access = await contracts.contract.methods.checkAccess(myBigInt, contextValue.web3.accounts[0]).send({
+  function handleSubmit() {
+    //Get Password
+    let pass = contracts.contract.methods.getPassword(hash, contextValue.web3.accounts[0]).send({
       from: contextValue.web3.accounts[0],
     })
-    setIsAllowed(access);
 
-    //If Access: Get Password
-    if(isAllowed){
-      //Get Password
-      let pass = await contracts.contract.methods.getPassword(myBigInt, contextValue.web3.accounts[0]).send({
-        from: contextValue.web3.accounts[0],
-      })
+    //If access, download
+    if(pass !== ''){
+      //Record Password
+      setIsAllowed(true);
       console.log('password:', pass); //!!!!!!!!Will have to remove this
       setPassword(pass);
-
+      
       //Download
       handleDownload()
     }
-  }
+  };
 
   // PINATA::::
   const [downloading, setDownloading] = useState(false);
-  const [downloadedFile, setDownloadedFile] = useState(null);
-  const handleDownload = async () => {
+  function handleDownload() {
     try {
       setDownloading(true);
 
-      // Download the encrypted file from IPFS using Pinata
+      //Grab file from Pinata????????
       const pinata = Pinata('bf7e53515b52c12fd824', '9c5db7703ac8cb82707ebb46684f8303c07159759ce02faef98f16ac11aa19a0');
-      const { IpfsContent } = await pinata.pinByHash(hash);
-      const decryptedFile = CryptoJS.AES.decrypt(IpfsContent, password);
+      const file = pinata.pinByHash(hash);
 
-      // Create a blob from the decrypted file content
-      const decryptedFileContent = new Blob([decryptedFile], { type: 'application/octet-stream' });
+      //Download
+      var reader = new FileReader();
+      reader.onload = () => {
+        //Decrypt
+        var decrypted = CryptoJS.AES.decrypt(reader.result, password);          // Decryption: I: Base64 encoded string (OpenSSL-format) -> O: WordArray
+        var typedArray = convertWordArrayToUint8Array(decrypted);               // Convert: WordArray -> typed array
+        var fileDec = new Blob([typedArray]);                                   // Create blob from typed array
 
-      setDownloadedFile(decryptedFileContent);
+        //Download
+        var a = document.createElement("a");
+        var url = window.URL.createObjectURL(fileDec);
+        var filename = file.name.substr(3, file.name.length);
+        a.href = url;
+        a.download = filename;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      };
+      reader.readAsText(file);
+
       setDownloading(false);
     } catch (error) {
       console.error(error);
@@ -109,16 +118,6 @@ const CreateNewFilePage = () => {
     }
   };
 
-
-  // const handleSave = () => {
-  //   const blob = new Blob([fileData], { type: 'text/plain' });
-  //   const url = URL.createObjectURL(blob);
-  //   const link = document.createElement('a');
-  //   link.href = url;
-  //   link.download = 'file.txt';
-  //   link.click();
-  // };
-  
   return (
     <>
       <NavBar />
@@ -152,11 +151,6 @@ const CreateNewFilePage = () => {
                       >
                         Download
                       </Button>
-                      {downloadedFile && (
-                        <div>
-                          <a href={URL.createObjectURL(downloadedFile)} download="downloadedFile">Downloaded File</a>
-                        </div>
-                      )}
                   </CardBody>
                   <CardFooter>
                     {isAllowed === true && 'Downloading...'}
@@ -172,4 +166,4 @@ const CreateNewFilePage = () => {
   )
 }
 
-export default CreateNewFilePage
+export default DownloadPage
