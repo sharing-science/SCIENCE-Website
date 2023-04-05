@@ -12,6 +12,7 @@
     "chart.js": "^2.9.4",
     "classnames": "^2.2.6",
     "crypto-hash": "1.1",
+    "index.js": "^0.0.3",
     "ipfs": "^0.66.0",
     "ipfs-core": "^0.18.0",
     "ipfs-http-client": "^60.0.0",
