@@ -207,6 +207,10 @@ const NavBar = () => {
                   <i className="tim-icons icon-cloud-upload-94" />
                   Approved List
                 </DropdownItem>
+                <DropdownItem tag={Link} to="/report">
+                  <i className="tim-icons icon-cloud-upload-94" />
+                  Report
+                </DropdownItem>
                 {/* <DropdownItem tag={Link} to="/crypt">
                   <i className="tim-icons icon-cloud-upload-94" />
                   Cryptography Test

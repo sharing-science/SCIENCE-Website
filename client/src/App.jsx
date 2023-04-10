@@ -20,6 +20,7 @@ import { PrivateRoute, PublicRoute } from './Helpers/Routes'
 import CheckAccessPage from './views/CheckAccessPage'
 import SeeApprovedPage from './views/SeeApprovedPage'
 import DownloadPage from './views/DownloadPage'
+import ReportPage from './views/ReportPage'
 
 // TESTING
 import EnDeTest from './views/EnDeTest'
@@ -45,6 +46,7 @@ const App = () => {
           <PrivateRoute exact path="/check" component={CheckAccessPage} />
           <PrivateRoute exact path="/approved" component={SeeApprovedPage} />
           <PrivateRoute exact path="/download" component={DownloadPage} />
+          <PrivateRoute exact path="/report" component={ReportPage} />
 
           {/* Testing */}
           <PrivateRoute exact path="/crypt" component={EnDeTest} />
