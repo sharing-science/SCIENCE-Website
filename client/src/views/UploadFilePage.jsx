@@ -17,8 +17,8 @@ import {
 } from "reactstrap";
 
 // core components
-import NavBar from "components/NavBar";
-import Footer from "components/Footer";
+import NavBar from "../components/NavBar";
+import Footer from "../components/Footer";
 
 const UploadFilePage = () => {
   const [uploadInput, setUploadInput] = useState();
@@ -64,7 +64,7 @@ const UploadFilePage = () => {
         <img
           alt="..."
           className="path"
-          src={require("assets/img/path4.png").default}
+          src={require("../assets/img/path4.png").default}
         />
         <section className="section">
           <Container>

@@ -13,10 +13,10 @@ import {
 } from "reactstrap";
 
 // core components
-import NavBar from "components/NavBar";
-import Footer from "components/Footer";
-import Context from "Helpers/Context";
-import getWeb3 from "Helpers/getWeb3";
+import NavBar from "../components/NavBar";
+import Footer from "../components/Footer";
+import Context from "../Helpers/Context";
+import getWeb3 from "../Helpers/getWeb3";
 
 import MyToken from "../contracts/MyToken.json";
 import MyTokenSale from "../contracts/MyTokenSale.json";
@@ -122,7 +122,7 @@ const SampleContract = () => {
             <img
               alt="..."
               className="path"
-              src={require("assets/img/cercuri.png").default}
+              src={require("../assets/img/cercuri.png").default}
             />
             <Container>
               <Row className="mb-4">

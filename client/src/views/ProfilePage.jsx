@@ -25,8 +25,8 @@ import {
 } from "reactstrap";
 
 // core components
-import NavBar from "components/NavBar";
-import Footer from "components/Footer";
+import NavBar from "../components/NavBar";
+import Footer from "../components/Footer";
 
 const ProfilePage = () => {
   const { contextValue } = useContext(Context);
@@ -128,7 +128,7 @@ const ProfilePage = () => {
             <img
               alt="..."
               className="path"
-              src={require("assets/img/path1.png").default}
+              src={require("../assets/img/path1.png").default}
             />
             <Container className="align-items-center">
               <Row>

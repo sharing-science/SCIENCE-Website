@@ -14,8 +14,8 @@ import {
 } from "reactstrap";
 
 // core components
-import NavBar from "components/NavBar";
-import Footer from "components/Footer";
+import NavBar from "../components/NavBar";
+import Footer from "../components/Footer";
 import Context from "../Helpers/Context";
 import getWeb3 from "../Helpers/getWeb3";
 import { Redirect } from "react-router-dom/cjs/react-router-dom.min";
@@ -57,7 +57,7 @@ const LoginPage = () => {
             <img
               alt="..."
               className="path"
-              src={require("assets/img/blob.png").default}
+              src={require("../assets/img/blob.png").default}
             />
             <Container>
               <Row>
@@ -66,7 +66,7 @@ const LoginPage = () => {
                     <CardHeader>
                       <CardImg
                         alt="..."
-                        src={require("assets/img/square6.png").default}
+                        src={require("../assets/img/square6.png").default}
                       />
                       <CardTitle tag="h4">
                         {" "}

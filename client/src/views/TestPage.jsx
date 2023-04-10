@@ -13,10 +13,10 @@ import {
 } from 'reactstrap'
 
 // core components
-import NavBar from 'components/NavBar'
-import Footer from 'components/Footer'
-import Context from 'Helpers/Context'
-import getWeb3 from 'Helpers/getWeb3'
+import NavBar from '../components/NavBar'
+import Footer from '../components/Footer'
+import Context from '../Helpers/Context'
+import getWeb3 from '../Helpers/getWeb3'
 import CollaborationEvent from '../contracts/CollaborationEvent.json'
 
 const TestPage = () => {
@@ -73,7 +73,7 @@ const TestPage = () => {
             <img
               alt="..."
               className="path"
-              src={require('assets/img/waves.png').default}
+              src={require('../assets/img/waves.png').default}
             />
             <Container>
               <Row>
