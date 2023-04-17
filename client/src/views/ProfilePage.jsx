@@ -1,17 +1,18 @@
-import React, { /*useState, useEffect,*/ useContext, /*useCallback */} from "react";
+import React, { useState, useEffect, useContext, /*useCallback */} from "react";
 // import classnames from "classnames";
 
 // web3 imports
-// import Roles from "../contracts/Roles.json";
+import Rating from "../contracts/Rating.json";
 import Context from "../Helpers/Context";
-// import getWeb3 from "../Helpers/getWeb3";
+import getWeb3 from "../Helpers/getWeb3";
 
 // reactstrap components
 import {
-  // Button,
+  Button,
   Card,
   CardHeader,
-  // CardBody,
+  CardFooter,
+  CardBody,
   // NavItem,
   // NavLink,
   // Nav,
@@ -30,6 +31,10 @@ import Footer from "../components/Footer";
 
 const ProfilePage = () => {
   const { contextValue } = useContext(Context);
+
+  const [contracts, setContracts] = useState({
+    contract: {},
+  })
 
   // const [requests, setRequests] = useState();
   // const [rolesList, setRolesList] = useState({
@@ -118,6 +123,35 @@ const ProfilePage = () => {
   //   };
   //   if (contextValue.loggedIn) init();
   // }, [contextValue.loggedIn, contextValue.web3.networkId, updateRoles]);
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const web3 = await getWeb3()
+        const Contract_instance = new web3.eth.Contract(  //OWNERSHIP NEEDS TO BE CHANGED TO RATING ONCE RATING IS FINISHED!!!!
+          Rating.abi,
+          Rating.networks[contextValue.web3.networkId] &&
+          Rating.networks[contextValue.web3.networkId].address,
+        )
+
+        setContracts((c) => ({
+          ...c,
+          contract: Contract_instance,
+        }))
+      } catch (error) {
+        console.log('Error')
+      }
+    }
+    init()
+  }, [contextValue.web3.networkId])
+
+  var rep = -1;
+
+  const getRept = async () => {
+    //Get Password
+    rep = await contracts.contract.methods
+      .getRep(contextValue.web3.accounts[0])
+      .call()
+  };
 
   return (
     <>
@@ -221,6 +255,28 @@ const ProfilePage = () => {
                   </Card> */}
                 </Col>
               </Row>
+            </Container>
+            <Container>
+              <Col xs="6">
+                <Card className="p-4 card-stats">
+                  <CardHeader>
+                    <h1>Get Reputation Score</h1>
+                  </CardHeader>
+                  <CardBody>
+                    <Button
+                      type="button"
+                      className="btn-round"
+                      color="info"
+                      onClick={getRept}
+                    >
+                      Submit
+                    </Button>
+                  </CardBody>
+                  <CardFooter>
+                    {rep !== -1 && 'Rep Score is: ' + rep}
+                  </CardFooter>
+                </Card>
+              </Col>
             </Container>
           </div>
         </div>
