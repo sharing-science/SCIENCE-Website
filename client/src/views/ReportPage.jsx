@@ -17,7 +17,7 @@ import NavBar from '../components/NavBar'
 import Footer from '../components/Footer'
 import Context from '../Helpers/Context'
 import getWeb3 from '../Helpers/getWeb3'
-import Ownership from '../contracts/Ownership.json'
+import Rating from '../contracts/Rating.json'
 
 
 function Report() {
@@ -25,7 +25,7 @@ function Report() {
     const [cid, setCid] = useState('');
     const [reason, setReason] = useState('');
     //const [reporter, setReporter] = useState('');
-
+    let reportID = 0;
 
     const handleDefendant = (event) => {
         setDefendant(event.target.value);
@@ -49,10 +49,10 @@ function Report() {
       const init = async () => {
         try {
           const web3 = await getWeb3()
-          const Contract_instance = new web3.eth.Contract(  //OWNERSHIP NEEDS TO BE CHANGED TO RATING ONCE RATING IS FINISHED!!!!
-            Ownership.abi,
-            Ownership.networks[contextValue.web3.networkId] &&
-              Ownership.networks[contextValue.web3.networkId].address,
+          const Contract_instance = new web3.eth.Contract(
+            Rating.abi,
+            Rating.networks[contextValue.web3.networkId] &&
+            Rating.networks[contextValue.web3.networkId].address,
           )
   
           setContracts((c) => ({
@@ -67,14 +67,12 @@ function Report() {
     }, [contextValue.web3.networkId])
 
     function handleSubmit(event) {
+        // Create report
+        reportID = contracts.contract.methods.createReport(defendant, cid, contextValue.web3.accounts[0], reason).send({
+            from: contextValue.web3.accounts[0],
+        })
 
-        //NEEDS TO BE UNCOMMENTED ONCE RATING IS FINISHED!!!!!!!!!!!!!!!
-        //Create report
-        // contracts.contract.methods.createReport(defendant, cid, contextValue.web3.accounts[0], reason).send({
-        //     from: contextValue.web3.accounts[0],
-        // })
-
-        //Maybe do something to report to user
+        // Maybe do something to report to user
     }
 
     return (
@@ -118,11 +116,11 @@ function Report() {
                         onClick={handleSubmit}
                         disabled={!cid || !defendant || !reason}
                       >
-                        Download
+                        Report
                       </Button>
                   </CardBody>
                   <CardFooter>
-                    {/* {isAllowed === true && 'Downloading...'} */}
+                    {reportID !== 0 && 'Successfully sent report ID: ' && reportID}
                   </CardFooter>
                 </Card>
               </Col>
