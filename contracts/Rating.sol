@@ -2,7 +2,7 @@
 pragma solidity >=0.6.0;
 pragma experimental ABIEncoderV2;
 
-contract RatingContract {
+contract Rating {
 
     struct Report {
         address defendant;
@@ -14,12 +14,13 @@ contract RatingContract {
 
     Report[] public reports;
     mapping(address => uint) public rep;
-    uint public reportsCount;
+    uint public reportsCount = 0;
 
-    function createReport(address _defendant, string memory _cid, address _reporter, string memory _reason) public {
+    function createReport(address _defendant, string memory _cid, address _reporter, string memory _reason) public returns(uint) {
         reportsCount++;
         Report memory newReport = Report(_defendant, _cid, _reporter, _reason, reportsCount);
         reports.push(newReport);
+        return reportsCount;
     }
 
     function addToList(Report memory _report) public {

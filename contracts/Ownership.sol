@@ -49,6 +49,10 @@ contract Ownership {
         _;
     }
 
+    function getFileCounter() public view returns (uint) {
+        return fileCounter;
+    }
+    
     function getOwnerFileLength() public view returns (uint) {
         return ownerFilesLength[msg.sender];
     }
