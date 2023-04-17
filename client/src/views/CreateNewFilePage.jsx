@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
+import axios from 'axios'
 
 // reactstrap components
 import {
@@ -73,13 +74,12 @@ const CreateNewFilePage = () => {
 
   function handleSubmit() {
     //Encrypt File
-    setEncrypted(encrypt(file, password));
+    // setEncrypted(encrypt(file, password));
 
     //Upload
-    handleUpload();
+    sendFileToIPFS(encryptedFile);
 
     //Handle Blockchain Contract
-    console.log('hash:', hash);
     let isRegistered =  contracts.contract.methods.newFile(hash, password).send({
       from: contextValue.web3.accounts[0],
     })
@@ -87,66 +87,31 @@ const CreateNewFilePage = () => {
   };
 
   // PINATA::::
-  const [uploading, setUploading] = useState(false);
-  function handleUpload() {
-    try {
-      setUploading(true);
+  const sendFileToIPFS = async (fileImg) => {
+    if (fileImg) {
+        try {
+            const formData = new FormData()
+            formData.append("file", fileImg)
 
-      // Upload the encrypted file to IPFS using Pinata
-      console.log('Name:', file.name);
-      console.log('1');
-      const pinata = new Pinata({ pinataJWTKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJlZDBhNzBjMC1iYmJiLTRjNWEtYmQ4Zi1mNzUyNWI0OGEyNTkiLCJlbWFpbCI6ImpvaG4uY29oZW4ud29ya0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJpZCI6IkZSQTEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX0seyJpZCI6Ik5ZQzEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiMWM2N2E5MDdmMjY5NjJhZjM3YWEiLCJzY29wZWRLZXlTZWNyZXQiOiIwMTdhOGIwNmE4ODUzMTA2YjUxY2RjN2UyZWU5NTEwYjk5ZjlmNjRmZmFiOGNiNTM2YjUwYzdkM2I4OTBiYjcxIiwiaWF0IjoxNjc5OTc0MzEwfQ.4ACpYrC8PJtMnF0SjPRYgawlR4Z6KHspGLSwTkUeNmc'});
-      console.log('2');
-      pinata.testAuthentication().then((result) => {
-        //handle successful authentication here
-        console.log(result);
-    }).catch((err) => {
-        //handle error here
-        console.log(err);
-    });
-      console.log('3');
-      const options = {
-        pinataMetadata: {
-            name: file.name,
-            keyvalues: {
-                customKey: 'customValue',
-                customKey2: 'customValue2'
-            }
-        },
-        pinataOptions: {
-            cidVersion: 0
+            const resFile = await axios({
+                method: "post",
+                url: "https://api.pinata.cloud/pinning/pinFileToIPFS",
+                data: formData,
+                headers: {
+                    pinata_api_key: `1c67a907f26962af37aa`,
+                    pinata_secret_api_key: `017a8b06a8853106b51cdc7e2ee9510b99f9f64ffab8cb536b50c7d3b890bb71`,
+                    "Content-Type": "multipart/form-data",
+                },
+            })
+
+            setHash(resFile.data.IpfsHash)
+            console.log('hash:', hash);
+        } catch (error) {
+            console.log("Error sending File to IPFS: ")
+            console.log(error)
         }
-      };
-      console.log('4');
-      const result = pinata.pinFileToIPFS(file, options);
-      console.log('5');
-      setHash(result.IpfsHash);
-      console.log('6');
-
-      setUploading(false);
-    } catch (error) {
-      console.error(error);
-      setUploading(false);
     }
-  };
-
-  // const uploadFile = async () => {
-  //   const fileName = 'brvv';
-  //   const filePath = 'C:\Users\John\Desktop\bruh.txt';
-  //   const pinata = new Pinata({ pinataJWTKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJlZDBhNzBjMC1iYmJiLTRjNWEtYmQ4Zi1mNzUyNWI0OGEyNTkiLCJlbWFpbCI6ImpvaG4uY29oZW4ud29ya0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJpZCI6IkZSQTEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX0seyJpZCI6Ik5ZQzEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiMWM2N2E5MDdmMjY5NjJhZjM3YWEiLCJzY29wZWRLZXlTZWNyZXQiOiIwMTdhOGIwNmE4ODUzMTA2YjUxY2RjN2UyZWU5NTEwYjk5ZjlmNjRmZmFiOGNiNTM2YjUwYzdkM2I4OTBiYjcxIiwiaWF0IjoxNjc5OTc0MzEwfQ.4ACpYrC8PJtMnF0SjPRYgawlR4Z6KHspGLSwTkUeNmc'});
-  //   const { IpfsHash } = await pinata.pinFileToIPFS(
-  //     fs.createReadStream(filePath),
-  //     {
-  //       pinataMetadata: {
-  //         name: fileName,
-  //       },
-  //       pinataOptions: {
-  //         cidVersion: 0,
-  //       },
-  //     },
-  //   );
-  //   return IpfsHash;
-  // };
+}
 
   return (
     <>

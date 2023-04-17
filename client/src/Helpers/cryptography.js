@@ -6,6 +6,7 @@ function encrypt(file, password) {
       reader.onload = () => {
         var wordArray = CryptoJS.lib.WordArray.create(reader.result);
         var encrypted = CryptoJS.AES.encrypt(wordArray, password).toString();
+        encrypted.name = "enc." + file.name
         var fileEnc = new Blob([encrypted]);
   
         resolve(fileEnc);
@@ -20,6 +21,7 @@ function encrypt(file, password) {
       var reader = new FileReader();
       reader.onload = () => {
         var decrypted = CryptoJS.AES.decrypt(reader.result, password);
+        decrypted.name = file.name.substr(3, decrypted.name.length);
         var typedArray = convertWordArrayToUint8Array(decrypted);
         var fileDec = new Blob([typedArray]);
   
