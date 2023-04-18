@@ -20,9 +20,7 @@ import Context from '../Helpers/Context'
 import getWeb3 from '../Helpers/getWeb3'
 import Ownership from '../contracts/Ownership.json'
 
-import { encrypt } from '../Helpers/cryptography';
-import Pinata from '@pinata/sdk';
-import fs from 'fs';
+// import { encrypt } from '../Helpers/cryptography';
 
 
 
@@ -30,7 +28,7 @@ const CreateNewFilePage = () => {
 
   const [file, setFile] = useState(null);
   const [password, setPassword] = useState('');
-  const [encryptedFile, setEncrypted] = useState(null);
+  // const [encryptedFile, setEncrypted] = useState(null);
   const [hash, setHash] = useState('');
   
   const { contextValue } = useContext(Context)
@@ -77,7 +75,7 @@ const CreateNewFilePage = () => {
     // setEncrypted(encrypt(file, password));
 
     //Upload
-    sendFileToIPFS(encryptedFile);
+    sendFileToIPFS(file);
 
     //Handle Blockchain Contract
     let isRegistered =  contracts.contract.methods.newFile(hash, password).send({
