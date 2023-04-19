@@ -71,19 +71,19 @@ const CreateNewFilePage = () => {
 
   function handleSubmit() {
     //Encrypt File
-    setEncrypted(encrypt(file, password));
-    setEncrypted(encryptFile(file));
+    // setEncrypted(encrypt(file, password));
+    // setEncrypted(encryptFile(file));
     // const encryptedFile = encryptFile(file);
 
     //Upload
-    sendFileToIPFS(encryptedFile);
-    // sendFileToIPFS(file);
+    // sendFileToIPFS(encryptedFile);
+    sendFileToIPFS(file);
 
     //Handle Blockchain Contract
-    let isRegistered =  contracts.contract.methods.newFile(hash, password).send({
-      from: contextValue.web3.accounts[0],
-    })
-    setIsRegistered(isRegistered)
+    // let isRegistered =  contracts.contract.methods.newFile(hash, password).send({
+    //   from: contextValue.web3.accounts[0],
+    // })
+    // setIsRegistered(isRegistered)
   };
 
   // PINATA::::

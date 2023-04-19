@@ -71,7 +71,7 @@ const DownloadPage = () => {
     })
 
     //If access, download
-    if(pass === "test"){
+    if(pass !== ""){
       //Record Password
       setIsAllowed(true);
       console.log('password:', pass); //!!!!!!!!Will have to remove this
@@ -140,7 +140,7 @@ const DownloadPage = () => {
                         type="button"
                         className="btn-round"
                         color="info"
-                        onClick={handleSubmit}
+                        onClick={handleDownload}
                         disabled={!hash || downloading}
                       >
                         Download
