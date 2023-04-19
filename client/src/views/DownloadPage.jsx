@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
+import axios from 'axios'
 
 // reactstrap components
 import {
@@ -19,9 +20,8 @@ import Context from '../Helpers/Context'
 import getWeb3 from '../Helpers/getWeb3'
 import Ownership from '../contracts/Ownership.json'
 
-import CryptoJS from 'crypto-js';
-import Pinata from '@pinata/sdk';
-import { convertWordArrayToUint8Array } from '../Helpers/cryptography';
+// import CryptoJS from 'crypto-js';
+// import { convertWordArrayToUint8Array } from '../Helpers/cryptography';
 
 
 
@@ -29,7 +29,7 @@ import { convertWordArrayToUint8Array } from '../Helpers/cryptography';
 const DownloadPage = () => {
 
   const [hash, setHash] = useState("");
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState("");
   const [isAllowed, setIsAllowed] = useState(false);
   
   const { contextValue } = useContext(Context)
@@ -71,7 +71,7 @@ const DownloadPage = () => {
     })
 
     //If access, download
-    if(pass !== ''){
+    if(pass === "test"){
       //Record Password
       setIsAllowed(true);
       console.log('password:', pass); //!!!!!!!!Will have to remove this
@@ -87,29 +87,23 @@ const DownloadPage = () => {
   function handleDownload() {
     try {
       setDownloading(true);
-
-      //Grab file from Pinata????????
-      const pinata = new Pinata({ pinataJWTKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJlZDBhNzBjMC1iYmJiLTRjNWEtYmQ4Zi1mNzUyNWI0OGEyNTkiLCJlbWFpbCI6ImpvaG4uY29oZW4ud29ya0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJpZCI6IkZSQTEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX0seyJpZCI6Ik5ZQzEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiMWM2N2E5MDdmMjY5NjJhZjM3YWEiLCJzY29wZWRLZXlTZWNyZXQiOiIwMTdhOGIwNmE4ODUzMTA2YjUxY2RjN2UyZWU5NTEwYjk5ZjlmNjRmZmFiOGNiNTM2YjUwYzdkM2I4OTBiYjcxIiwiaWF0IjoxNjc5OTc0MzEwfQ.4ACpYrC8PJtMnF0SjPRYgawlR4Z6KHspGLSwTkUeNmc'});
-      const file = pinata.pinByHash(hash);
-
-      //Download
-      var reader = new FileReader();
-      reader.onload = () => {
-        //Decrypt
-        var decrypted = CryptoJS.AES.decrypt(reader.result, password);          // Decryption: I: Base64 encoded string (OpenSSL-format) -> O: WordArray
-        var typedArray = convertWordArrayToUint8Array(decrypted);               // Convert: WordArray -> typed array
-        var fileDec = new Blob([typedArray]);                                   // Create blob from typed array
-
-        //Download
-        var a = document.createElement("a");
-        var url = window.URL.createObjectURL(fileDec);
-        var filename = file.name.substr(3, file.name.length);
-        a.href = url;
-        a.download = filename;
-        a.click();
-        window.URL.revokeObjectURL(url);
-      };
-      reader.readAsText(file);
+      try {
+        const fileUrl = `https://gateway.pinata.cloud/ipfs/${hash}`;
+  
+        axios.get(fileUrl, { responseType: 'blob' }).then((response) => {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'filename');
+        document.body.appendChild(link);
+        link.click();
+        })
+        .catch((error) => {
+          console.error(error);
+        })
+      } catch (error) {
+        console.error(error);
+      }
 
       setDownloading(false);
     } catch (error) {
@@ -153,7 +147,7 @@ const DownloadPage = () => {
                       </Button>
                   </CardBody>
                   <CardFooter>
-                    {isAllowed === true && 'Downloading...'}
+                    {isAllowed === true && downloading === true && 'Downloading...'}
                   </CardFooter>
                 </Card>
               </Col>

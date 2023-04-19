@@ -20,7 +20,8 @@ import Context from '../Helpers/Context'
 import getWeb3 from '../Helpers/getWeb3'
 import Ownership from '../contracts/Ownership.json'
 
-// import { encrypt } from '../Helpers/cryptography';
+import CryptoJS from 'crypto-js';
+import { encrypt } from '../Helpers/cryptography';
 
 
 
@@ -28,7 +29,7 @@ const CreateNewFilePage = () => {
 
   const [file, setFile] = useState(null);
   const [password, setPassword] = useState('');
-  // const [encryptedFile, setEncrypted] = useState(null);
+  const [encryptedFile, setEncrypted] = useState(null);
   const [hash, setHash] = useState('');
   
   const { contextValue } = useContext(Context)
@@ -61,8 +62,6 @@ const CreateNewFilePage = () => {
   const handlePasswordChange = (event) => {
     setPassword(event.target.value);
   };
-
-  //Calculates hash of file when uploaded and sets hash as file ID
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
@@ -72,10 +71,13 @@ const CreateNewFilePage = () => {
 
   function handleSubmit() {
     //Encrypt File
-    // setEncrypted(encrypt(file, password));
+    setEncrypted(encrypt(file, password));
+    setEncrypted(encryptFile(file));
+    // const encryptedFile = encryptFile(file);
 
     //Upload
-    sendFileToIPFS(file);
+    sendFileToIPFS(encryptedFile);
+    // sendFileToIPFS(file);
 
     //Handle Blockchain Contract
     let isRegistered =  contracts.contract.methods.newFile(hash, password).send({
@@ -110,6 +112,19 @@ const CreateNewFilePage = () => {
         }
     }
 }
+
+const encryptFile = async (file) => {
+  const reader = new FileReader();
+  reader.readAsArrayBuffer(file);
+  return new Promise((resolve) => {
+    reader.onload = () => {
+      const wordArray = CryptoJS.lib.WordArray.create(reader.result);
+      // const key = CryptoJS.enc.Utf8.parse('<YOUR_SECRET_KEY>');
+      const encrypted = CryptoJS.AES.encrypt(wordArray, password);
+      resolve(encrypted.ciphertext.toString());
+    };
+  });
+};
 
   return (
     <>
