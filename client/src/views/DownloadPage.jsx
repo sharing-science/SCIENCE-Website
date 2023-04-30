@@ -20,7 +20,7 @@ import Context from '../Helpers/Context'
 import getWeb3 from '../Helpers/getWeb3'
 import Ownership from '../contracts/Ownership.json'
 
-// import CryptoJS from 'crypto-js';
+import CryptoJS from 'crypto-js';
 // import { convertWordArrayToUint8Array } from '../Helpers/cryptography';
 
 
@@ -29,8 +29,9 @@ import Ownership from '../contracts/Ownership.json'
 const DownloadPage = () => {
 
   const [hash, setHash] = useState("");
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState('');
   const [isAllowed, setIsAllowed] = useState(false);
+  const [file, setFile] = useState(null);
   
   const { contextValue } = useContext(Context)
 
@@ -63,6 +64,44 @@ const DownloadPage = () => {
     setHash(event.target.value);
   };
 
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+    console.log(file);
+  }
+
+  function decrypt() {
+    var reader = new FileReader();
+    reader.onload = () => {
+        var decrypted = CryptoJS.AES.decrypt(reader.result, password);               // Decryption: I: Base64 encoded string (OpenSSL-format) -> O: WordArray
+        var typedArray = convertWordArrayToUint8Array(decrypted);               // Convert: WordArray -> typed array
+
+        var fileDec = new Blob([typedArray]);                                   // Create blob from typed array
+
+        var a = document.createElement("a");
+        var url = window.URL.createObjectURL(fileDec);
+        var filename = file.name.substr(3, file.name.length);
+        a.href = url;
+        a.download = filename;
+        a.click();
+        window.URL.revokeObjectURL(url);
+    };
+    reader.readAsText(file);
+}
+
+function convertWordArrayToUint8Array(wordArray) {
+  var arrayOfWords = wordArray.hasOwnProperty("words") ? wordArray.words : [];
+  var length = wordArray.hasOwnProperty("sigBytes") ? wordArray.sigBytes : arrayOfWords.length * 4;
+  var uInt8Array = new Uint8Array(length), index=0, word, i;
+  for (i=0; i<length; i++) {
+      word = arrayOfWords[i];
+      uInt8Array[index++] = word >> 24;
+      uInt8Array[index++] = (word >> 16) & 0xff;
+      uInt8Array[index++] = (word >> 8) & 0xff;
+      uInt8Array[index++] = word & 0xff;
+  }
+  return uInt8Array;
+}
+
   //When file and name completed, register file with blockchain via newFile() smart contract
   function handleSubmit() {
     //Get Password
@@ -71,7 +110,7 @@ const DownloadPage = () => {
     })
 
     //If access, download
-    if(pass !== ""){
+    if(pass !== ''){
       //Record Password
       setIsAllowed(true);
       console.log('password:', pass); //!!!!!!!!Will have to remove this
@@ -149,6 +188,32 @@ const DownloadPage = () => {
                   <CardFooter>
                     {isAllowed === true && downloading === true && 'Downloading...'}
                   </CardFooter>
+                </Card>
+              </Col>
+            </Container>
+            <Container>
+              <Col xs="6">
+                <Card className="p-4 card-stats">
+                  <CardHeader>
+                    <h1>Decrypt File</h1>
+                  </CardHeader>
+                  <CardBody>
+
+                      <div className="File-Input">
+                        <label htmlFor="file-input">Encrypted File</label>
+                        <input type="file" className="form-control" id="file-input" onChange={handleFileChange} />
+                      </div>
+
+                      <Button
+                        type="button"
+                        className="btn-round"
+                        color="info"
+                        onClick={decrypt}
+                        disabled={!file || !password}
+                      >
+                        Decrypt
+                      </Button>
+                  </CardBody>
                 </Card>
               </Col>
             </Container>

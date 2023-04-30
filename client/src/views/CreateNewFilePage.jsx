@@ -65,25 +65,23 @@ const CreateNewFilePage = () => {
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
+  const handleEncryptedChange = (e) => {
+    setEncrypted(e.target.files[0]);
+  };
 
   //When file and name completed, register file with blockchain via newFile() smart contract
   const [isRegistered, setIsRegistered] = useState('')
 
   function handleSubmit() {
-    //Encrypt File
-    // setEncrypted(encrypt(file, password));
-    // setEncrypted(encryptFile(file));
-    // const encryptedFile = encryptFile(file);
-
     //Upload
-    // sendFileToIPFS(encryptedFile);
-    sendFileToIPFS(file);
+    sendFileToIPFS(encryptedFile);
 
     //Handle Blockchain Contract
-    // let isRegistered =  contracts.contract.methods.newFile(hash, password).send({
-    //   from: contextValue.web3.accounts[0],
-    // })
-    // setIsRegistered(isRegistered)
+    console.log('hash:', hash);
+    let registered =  contracts.contract.methods.newFile(hash, password).send({
+      from: contextValue.web3.accounts[0],
+    })
+    setIsRegistered(registered)
   };
 
   // PINATA::::
@@ -113,18 +111,24 @@ const CreateNewFilePage = () => {
     }
 }
 
-const encryptFile = async (file) => {
-  const reader = new FileReader();
+function encrypt() {
+  var reader = new FileReader();
+  reader.onload = () => {
+      var wordArray = CryptoJS.lib.WordArray.create(reader.result);           // Convert: ArrayBuffer -> WordArray
+      var encrypted = CryptoJS.AES.encrypt(wordArray, password).toString();        // Encryption: I: WordArray -> O: -> Base64 encoded string (OpenSSL-format)
+
+      var fileEnc = new Blob([encrypted]);                                    // Create blob from string
+
+      var a = document.createElement("a");
+      var url = window.URL.createObjectURL(fileEnc);
+      var filename = "enc." + file.name;
+      a.href = url;
+      a.download = filename;
+      a.click();
+      window.URL.revokeObjectURL(url);
+  };
   reader.readAsArrayBuffer(file);
-  return new Promise((resolve) => {
-    reader.onload = () => {
-      const wordArray = CryptoJS.lib.WordArray.create(reader.result);
-      // const key = CryptoJS.enc.Utf8.parse('<YOUR_SECRET_KEY>');
-      const encrypted = CryptoJS.AES.encrypt(wordArray, password);
-      resolve(encrypted.ciphertext.toString());
-    };
-  });
-};
+}
 
   return (
     <>
@@ -142,7 +146,7 @@ const encryptFile = async (file) => {
               <Col xs="6">
                 <Card className="p-4 card-stats">
                   <CardHeader>
-                    <h1>Upload New File</h1>
+                    <h1>Encrypt File</h1>
                   </CardHeader>
                   <CardBody>
                     <div className="Get-Password">
@@ -159,8 +163,38 @@ const encryptFile = async (file) => {
                         type="button"
                         className="btn-round"
                         color="info"
+                        onClick={encrypt}
+                        disabled={!file || !password}
+                      >
+                        Encrypt
+                      </Button>
+                  </CardBody>
+                </Card>
+              </Col>
+            </Container>
+            <Container>
+              <Col xs="6">
+                <Card className="p-4 card-stats">
+                  <CardHeader>
+                    <h1>Upload Encrypted File</h1>
+                  </CardHeader>
+                  <CardBody>
+                    <div className="Get-Password">
+                      <label>Same Encryption Password</label>
+                      <Input type="password" value={password} onChange={handlePasswordChange} />
+                      </div>
+
+                      <div className="File-Input">
+                        <label htmlFor="file-input">Encrypted File Input</label>
+                        <input type="file" className="form-control" id="file-input" onChange={handleEncryptedChange} />
+                      </div>
+
+                      <Button
+                        type="button"
+                        className="btn-round"
+                        color="info"
                         onClick={handleSubmit}
-                        disabled={!file || password === ''} //ADD "|| uploading"
+                        disabled={!encryptedFile || password === ''} //ADD "|| uploading"
                       >
                         Register and Upload
                       </Button>
@@ -168,7 +202,7 @@ const encryptFile = async (file) => {
                   <CardFooter>
                   {hash && isRegistered && (
                     <div>
-                      <p>File uploaded successfully with hash: {hash}</p>
+                      <p>File uploaded successfully with hash: {hash} and password: {password} </p>
                     </div>
                   )}
                   </CardFooter>
