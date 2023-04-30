@@ -19,8 +19,9 @@ contract Rating {
     }
 
     Report[] public reports;
-    mapping(address => uint) public rep;
     uint public reportsCount = 0;
+    mapping(address => uint) public rep;
+    mapping(address => bool) public isCommittee;
 
     uint constant DEFENDANT_PENALTY = 1;
     uint constant REPORTER_PENALTY = 1;
@@ -36,6 +37,11 @@ contract Rating {
         _;
     }
 
+    function getRep(address _addr) public view returns (uint) {
+        return rep[_addr];
+    }
+
+    //REPORT LIST FUNCTIONS:::
     function createReport(address _defendant, string memory _cid, address _reporter, string memory _reason) public returns(uint) {
         reportsCount++;
         Report memory newReport = Report(_defendant, _cid, _reporter, _reason, reportsCount, 0, 0);
@@ -62,6 +68,7 @@ contract Rating {
         }
     }
 
+    //VOTING FUNCTIONS:::
     function approveOrDismiss(uint _reportId, bool _approved) public {
         //Handle vote:
         if (_approved) {
@@ -75,9 +82,6 @@ contract Rating {
         rep[msg.sender] += VOTE_REWARD;
     }
 
-    function getRep(address _addr) public view returns (uint) {
-        return rep[_addr];
-    }
     function attemptDecision(uint _reportId) public  {  //
         if(reports[_reportId].yes_votes == 3){//report validated
             rep[reports[_reportId].reporter] += REPORTER_REWARD;
@@ -88,5 +92,15 @@ contract Rating {
             delete reports[_reportId];
         }
     }
-    
+
+    //COMMITTEE FUNCTIONS:::
+    function applyCM() public returns(bool) {
+        msg.sender;
+    }
+
+    function removeCM(address _user) public onlyAdmin {
+        s
+    }
+
+
 }
