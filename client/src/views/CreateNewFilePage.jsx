@@ -21,9 +21,6 @@ import getWeb3 from '../Helpers/getWeb3'
 import Ownership from '../contracts/Ownership.json'
 
 import CryptoJS from 'crypto-js';
-import { encrypt } from '../Helpers/cryptography';
-
-
 
 const CreateNewFilePage = () => {
 

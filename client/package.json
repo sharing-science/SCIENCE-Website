@@ -10,6 +10,7 @@
     "axios": "^0.24.0",
     "bootstrap": "^4.6.0",
     "chart.js": "^2.9.4",
+    "cids": "^1.1.9",
     "classnames": "^2.2.6",
     "crypto-hash": "1.1",
     "index.js": "^0.0.3",

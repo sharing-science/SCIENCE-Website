@@ -17,6 +17,7 @@ import {
 import NavBar from '../components/NavBar'
 import Footer from '../components/Footer'
 
+
 function PinataUpload() {
 
   const [hash, setHash] = useState("")
@@ -25,25 +26,39 @@ function PinataUpload() {
     setHash(event.target.value);
   };
 
+  const CID = require('cids');
+
+  async function fetchIPFSResourceFromGateway(ipfsHash) {
+    const gatewayUrl = 'https://ipfs.nftstorage.link';
+    const fileUrl = `${gatewayUrl}/ipfs/${ipfsHash}`;
+
+    try {
+      axios.get(fileUrl, { responseType: 'blob' }).then((response) => {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'filename');
+        document.body.appendChild(link);
+        link.click();
+        })
+        .catch((error) => {
+          console.error(error);
+        })
+    } catch (error) {
+      console.error(`Error fetching IPFS resource: ${error.message}`);
+    }
+  }
+
+  function convertToCIDv1(cidString) {
+    const cid = new CID(cidString);
+    const cidv1 = cid.toV1();
+    const base32CidString = cidv1.toString('base32');
+    return base32CidString;
+  }
 
   function handleDownload() {
-    try {
-      const fileUrl = `https://gateway.pinata.cloud/ipfs/${hash}`;
-
-      axios.get(fileUrl, { responseType: 'blob' }).then((response) => {
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'filename');
-      document.body.appendChild(link);
-      link.click();
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-    } catch (error) {
-      console.error(error);
-    }
+    let base32Cid = convertToCIDv1(hash);
+    fetchIPFSResourceFromGateway(base32Cid);
   };
 
   return (
