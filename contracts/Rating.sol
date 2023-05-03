@@ -21,7 +21,9 @@ contract Rating {
     Report[] public reports;
     uint public reportsCount = 0;
     mapping(address => uint) public rep;
+    uint public totalRep = 0;
     mapping(address => bool) public isCommittee;
+    uint public numMembers = 0;
 
     uint constant DEFENDANT_PENALTY = 1;
     uint constant REPORTER_PENALTY = 1;
@@ -37,8 +39,17 @@ contract Rating {
         _;
     }
 
+    modifier onlyCommittee() {
+        require(isCommittee[msg.sender], "Only committee member can call this function");
+        _;
+    }
+
     function getRep(address _addr) public view returns (uint) {
         return rep[_addr];
+    }
+
+    function getNumMembers() public view returns(uint) {
+        return numMembers;
     }
 
     //REPORT LIST FUNCTIONS:::
@@ -55,21 +66,25 @@ contract Rating {
         reports.push(_report);
     }
 
-    function getReports() public view returns (Report[] memory) {
+    function getReports() public view onlyCommittee returns(Report[] memory) {
         return reports;
     }
 
-    function removeReport(uint _reportId) public {
-        for (uint i = 0; i < reports.length; i++) {
-            if (reports[i].reportId == _reportId) {
-                delete reports[i];
-                break;
-            }
-        }
+    function getNumReports() public view returns(uint) {
+        return reportsCount;
     }
 
+    // function removeReport(uint _reportId) public {
+    //     for (uint i = 0; i < reports.length; i++) {
+    //         if (reports[i].reportId == _reportId) {
+    //             delete reports[i];
+    //             break;
+    //         }
+    //     }
+    // }
+
     //VOTING FUNCTIONS:::
-    function approveOrDismiss(uint _reportId, bool _approved) public {
+    function approveOrDismiss(uint _reportId, bool _approved) public onlyCommittee {
         //Handle vote:
         if (_approved) {
             reports[_reportId].yes_votes++;
@@ -80,12 +95,14 @@ contract Rating {
 
         //Committee Member reward:
         rep[msg.sender] += VOTE_REWARD;
+        totalRep += VOTE_REWARD;
     }
 
     function attemptDecision(uint _reportId) public  {  //
         if(reports[_reportId].yes_votes == 3){//report validated
             rep[reports[_reportId].reporter] += REPORTER_REWARD;
             rep[reports[_reportId].defendant] -= DEFENDANT_PENALTY;
+            totalRep = totalRep + REPORTER_REWARD - DEFENDANT_PENALTY;
             delete reports[_reportId];
         }else if(reports[_reportId].no_votes == 3){
             //reporter penalty?
@@ -93,14 +110,41 @@ contract Rating {
         }
     }
 
-    //COMMITTEE FUNCTIONS:::
-    function applyCM() public returns(bool) {
-        msg.sender;
+    // COMMITTEE FUNCTIONS:::
+    function applyCM(address _user) public returns(bool) {
+        if(isCommittee[_user]){
+            return false;
+        }
+        if(numMembers < 5){
+            isCommittee[_user] = true;
+            numMembers += 1;
+            return true;
+        }
+        if(numMembers < 10 && rep[_user] >= 1){
+            isCommittee[_user] = true;
+            numMembers += 1;
+            return true;
+        }
+        if(numMembers < 15 && rep[_user] >= 2){
+            isCommittee[_user] = true;
+            numMembers += 1;
+            return true;
+        }
+        return false;
+    }
+
+    function addCM(address _user) public onlyAdmin {
+        if(isCommittee[_user] == false){
+            isCommittee[_user] = true;
+            numMembers += 1;
+        }
     }
 
     function removeCM(address _user) public onlyAdmin {
-        s
+        if(isCommittee[_user]){
+            isCommittee[_user] = false;
+            numMembers -= 1;
+        }
     }
-
 
 }

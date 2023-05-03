@@ -14,10 +14,10 @@ import {
 } from 'reactstrap'
 
 // core components
-import NavBar from 'components/NavBar'
-import Footer from 'components/Footer'
-import Context from 'Helpers/Context'
-import getWeb3 from 'Helpers/getWeb3'
+import NavBar from '../components/NavBar'
+import Footer from '../components/Footer'
+import Context from '../Helpers/Context'
+import getWeb3 from '../Helpers/getWeb3'
 import Ownership from '../contracts/Ownership.json'
 
 const ApproveRequestsPage = () => {
@@ -72,8 +72,13 @@ const ApproveRequestsPage = () => {
   // }
 
   const handleSubmit = async () => {
-    const allPerms = await contracts.contract.methods.getAllRequests().call();
-    setPerms(allPerms);
+    contracts.contract.methods.getAllRequests().call({
+      from: contextValue.web3.accounts[0],
+    }).then((allPerms) => {
+      setPerms(allPerms);
+      console.log('allPerms:', allPerms);
+    });
+    console.log('num Perms:', await contracts.contract.methods.getNumRequests().call());
     // setFileIDs(allPerms);
   }
 
@@ -97,22 +102,30 @@ const ApproveRequestsPage = () => {
     })
   }
 
+  //Accept
   const [isAccepted, setIsAccepted] = useState('')
   const handleSubmit2 = async () => {
     let acceptedPerm = perms[input.index]
-    const isAccepted = await contracts.contract.methods
+    contracts.contract.methods
       .fulfillRequest(acceptedPerm.fileID, acceptedPerm.id, true)
-      .call()
-    setIsAccepted(isAccepted)
+      .call({
+        from: contextValue.web3.accounts[0],
+      }).then((isAccepted) => {
+        setIsAccepted(isAccepted)
+      });
   }
 
+  //Deny
   const [isDenied, setIsDenied] = useState('')
   const handleSubmit3 = async () => {
     let acceptedPerm = perms[input.index]
-    const isDenied = await contracts.contract.methods
-      .fulfillRequest(acceptedPerm.fileID, acceptedPerm.id, false)
-      .call()
-    setIsDenied(isDenied)
+    contracts.contract.methods
+      .fulfillRequest(acceptedPerm.fileID, acceptedPerm.id, true)
+      .call({
+        from: contextValue.web3.accounts[0],
+      }).then((isDenied) => {
+        setIsDenied(isDenied)
+      });
   }
   // {perms.map((perm, index) => (
   //   <div key={index}>
@@ -135,7 +148,7 @@ const ApproveRequestsPage = () => {
             <img
               alt="..."
               className="path"
-              src={require('assets/img/waves.png').default}
+              src={require('../assets/img/waves.png').default}
             />
             <Container>
               <Col xs="8">

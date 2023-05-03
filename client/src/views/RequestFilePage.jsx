@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import axios from 'axios'
+// import axios from 'axios'
 
 // reactstrap components
 import {
@@ -24,30 +24,28 @@ import Ownership from '../contracts/Ownership.json'
 const RequestFilePage = () => {
   const { contextValue } = useContext(Context)
 
-  let requestsMade = 0
-
   const[requested, setRequested] = useState()
 
   const [contracts, setContracts] = useState({
     contract: {},
   })
 
-  const [showTable, setShowTable] = useState(false)
+  // const [showTable, setShowTable] = useState(false)
 
   const [inputs, setInputs] = useState({
     hash: '',
   })
 
-  const [fileNames, setFileNames] = useState([])
+  // const [fileNames, setFileNames] = useState([])
 
-  const getFileNames = async () => {
-    const response = await axios('http://localhost:5000/api/fileNames')
-    const info = []
-    for (let i = 0; i < response.data.files.length; ++i)
-      info.push(response.data.files[i])
-    console.log(info)
-    setFileNames(info)
-  }
+  // const getFileNames = async () => {
+  //   const response = await axios('http://localhost:5000/api/fileNames')
+  //   const info = []
+  //   for (let i = 0; i < response.data.files.length; ++i)
+  //     info.push(response.data.files[i])
+  //   console.log(info)
+  //   setFileNames(info)
+  // }
 
   const handleInputChange = (e) => {
     const value =
@@ -72,7 +70,7 @@ const RequestFilePage = () => {
           ...c,
           contract: Contract_instance,
         }))
-        getFileNames()
+        // getFileNames()
       } catch (error) {
         console.log('Error')
       }
@@ -81,11 +79,13 @@ const RequestFilePage = () => {
   }, [contextValue.web3.networkId])
 
   const handleSubmit = async () => {
-    const requested = await contracts.contract.methods.requestAccess(inputs.hash, 7).send({
-      from: contextValue.web3.accounts[0],
-    })
-    requestsMade++;
-    setRequested(requested);
+    const sender_address = contextValue.web3.accounts[0];
+    contracts.contract.methods.requestAccess(inputs.hash, 7).call({
+      from: sender_address,
+    }).then((requested) =>{
+      setRequested(requested);
+      console.log('requested:', requested);
+    });
   }
   return (
     <>
@@ -125,7 +125,6 @@ const RequestFilePage = () => {
                       </Button>
                     </CardBody>
                     <CardFooter>
-                      {'Debugging - Requests Made: ' + requestsMade}
                       {requested !== '' && requested === true &&
                       'Request Made'}
                       {requested !== '' && requested === false &&
@@ -133,7 +132,7 @@ const RequestFilePage = () => {
                     </CardFooter>
                   </Card>
                 </Col>
-                <Col xs="6">
+                {/* <Col xs="6">
                   <Card className="p-4 card-stats">
                     <CardHeader>
                       <h1>Files</h1>
@@ -167,7 +166,7 @@ const RequestFilePage = () => {
                     </CardBody>
                     <CardFooter></CardFooter>
                   </Card>
-                </Col>
+                </Col> */}
               </Row>
             </Container>
           </div>

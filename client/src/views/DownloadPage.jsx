@@ -60,9 +60,9 @@ const DownloadPage = () => {
     init()
   }, [contextValue.web3.networkId])
   
-  const handlePasswordChange = (event) => {
-    setPassword(event.target.value);
-  };
+  // const handlePasswordChange = (event) => {
+  //   setPassword(event.target.value);
+  // };
 
   const handleHashChange = (event) => {
     setHash(event.target.value);
@@ -108,22 +108,27 @@ function convertWordArrayToUint8Array(wordArray) {
 
   //When file and name completed, register file with blockchain via newFile() smart contract
   function handleSubmit() {
-    //Get Password
-    let pass = contracts.contract.methods.getPassword(hash, contextValue.web3.accounts[0]).send({
+    contracts.contract.methods.checkAccess(hash, contextValue.web3.accounts[0]).call({
       from: contextValue.web3.accounts[0],
-    })
-
-    //If access, download
-    if(pass !== ''){
-      //Record Password
-      setIsAllowed(true);
-      console.log('password:', pass); //!!!!!!!!Will have to remove this
-      setPassword(pass);
-      
-      //Download
-      handleDownload()
-    }
-  };
+    }).then((access) => {
+      console.log('Access: ', access);
+      //If access, download
+      if(access){
+        //Get Password
+        contracts.contract.methods.getPassword(hash, contextValue.web3.accounts[0]).call({
+          from: contextValue.web3.accounts[0],
+        }).then((pass) => {
+          //Record Password
+          setIsAllowed(true);
+          console.log('password:', pass); // log the password, not the getPassword promise
+          setPassword(pass);
+          
+          //Download
+          handleDownload()
+        });
+      }
+    });
+  }
 
   // PINATA::::
   const CID = require('cids');
@@ -193,7 +198,7 @@ function convertWordArrayToUint8Array(wordArray) {
                         type="button"
                         className="btn-round"
                         color="info"
-                        onClick={handleDownload}
+                        onClick={handleSubmit}
                         disabled={!hash || downloading}
                       >
                         Download
@@ -213,10 +218,10 @@ function convertWordArrayToUint8Array(wordArray) {
                   </CardHeader>
                   <CardBody>
 
-                      <div className="Get-Password">
+                      {/* <div className="Get-Password">
                         <label>TESTING Password!!!!</label>
                         <Input type="password" value={password} onChange={handlePasswordChange} />
-                      </div>
+                      </div> */}
 
                       <div className="File-Input">
                         <label htmlFor="file-input">Encrypted File</label>

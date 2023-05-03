@@ -49,6 +49,10 @@ contract Ownership {
         _;
     }
 
+    function getFileOwner(string calldata _hash) public view returns(address) {
+        return isfileOwner[_hash];
+    }
+
     function getFileCounter() public view returns (uint) {
         return fileCounter;
     }
@@ -85,6 +89,20 @@ contract Ownership {
             }
         }
         return answer;
+    }
+
+    function getNumRequests() public view returns (uint){
+        string[FILE_LENGTH] memory files = getOwnersFiles();
+        uint fileLength = getOwnerFileLength();
+        uint totalPermsCount = 0;
+
+        //Get number of total Perms under owner
+        for (uint i = 0; i < fileLength; ++i) {
+            string memory currentFile = files[i];
+            uint fileRequestLength = fileRequestCounter[currentFile];
+            totalPermsCount += fileRequestLength;
+        }
+        return totalPermsCount;
     }
 
     function getAllAllowed() public view returns (Perms[] memory) {
@@ -177,19 +195,19 @@ contract Ownership {
 
 
     //Creates new data to be used
-    function newFile(string calldata _fileID, string memory _password) public returns(bool) { //take in HashID argument
-        if(ownerFilesLength[msg.sender] == FILE_LENGTH){
+    function newFile(string calldata _fileID, string memory _password, address _owner) public returns(bool) { //take in HashID argument
+        if(ownerFilesLength[_owner] == FILE_LENGTH){
             return false;
         }
 
-        isfileOwner[_fileID] = msg.sender;
+        isfileOwner[_fileID] = _owner;
         fileToPass[_fileID] = _password;
 
         fileRequestCounter[_fileID] = 0;
         fileAllowedCounter[_fileID] = 0;
         
-        ownersFiles[msg.sender][ownerFilesLength[msg.sender]] = _fileID;
-        ++ownerFilesLength[msg.sender];
+        ownersFiles[_owner][ownerFilesLength[_owner]] = _fileID;
+        ++ownerFilesLength[_owner];
         ++fileCounter;
         return true;
     }
@@ -208,7 +226,7 @@ contract Ownership {
         if(!found) return false;
 
         //create new file
-        if(!newFile(_citationID, "c")) return false; //c is the password for citations
+        if(!newFile(_citationID, "c", _user)) return false; //c is the password for citations
 
         //give owedOwner access to citation
         address owedOwner = isfileOwner[_fileID];
@@ -382,6 +400,10 @@ contract Ownership {
     function checkAccess(string calldata _fileID, address _user)
         public        returns (bool)
     {
+        if(isfileOwner[_fileID] == _user){
+            return true;
+        }
+
         for (uint i = 0; i < fileAllowed[_fileID].length; i++) {
             if (fileAllowed[_fileID][i].user == _user) {
                 if(fileAllowed[_fileID][i].isTimed){

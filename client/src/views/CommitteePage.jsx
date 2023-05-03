@@ -14,11 +14,11 @@ import {
 } from 'reactstrap'
 
 // core components
-import NavBar from 'components/NavBar'
-import Footer from 'components/Footer'
-import Context from 'Helpers/Context'
-import getWeb3 from 'Helpers/getWeb3'
-import Ownership from '../contracts/Ownership.json'
+import NavBar from '../components/NavBar'
+import Footer from '../components/Footer'
+import Context from '../Helpers/Context'
+import getWeb3 from '../Helpers/getWeb3'
+import Rating from '../contracts/Rating.json'
 
 const CommitteePage = () => {
   const { contextValue } = useContext(Context)
@@ -26,17 +26,20 @@ const CommitteePage = () => {
   const [contracts, setContracts] = useState({
     contract: {},
   })
-
-  const [perms, setPerms] = useState([]);
+  
+  const [reports, setReports] = useState([]);
+  const [newMember, setNewMember] = useState();
+  const [applied, setApplied] = useState();
+  const [numMembers, setNumMembers] = useState();
 
   useEffect(() => {
     const init = async () => {
       try {
         const web3 = await getWeb3()
         const Contract_instance = new web3.eth.Contract(
-          Ownership.abi,
-          Ownership.networks[contextValue.web3.networkId] &&
-            Ownership.networks[contextValue.web3.networkId].address,
+          Rating.abi,
+          Rating.networks[contextValue.web3.networkId] &&
+          Rating.networks[contextValue.web3.networkId].address,
         )
 
         setContracts((c) => ({
@@ -52,9 +55,13 @@ const CommitteePage = () => {
 
 
   const handleSubmit = async () => {
-    const allPerms = await contracts.contract.methods.getAllRequests().call();
-    setPerms(allPerms);
-    // setFileIDs(allPerms);
+    contracts.contract.methods.getReports().call({
+      from: contextValue.web3.accounts[0],
+    }).then((allReports) => {
+      setReports(allReports);
+      console.log('allReports:', allReports);
+    });
+    console.log('num Reports:', await contracts.contract.methods.getNumReports().call());
   }
 
   const [input, setInput] = useState({
@@ -70,22 +77,43 @@ const CommitteePage = () => {
     })
   }
 
-  const [isAccepted, setIsAccepted] = useState('')
   const handleSubmit2 = async () => {
-    let acceptedPerm = perms[input.index]
-    const isAccepted = await contracts.contract.methods
-      .fulfillRequest(acceptedPerm.fileID, acceptedPerm.id, true)
-      .call()
-    setIsAccepted(isAccepted)
+    let acceptedReport = reports[input.index]
+    await contracts.contract.methods
+      .approveOrDismiss(acceptedReport.reportId, true)
+      .call({
+        from: contextValue.web3.accounts[0],
+      })
   }
 
-  const [isDenied, setIsDenied] = useState('')
   const handleSubmit3 = async () => {
-    let acceptedPerm = perms[input.index]
-    const isDenied = await contracts.contract.methods
-      .fulfillRequest(acceptedPerm.fileID, acceptedPerm.id, false)
-      .call()
-    setIsDenied(isDenied)
+    let deniedReport = reports[input.index]
+    await contracts.contract.methods
+      .approveOrDismiss(deniedReport.reportId, false)
+      .call({
+        from: contextValue.web3.accounts[0],
+      })
+  }
+
+  const handleApply = async () => {
+    setApplied(true);
+    await contracts.contract.methods.applyCM(contextValue.web3.accounts[0]).call({
+      from: contextValue.web3.accounts[0],
+    }).then((decision) => {
+      setNewMember(decision);
+      console.log('return apply:', decision);
+    });
+  }
+
+  const [flag, setFlag] = useState(false);
+  const handleGetNumbers = async () => {
+    await contracts.contract.methods.getNumMembers().call({
+      from: contextValue.web3.accounts[0],
+    }).then((num) => {
+      setNumMembers(num);
+      console.log('number members:', num);
+    });
+    setFlag(true);
   }
 
   return (
@@ -98,13 +126,13 @@ const CommitteePage = () => {
             <img
               alt="..."
               className="path"
-              src={require('assets/img/waves.png').default}
+              src={require('../assets/img/waves.png').default}
             />
             <Container>
               <Col xs="8">
                 <Card className="p-4 card-stats">
                   <CardHeader>
-                    <h1>Approve Requests</h1>
+                    <h1>Reports List</h1>
                   </CardHeader>
                   <CardBody>
                     <Button
@@ -113,9 +141,9 @@ const CommitteePage = () => {
                       color="info"
                       onClick={handleSubmit}
                     >
-                      See Requests
+                      See Reports
                     </Button>
-                    {perms && (
+                    {reports && (
                       <Table responsive>
                         <thead>
                           <tr>
@@ -123,25 +151,20 @@ const CommitteePage = () => {
                             {/* <th>Requester</th>
                             <th>Action</th> */}
                             <th>ID</th>
-                            <th>FileID</th>
-                            <th>Requester</th>
-                            <th>Permission</th>
-                            <th>Timed</th>
-                            <th>Days</th>
-                            <th>Action</th>
+                            <th>Defendant</th>
+                            <th>Reporter</th>
+                            <th>Hash</th>
+                            <th>Reason</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {perms.map((perm, index) => (
+                          {reports.map((report, index) => (
                             <div key={index}>
-                              <p>id: {perm.id}</p>
-                              <p>user: {perm.user}</p>
-                              <p>fileID: {perm.fileID}</p>
-                              <p>fileType: {perm.fileType}</p>
-                              <p>isTimed: {perm.isTimed}</p>
-                              <p>time: {perm.time}</p>
-                              <p>deadline: {perm.deadline}</p>
-                              <p>isAllowed: {perm.isAllowed}</p>
+                              <p>id: {report.reportId}</p>
+                              <p>defendant: {report.defendant}</p>
+                              <p>reporter: {report.reporter}</p>
+                              <p>hash: {report.cid}</p>
+                              <p>reason: {report.reason}</p>
                             </div>
                           ))
                           }
@@ -157,7 +180,7 @@ const CommitteePage = () => {
               <Col xs="6">
                 <Card className="p-4 card-stats">
                   <CardHeader>
-                    <h1>Accept Request</h1>
+                    <h1>Vote Valid Report</h1>
                   </CardHeader>
                   <label>Request #</label>
                   <Input
@@ -177,9 +200,6 @@ const CommitteePage = () => {
                       Submit
                     </Button>
                   </CardBody>
-                  <CardFooter>
-                    {isAccepted !== '' && 'The request was fulfilled: ' + isAccepted}
-                  </CardFooter>
                 </Card>
               </Col>
             </Container>
@@ -187,7 +207,7 @@ const CommitteePage = () => {
               <Col xs="6">
                 <Card className="p-4 card-stats">
                   <CardHeader>
-                    <h1>Deny Request</h1>
+                    <h1>Vote Invalid Report</h1>
                   </CardHeader>
                   <label>Request #</label>
                   <Input
@@ -207,8 +227,37 @@ const CommitteePage = () => {
                       Submit
                     </Button>
                   </CardBody>
+                </Card>
+              </Col>
+            </Container>
+            <Container>
+              <Col xs="6">
+                <Card className="p-4 card-stats">
+                  <CardHeader>
+                    <h1>Not a Member? Apply Here</h1>
+                  </CardHeader>
+                  <CardBody>
+                    <Button
+                      type="button"
+                      className="btn-round"
+                      color="info"
+                      onClick={handleApply}
+                    >
+                      Apply
+                    </Button>
+                    <Button
+                      type="button"
+                      className="btn-round"
+                      color="info"
+                      onClick={handleGetNumbers}
+                    >
+                      Get Number of Committee Members
+                    </Button>
+                  </CardBody>
                   <CardFooter>
-                    {isDenied !== '' && 'The request was fulfilled: ' + isDenied}
+                  <div>{applied && newMember  && 'Congratulations, you are now a member!'}</div>
+                  <div>{applied && newMember === false  && 'Sorry, your reputation is too low.'}</div>
+                  <div>{flag && `There are ${numMembers} committee members`}</div>
                   </CardFooter>
                 </Card>
               </Col>

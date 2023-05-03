@@ -73,12 +73,7 @@ const CreateNewFilePage = () => {
     //Upload
     sendFileToIPFS(encryptedFile);
 
-    //Handle Blockchain Contract
-    console.log('hash:', hash);
-    let registered =  contracts.contract.methods.newFile(hash, password).send({
-      from: contextValue.web3.accounts[0],
-    })
-    setIsRegistered(registered)
+    
   };
 
   // PINATA::::
@@ -100,7 +95,19 @@ const CreateNewFilePage = () => {
             })
 
             setHash(resFile.data.IpfsHash)
+            console.log('IpfsHash:', resFile.data.IpfsHash);
+
+            //Handle Blockchain Contract
             console.log('hash:', hash);
+            contracts.contract.methods.newFile(resFile.data.IpfsHash, password, contextValue.web3.accounts[0]).call({
+              from: contextValue.web3.accounts[0],
+            }).then((registered) => {
+              console.log('Was file registered:', registered);
+              setIsRegistered(registered);
+            }).catch((error) => {
+              console.error('Error registering file:', error);
+              setIsRegistered(false);
+            });
         } catch (error) {
             console.log("Error sending File to IPFS: ")
             console.log(error)
