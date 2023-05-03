@@ -50,8 +50,12 @@ const SeeApprovedPage = () => {
   }, [contextValue.web3.networkId])
 
   const handleSubmit = async () => {
-    const allPerms = await contracts.contract.methods.getAllAllowed().call();
-    setPerms(allPerms);
+    contracts.contract.methods.getAllAllowed().call({
+      from: contextValue.web3.accounts[0],
+    }).then((allPerms) => {
+      setPerms(allPerms);
+      console.log('allPerms:', allPerms);
+    });
   }
 
   return (
@@ -88,28 +92,26 @@ const SeeApprovedPage = () => {
                             <th className="text-center">#</th>
                             {/* <th>Requester</th>
                             <th>Action</th> */}
-                            <th>ID</th>
-                            <th>FileID</th>
-                            <th>Accessee</th>
+                            {/* <th>ID</th> */}
+                            <th>File Hash</th>
+                            <th>Requester</th>
                             <th>Permission</th>
                             <th>Timed</th>
                             <th>Days</th>
-                            <th>Action</th>
+                            {/* <th>Action</th> */}
                           </tr>
                         </thead>
                         <tbody>
-                          {perms.map((perm, index) => (
-                            <div key={index}>
-                              <p>id: {perm.id}</p>
-                              <p>user: {perm.user}</p>
-                              <p>fileID: {perm.fileID}</p>
-                              <p>fileType: {perm.fileType}</p>
-                              <p>isTimed: {perm.isTimed}</p>
-                              <p>time: {perm.time}</p>
-                              <p>deadline: {perm.deadline}</p>
-                              <p>isAllowed: {perm.isAllowed}</p>
-                            </div>
-                          ))}
+                        {perms.map((perm) => (
+                          <tr key={perm.id}>
+                          <td>{perm.id}</td>
+                          <td>{perm.fileID}</td>
+                          <td>{perm.user}</td>
+                          <td>{perm.fileType}</td>
+                          <td>{perm.isTimed ? 'Yes' : 'No'}</td>
+                          <td>{perm.time}</td>
+                        </tr>
+                        ))}
                         </tbody>
                       </Table>
                     )}
