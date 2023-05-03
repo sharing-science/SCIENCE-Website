@@ -64,21 +64,17 @@ const CommitteePage = () => {
     console.log('num Reports:', await contracts.contract.methods.getNumReports().call());
   }
 
-  const [input, setInput] = useState({
-    index: '',
-  })
+  const [id, setId] = useState('');
 
-  const handleInputChange = (e) => {
-    const value =
-      e.target.type === 'checkbox' ? e.target.checked : e.target.value
-      setInput({
-      ...input,
-      [e.target.name]: value,
-    })
-  }
+  const handleIdChange = (event) => {
+    const value = event.target.value;
+    if (!isNaN(value)) {
+      setId(value);
+    }
+  };
 
   const handleSubmit2 = async () => {
-    let acceptedReport = reports[input.index]
+    let acceptedReport = reports[id]
     await contracts.contract.methods
       .approveOrDismiss(acceptedReport.reportId, true)
       .send({
@@ -87,7 +83,7 @@ const CommitteePage = () => {
   }
 
   const handleSubmit3 = async () => {
-    let deniedReport = reports[input.index]
+    let deniedReport = reports[id]
     await contracts.contract.methods
       .approveOrDismiss(deniedReport.reportId, false)
       .send({
@@ -186,8 +182,8 @@ const CommitteePage = () => {
                     <label>Request #</label>
                     <Input
                       name="Index"
-                      onChange={handleInputChange}
-                      value={input.index}
+                      onChange={handleIdChange}
+                      value={id}
                       type="number"
                       color="primary"
                     />
@@ -213,8 +209,8 @@ const CommitteePage = () => {
                     <label>Request #</label>
                     <Input
                       name="Index"
-                      onChange={handleInputChange}
-                      value={input.index}
+                      onChange={handleIdChange}
+                      value={id}
                       type="number"
                       color="primary"
                     />

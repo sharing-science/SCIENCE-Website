@@ -89,23 +89,19 @@ const ApproveRequestsPage = () => {
   //   await handleSubmit()
   // }
 
-  const [input, setInput] = useState({
-    index: '',
-  })
+  const [id, setId] = useState('');
 
-  const handleInputChange = (e) => {
-    const value =
-      e.target.type === 'checkbox' ? e.target.checked : e.target.value
-      setInput({
-      ...input,
-      [e.target.name]: value,
-    })
-  }
+  const handleIdChange = (event) => {
+    const value = event.target.value;
+    if (!isNaN(value)) {
+      setId(value);
+    }
+  };
 
   //Accept
   const [isAccepted, setIsAccepted] = useState('')
   const handleSubmit2 = async () => {
-    let acceptedPerm = perms[input.index]
+    let acceptedPerm = perms[id]
     contracts.contract.methods
       .fulfillRequest(acceptedPerm.fileID, acceptedPerm.id, true)
       .send({
@@ -118,7 +114,7 @@ const ApproveRequestsPage = () => {
   //Deny
   const [isDenied, setIsDenied] = useState('')
   const handleSubmit3 = async () => {
-    let acceptedPerm = perms[input.index]
+    let acceptedPerm = perms[id]
     contracts.contract.methods
       .fulfillRequest(acceptedPerm.fileID, acceptedPerm.id, true)
       .send({
@@ -249,8 +245,8 @@ const ApproveRequestsPage = () => {
                   <label>Request #</label>
                   <Input
                     name="Index"
-                    onChange={handleInputChange}
-                    value={input.index}
+                    onChange={handleIdChange}
+                    value={id}
                     type="number"
                     step="1"
                     color="primary"
@@ -280,8 +276,8 @@ const ApproveRequestsPage = () => {
                   <label>Request #</label>
                   <Input
                     name="Index"
-                    onChange={handleInputChange}
-                    value={input.index}
+                    onChange={handleIdChange}
+                    value={id}
                     type="number"
                     color="primary"
                   />
