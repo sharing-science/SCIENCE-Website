@@ -80,7 +80,7 @@ const RequestFilePage = () => {
 
   const handleSubmit = async () => {
     const sender_address = contextValue.web3.accounts[0];
-    contracts.contract.methods.requestAccess(inputs.hash, 7).call({
+    contracts.contract.methods.requestAccess(inputs.hash, 7).send({
       from: sender_address,
     }).then((requested) =>{
       setRequested(requested);

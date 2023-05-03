@@ -99,7 +99,7 @@ const CreateNewFilePage = () => {
 
             //Handle Blockchain Contract
             console.log('hash:', hash);
-            contracts.contract.methods.newFile(resFile.data.IpfsHash, password, contextValue.web3.accounts[0]).call({
+            contracts.contract.methods.newFile(resFile.data.IpfsHash, password, contextValue.web3.accounts[0]).send({
               from: contextValue.web3.accounts[0],
             }).then((registered) => {
               console.log('Was file registered:', registered);

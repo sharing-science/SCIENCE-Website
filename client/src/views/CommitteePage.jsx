@@ -81,7 +81,7 @@ const CommitteePage = () => {
     let acceptedReport = reports[input.index]
     await contracts.contract.methods
       .approveOrDismiss(acceptedReport.reportId, true)
-      .call({
+      .send({
         from: contextValue.web3.accounts[0],
       })
   }
@@ -90,14 +90,14 @@ const CommitteePage = () => {
     let deniedReport = reports[input.index]
     await contracts.contract.methods
       .approveOrDismiss(deniedReport.reportId, false)
-      .call({
+      .send({
         from: contextValue.web3.accounts[0],
       })
   }
 
   const handleApply = async () => {
     setApplied(true);
-    await contracts.contract.methods.applyCM(contextValue.web3.accounts[0]).call({
+    await contracts.contract.methods.applyCM(contextValue.web3.accounts[0]).send({
       from: contextValue.web3.accounts[0],
     }).then((decision) => {
       setNewMember(decision);
@@ -150,7 +150,7 @@ const CommitteePage = () => {
                             <th className="text-center">#</th>
                             {/* <th>Requester</th>
                             <th>Action</th> */}
-                            <th>ID</th>
+                            {/* <th>ID</th> */}
                             <th>Defendant</th>
                             <th>Reporter</th>
                             <th>Hash</th>
@@ -158,14 +158,14 @@ const CommitteePage = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {reports.map((report, index) => (
-                            <div key={index}>
-                              <p>id: {report.reportId}</p>
-                              <p>defendant: {report.defendant}</p>
-                              <p>reporter: {report.reporter}</p>
-                              <p>hash: {report.cid}</p>
-                              <p>reason: {report.reason}</p>
-                            </div>
+                          {reports.map((report) => (
+                            <tr key={report.reportId}>
+                              <td>id: {report.reportId}</td>
+                              <td>defendant: {report.defendant}</td>
+                              <td>reporter: {report.reporter}</td>
+                              <td>hash: {report.cid}</td>
+                              <td>reason: {report.reason}</td>
+                            </tr>
                           ))
                           }
                         </tbody>
@@ -182,15 +182,15 @@ const CommitteePage = () => {
                   <CardHeader>
                     <h1>Vote Valid Report</h1>
                   </CardHeader>
-                  <label>Request #</label>
-                  <Input
-                    name="Index"
-                    onChange={handleInputChange}
-                    value={input.index}
-                    type="number"
-                    color="primary"
-                  />
                   <CardBody>
+                    <label>Request #</label>
+                    <Input
+                      name="Index"
+                      onChange={handleInputChange}
+                      value={input.index}
+                      type="number"
+                      color="primary"
+                    />
                     <Button
                       type="button"
                       className="btn-round"
@@ -209,15 +209,15 @@ const CommitteePage = () => {
                   <CardHeader>
                     <h1>Vote Invalid Report</h1>
                   </CardHeader>
-                  <label>Request #</label>
-                  <Input
-                    name="Index"
-                    onChange={handleInputChange}
-                    value={input.index}
-                    type="number"
-                    color="primary"
-                  />
                   <CardBody>
+                    <label>Request #</label>
+                    <Input
+                      name="Index"
+                      onChange={handleInputChange}
+                      value={input.index}
+                      type="number"
+                      color="primary"
+                    />
                     <Button
                       type="button"
                       className="btn-round"
