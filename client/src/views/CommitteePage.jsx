@@ -156,11 +156,11 @@ const CommitteePage = () => {
                         <tbody>
                           {reports.map((report) => (
                             <tr key={report.reportId}>
-                              <td>id: {report.reportId}</td>
-                              <td>defendant: {report.defendant}</td>
-                              <td>reporter: {report.reporter}</td>
-                              <td>hash: {report.cid}</td>
-                              <td>reason: {report.reason}</td>
+                              <td>{report.reportId}</td>
+                              <td>{report.defendant}</td>
+                              <td>{report.reporter}</td>
+                              <td>{report.cid}</td>
+                              <td>{report.reason}</td>
                             </tr>
                           ))
                           }

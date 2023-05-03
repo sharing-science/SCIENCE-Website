@@ -181,7 +181,7 @@ const NavBar = () => {
                 </DropdownItem>
                 <DropdownItem tag={Link} to="/download">
                   <i className="tim-icons icon-cloud-upload-94" />
-                  Download Page
+                  Download
                 </DropdownItem>
                 <DropdownItem tag={Link} to="/approveRequests">
                   <i className="tim-icons icon-cloud-upload-94" />
@@ -205,7 +205,7 @@ const NavBar = () => {
                 </DropdownItem>
                 <DropdownItem tag={Link} to="/approved">
                   <i className="tim-icons icon-cloud-upload-94" />
-                  Approved List
+                  See Approved List
                 </DropdownItem>
                 <DropdownItem tag={Link} to="/report">
                   <i className="tim-icons icon-cloud-upload-94" />
